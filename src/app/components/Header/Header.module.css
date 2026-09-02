@@ -1,0 +1,22 @@
+.header {
+    width: 100%;
+    max-width: 782px;
+    height: 56px;
+    background: white;
+    margin: 0 auto;
+    padding: 0 100px;
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+}
+
+.nav .navItems {
+    display: flex;
+}
+
+.nav .logo {
+    width: 113px;
+    height: 40px;
+}

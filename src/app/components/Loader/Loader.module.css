@@ -1,0 +1,40 @@
+.loader {
+    margin: auto;
+}
+
+.square {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--darkOrange);
+  animation: square-loader 1.2s ease-in-out infinite;
+}
+
+.delay1 {
+  animation-delay: 0ms;
+}
+
+.delay2 {
+  animation-delay: 150ms;
+}
+
+.delay3 {
+  animation-delay: 300ms;
+}
+
+.delay4 {
+  animation-delay: 450ms;
+}
+
+@keyframes square-loader {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+
+  25% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
