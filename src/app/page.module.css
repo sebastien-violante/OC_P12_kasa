@@ -1,0 +1,65 @@
+.cardWrapper {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+.explanations {
+    background: white;
+    padding: 40px;
+}
+
+.hero {
+  margin: 40px 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+}
+
+.hero h1 {
+  color: var(--mainRed);
+  font-size: 32px;
+  font-weight: var(--weight-bold);
+}
+
+.hero p {
+  font-size: 14px;
+}
+
+.heroPictureContainer {
+  width: 100%;
+  max-width: 1115px;
+  height: 458px;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  margin-top: 32px;
+}
+
+.heroPictureContainer img {
+  width: 1115px;
+  height: auto;
+  max-width: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.homeWrapper {
+  width: 100%;
+  max-width: 1115px;
+  margin: auto;
+}
+
+.tiles {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    gap: 16px;
+}
