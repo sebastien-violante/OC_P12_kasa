@@ -12,7 +12,9 @@
   --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
-
+  --weight-extrabold: 800;
+  --weight-black: 900;
+  
   --box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
