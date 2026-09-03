@@ -7,7 +7,18 @@
 
 .explanations {
     background: white;
-    padding: 40px;
+    padding: 40px 8px;
+    text-align: center;
+}
+
+.explanations h2 {
+  font-size: 24px;
+  font-weight: var(--weight-semibold);
+  margin-bottom: 16px;
+}
+
+.explanations > p {
+  font-size: 14px;
 }
 
 .hero {
@@ -55,6 +66,13 @@
   margin: auto;
 }
 
+.loadMore {
+  font-weight: var(--weight-bold);
+  padding: 30px;
+  color: var(--darkOrange);
+  cursor: pointer;
+}
+
 .tiles {
     display: flex;
     flex-wrap: wrap;
@@ -62,4 +80,10 @@
     justify-content: center;
     padding: 40px 0;
     gap: 16px;
+}
+
+@media (min-width: 1200px) {
+  .explanations {
+    padding: 40px;
+  }
 }

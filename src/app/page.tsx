@@ -12,11 +12,16 @@ import Image from "next/image";
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [properties, setProperties] = useState<Property[] | null>(null);
+  const [visibleCards, setVisibleCards] = useState(6)  // nombre de cartes visibles par lot
+
+  const loadMoreProperties = () => {
+    setVisibleCards(prev => prev+6)
+  }
+
   useEffect(() => {
     const loadProperties = async () => {
       try {
         const properties = await getRequest<Property[]>("api/properties");
-        console.log(properties);
         setProperties(properties);
         setLoading(false);
       } catch (error) {
@@ -46,13 +51,19 @@ export default function Home() {
         </div>
       </section>
       <section className={styles.cardWrapper} aria-label="nos logements">
-        {properties?.map((property) => (
+        {properties?.slice(0, visibleCards).map((property) => (
           <PropertyCard property={property} key={property.slug} />
         ))}
+        {properties && visibleCards < properties.length && (
+          <button 
+            onClick={loadMoreProperties}
+            className={styles.loadMore}
+          >Voir plus de logements...</button>
+        )}
       </section>
       <section className={styles.explanations}>
         <h2>Comment ça marche ?</h2>
-        <p>Que vous partiez pour un week-end improvisé, des vacances en famille ou un voyage professionnel, Kasa vous aide à trouver un lieu qui vous ressemble.</p>
+        <p>Que vous partiez pour un week-end improvisé, des vacances en famille ou un voyage professionnel, <br/>Kasa vous aide à trouver un lieu qui vous ressemble.</p>
         <div className={styles.tiles}>
           <Tile title={"Recherchez"} description={"Entrez votre destination, vos dates et laissez Kasa faire le reste"}/>
           <Tile title={"Réservez"} description={"Profitez d’une plateforme sécurisée et de profils d’hôtes vérifiés."}/>
