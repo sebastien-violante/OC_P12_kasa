@@ -4,7 +4,7 @@
   --mainRed: #99331A;
   --darkOrange: #842C16;
   --lightOrange: #FFFBF9;
-  --noir: #FFFBF9;
+  --noir: #0D0D0D;
   --grisLight: #F5F5F5;
   --grisDark: #565656;
 
@@ -25,7 +25,7 @@ body {
 }
 
 
-@media (min-width: 1200px) {
+@media (min-width: 767px) {
   body {
     margin-top: 40px;
   }

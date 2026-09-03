@@ -63,7 +63,7 @@
 .homeWrapper {
   width: 100%;
   max-width: 1115px;
-  margin: auto;
+  margin: 20px auto;
 }
 
 .loadMore {
@@ -82,8 +82,11 @@
     gap: 16px;
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 767px) {
   .explanations {
     padding: 40px;
+  }
+  .homeWrapper {
+    margin: auto;
   }
 }
