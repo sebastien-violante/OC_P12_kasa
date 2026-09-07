@@ -121,7 +121,7 @@ export default function Inscription() {
           )}
         </div>
         <div className={styles.formGroup}>
-          <label htmlFor="firstname">Prenom</label>
+          <label htmlFor="firstname">Prénom</label>
           <input
             id="firstname"
             name="firstname"

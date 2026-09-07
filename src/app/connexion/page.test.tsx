@@ -16,7 +16,7 @@ jest.mock("../utils/postRequest", () => ({
   __esModule: true,
   default: jest.fn(),
 }));
-const mockedPostRequest = jest.mocked(postRequest);
+const mockedPostRequest = jest.mocked(postRequest)
 
 describe("Page de connexion", () => {
   // MONTAGE DE LA PAGE //////////////////////////////////////////////////////////////////////////////////
@@ -127,4 +127,4 @@ describe("Page de connexion", () => {
     expect(apiError).toBeInTheDocument();
     expect(apiError).toHaveAttribute("role", "alert");
   });
-});
+})

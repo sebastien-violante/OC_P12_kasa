@@ -2,10 +2,10 @@ import { z } from "zod";
 
 export const registerSchema = z.object({
   firstname: z.string().regex(/^[A-Za-zÀ-ÖØ-öø-ÿ]{2,}$/, {
-    message: "Le prénom doit contenir au moins 2 caractères.",
+    message: "Le prénom doit contenir au moins 2 caractères",
   }),
   name: z.string().regex(/^[A-Za-zÀ-ÖØ-öø-ÿ]{2,}$/, {
-    message: "Le nom doit contenir au moins 2 caractères.",
+    message: "Le nom doit contenir au moins 2 caractères",
   }),
   email: z.email("Le format de l'email est invalide"),
   password: z
@@ -18,7 +18,7 @@ export const registerSchema = z.object({
       "Le mot de passe doit contenir au moins 1 caractère spécial",
     ),
   acceptCgu: z.boolean().refine((value) => value === true, {
-    message: "Vous devez accepter les conditions avant de vous inscrire.",
+    message: "Vous devez accepter les conditions avant de vous inscrire",
   }),
 });
 
