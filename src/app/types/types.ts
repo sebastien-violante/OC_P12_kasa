@@ -71,7 +71,18 @@ export type RegistrationResponse = {
     user: User;
 }
 
+// Types d'envoi et de réponse pour l'authentification
+export type AuthenticationPayload = {
+  email: string;
+  password: string;
+};
+
+export type AuthenticationResponse = {
+    token: string;
+    user: User;
+}
+
 export type FlashType = {
-  type: "success" | "warning" | "alert";
+  type: "success" | "warning" | "fail";
   message: string;
 };

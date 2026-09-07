@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { FlashType } from "@/app/types/types";
 
-type FlashMessageProps = {
-  status: boolean;
-  message: string;
-};
-
-export default function FlashMessage({ status, message }: FlashMessageProps) {
+export default function FlashMessage({ type, message }: FlashType) {
   const [isVisible, setIsVisible] = useState(true);
+
+  const backgroundColors = {
+    success: "#99331A",
+    warning: "#565656",
+    fail: "#0D0D0D"
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -24,11 +26,10 @@ export default function FlashMessage({ status, message }: FlashMessageProps) {
 
   return (
     <div
-      className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg ${
-        status ? "bg-green-500" : "bg-red-500"
-      } px-6 py-4 text-white shadow-lg`}
-      role={status ? "status" : "alert"}
-      aria-live={status ? "polite" : "assertive"}
+      style={{backgroundColor: backgroundColors[type], color: "white"}}
+      className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg px-6 py-4 text-white shadow-lg`}
+      //role={status ? "status" : "alert"}
+      //aria-live={status ? "polite" : "assertive"}
     >
       {message}
     </div>

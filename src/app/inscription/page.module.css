@@ -7,6 +7,8 @@
     flex-direction: column;
     align-items: center;
     padding: 80px 0;
+    border: 1px solid var(--grisLight);
+    border-radius: 10px;
 }
 
 .formHeader {
@@ -44,7 +46,7 @@
     border: 1px solid var(--grisLight);
     border-radius: 4px;
     font-size: 14px;
-    font-weight: var(--weight-bold);
+    color: var(--mainRed);
     padding-left: 10px;
 }
 
@@ -79,4 +81,10 @@
 .connect {
     color: var(--mainRed);
     font-size: 14px;
+}
+
+.apiError {
+    color: red;
+    width: 100%;
+    text-align: center;
 }

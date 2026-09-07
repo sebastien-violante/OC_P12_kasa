@@ -74,7 +74,7 @@ export default function Header() {
               className={styles.logoMobile}
             />
             <button onClick={expandMenu}>
-              <img src={`/pictures/${menuExpanded ? "cross" : "burger"}.svg`} />
+              <img src={`/pictures/${menuExpanded ? "cross" : "burger"}.svg`} alt="ouverture/fermeture du menu"/>
             </button>
           </div>
 
