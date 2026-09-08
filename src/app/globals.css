@@ -2,6 +2,7 @@
 
 :root {
   --mainRed: #99331A;
+  --mainRedOpacified: rgba(153, 51, 26, .1);
   --darkOrange: #842C16;
   --lightOrange: #FFFBF9;
   --noir: #0D0D0D;

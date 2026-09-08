@@ -55,6 +55,10 @@
     position: relative;
 }
 
+.pictureContainer img {
+    object-fit: cover;
+}
+
 .price {
     font-size: 14px;
     font-weight: var(--weight-medium);

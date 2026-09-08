@@ -5,20 +5,23 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "http://localhost:8000/:path*",
+        destination: "http://localhost:8000/api/:path*",
+      },
+      {
+        source: "/auth/:path*",
+        destination: "http://localhost:8000/auth/:path*",
       },
     ];
   },
-  // Ajout configuration pour récupération des images depuis AWS
+
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 's3-eu-west-1.amazonaws.com',
+        protocol: "https",
+        hostname: "s3-eu-west-1.amazonaws.com",
       },
     ],
   },
-
 };
 
 export default nextConfig;

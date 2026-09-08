@@ -9,7 +9,7 @@ type PropertyCardProps = {
 export default function PropertyCard({ property }: PropertyCardProps) {
   return (
     <article className={styles.card}>
-      <Link href="#">
+      <Link href={`/property/${property.id}`}>
         <div className={styles.pictureContainer}>
           <Image src={property.cover} alt={`photo du logement ${property.title}`} fill />
         </div>

@@ -1,0 +1,90 @@
+.formWrapper{
+    width: 100%;
+    max-width: 742px;
+    margin: 40px auto;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 80px 0;
+    border: 1px solid var(--grisLight);
+    border-radius: 10px;
+}
+
+.formHeader {
+    text-align: center;
+    padding: 0 80px;
+}
+
+.formHeader h1 {
+    font-size: 32px;
+    font-weight: var(--weight-bold);
+    color: var(--mainRed);
+    margin-bottom: 8px;
+}
+
+.formHeader p {
+    font-size: 14px;
+    max-width: 488px;
+}
+
+.form {
+    margin: 38px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.formGroup label {
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.formGroup input {
+    width: 100%;
+    height: 40px;
+    border: 1px solid var(--grisLight);
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--mainRed);
+    padding-left: 10px;
+}
+
+.acceptCgu {
+    display: flex;
+    gap: 10px;
+}
+
+.acceptCgu > label {
+    font-size: 12px;
+    color: var(--grisDark);
+}
+
+.fieldError {
+    color: var(--mainRed);
+    font-size: 12px;
+}
+
+.inputOnError {
+  background: var(--mainRedOpacified);
+}
+
+.submitBtn {
+    width: 230px;
+    height: 36px;
+    color: white;
+    background: var(--mainRed);
+    border-radius: 10px;
+    margin: auto;
+}
+
+.connect {
+    color: var(--mainRed);
+    font-size: 14px;
+}
+
+.apiError {
+    color: red;
+    width: 100%;
+    text-align: center;
+}

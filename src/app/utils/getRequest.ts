@@ -7,7 +7,7 @@
 export default async function getRequest<T>(url : string): Promise<T> {
   
     const headers: HeadersInit = { "Content-Type": "application/json" };
-    const response = await fetch(`api/${url}`, { method: "GET", headers });
+    const response = await fetch(url, { method: "GET", headers });
     //const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
     if (!response.ok) {
         throw new Error(`Erreur HTTP : ${response.status}`);

@@ -8,12 +8,13 @@ import PropertyCard from "./components/PropertyCard/PropertyCard";
 import Tile from "./components/Tile/Tile";
 import styles from "./page.module.css";
 import Image from "next/image";
+import Cookies from "js-cookie";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [properties, setProperties] = useState<Property[] | null>(null);
   const [visibleCards, setVisibleCards] = useState(6)  // nombre de cartes visibles par lot
-
+  const [token, setToken] = useState<string | null>(null)
   const loadMoreProperties = () => {
     setVisibleCards(prev => prev+6)
   }
@@ -32,15 +33,16 @@ export default function Home() {
     loadProperties();
   }, []);
 
+  useEffect(() => {
+    const token = Cookies.get("token")
+    if(token) {setToken(token)}
+    }, [token])
+
   return (
     <main className={styles.homeWrapper}>
-      {loading && (
-        <div role="status" aria-live="polite">
-          <Loader />
-          <span className="sr-only">Chargement des logements…</span>
-        </div>
-      )}
+      
       <section className={styles.hero}>
+        { token && (<p>{token}</p>)}
         <h1>Chez vous, partout et ailleurs</h1>
         <p>
           Avec Kasa, vivez des séjours uniques dans des hébergements chaleureux,
@@ -50,6 +52,12 @@ export default function Home() {
           <img src="/pictures/hero.png" alt="" />
         </div>
       </section>
+      {loading && (
+        <div role="status" aria-live="polite">
+          <Loader />
+          <span className="sr-only">Chargement des logements…</span>
+        </div>
+      )}
       <section className={styles.cardWrapper} aria-label="nos logements">
         {properties?.slice(0, visibleCards).map((property) => (
           <PropertyCard property={property} key={property.slug} />
