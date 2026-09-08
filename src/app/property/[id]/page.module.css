@@ -1,0 +1,174 @@
+.top {
+  width: 100%;
+  max-width: 971px;
+  margin: auto;
+}
+
+.top .backToProperties {
+  padding: 10px 16px;
+  background: var(--grisLight);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 193px;
+  gap: 5px;
+  font-size: 14px;
+  margin-bottom: 40px;
+}
+
+.mainWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  margin: auto;
+}
+
+.property {
+  max-width: 616px;
+}
+
+.property .grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 420px 110px;
+  gap: 10px;
+}
+
+.property .item {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.property .image {
+  object-fit: cover;
+}
+
+.property .cover {
+  object-fit: cover;
+  object-position: left bottom;
+}
+
+.property .item:first-child {
+  grid-row: span 1;
+  grid-column: span 4;
+}
+
+.property .item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.property .tags {
+  display: flex;
+  gap: 8px;
+  max-width: 350px;
+  flex-wrap: wrap;
+}
+
+.property .data {
+  padding: 24px;
+  background: white;
+  border-radius: 10px;
+  margin-top: 24px;
+}
+
+.property .data h1 {
+  font-size: 24px;
+  font-weight: var(--weight-medium);
+  margin-bottom: 16px;
+}
+
+.property .data h2 {
+  margin: 40px 0 16px 0;
+}
+
+.property .data .location {
+  font-size: 14px;
+  color: var(--grisDark);
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.property .data .description {
+  font-size: 14px;
+}
+
+.host {
+  padding: 24px;
+  background: white;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 616px;
+  height: 280px;
+}
+
+.host .data {
+  height: 114px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.host .data img {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.host .data .rating {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--grisLight);
+}
+
+.host .data .rating img {
+  width: 20px;
+  height: 20px;
+}
+
+.host .link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 36px;
+  background: var(--mainRed);
+  color: white;
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+@media screen and (min-width: 767px) {
+  .property .grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 174px);
+  gap: 10px;
+}
+  .property .item:first-child {
+    grid-row: span 2;
+    grid-column: span 2;
+  }
+}
+@media screen and (min-width: 1021px) {
+  .mainWrapper {
+    flex-direction: row;
+    align-items: flex-start;
+    width: 971px;
+  }
+  .host {
+    width: 345px;
+  }
+}

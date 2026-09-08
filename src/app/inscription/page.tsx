@@ -63,7 +63,7 @@ export default function Inscription() {
         RegistrationPayload,
         RegistrationResponse
       >({
-        url: "/api/auth/register",
+        url: "/auth/register",
         payload,
       });
       if (result.data) {

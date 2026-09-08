@@ -9,6 +9,9 @@ export type Property = {
     rating_counts: number;
     slug: string;
     title: string;
+    pictures?: string[];
+    equipments?: string[];
+    tags?: string[];
 };
 
 export type Host = {

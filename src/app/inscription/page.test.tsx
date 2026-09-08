@@ -143,7 +143,7 @@ describe("Page de connexion", () => {
   });
 
   // TEST DE CONNEXION AVEC DONNEES INVALIDES
-  it("affiche le message lorsque l'API renvoie une erreur", async () => {
+  it("affiche un message lorsque l'API renvoie une erreur", async () => {
     const user = userEvent.setup();
 
     mockedPostRequest.mockRejectedValue({

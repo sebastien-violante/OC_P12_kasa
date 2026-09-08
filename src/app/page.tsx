@@ -40,12 +40,7 @@ export default function Home() {
 
   return (
     <main className={styles.homeWrapper}>
-      {loading && (
-        <div role="status" aria-live="polite">
-          <Loader />
-          <span className="sr-only">Chargement des logements…</span>
-        </div>
-      )}
+      
       <section className={styles.hero}>
         { token && (<p>{token}</p>)}
         <h1>Chez vous, partout et ailleurs</h1>
@@ -57,6 +52,12 @@ export default function Home() {
           <img src="/pictures/hero.png" alt="" />
         </div>
       </section>
+      {loading && (
+        <div role="status" aria-live="polite">
+          <Loader />
+          <span className="sr-only">Chargement des logements…</span>
+        </div>
+      )}
       <section className={styles.cardWrapper} aria-label="nos logements">
         {properties?.slice(0, visibleCards).map((property) => (
           <PropertyCard property={property} key={property.slug} />

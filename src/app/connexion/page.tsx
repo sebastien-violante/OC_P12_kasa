@@ -52,7 +52,7 @@ export default function Connexion() {
         AuthenticationPayload,
         AuthenticationResponse
       >({
-        url: "/api/auth/login",
+        url: "/auth/login",
         payload,
       });
       if (result.data) {
