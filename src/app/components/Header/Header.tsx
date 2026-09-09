@@ -36,7 +36,7 @@ export default function Header() {
               </Link>
             </li>
             <li>
-              <Link href="/about" className={styles.text}>
+              <Link href="/a-propos" className={styles.text}>
                 A propos
               </Link>
             </li>
