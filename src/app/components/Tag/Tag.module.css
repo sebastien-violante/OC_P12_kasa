@@ -1,5 +1,4 @@
 .span {
-    min-width: 100px;
     height: 33px;
     background: var(--grisLight);
     border-radius: 5px;
@@ -8,5 +7,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 5px;
+    padding: 0 10px;
+}
+
+.selected {
+    background: var(--mainRed);
+    color: white;
 }

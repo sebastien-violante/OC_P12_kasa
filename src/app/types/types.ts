@@ -85,6 +85,21 @@ export type AuthenticationResponse = {
     user: User;
 }
 
+
+// Types d'envoi formulaire propriété 
+export type PropertyFormData = {
+  title: string;
+  description: string;
+  postalCode: string;
+  location: string;
+  cover: string;
+  pictures: string[];
+  name: string;
+  profile: string;
+  equipments: string[];
+  categories: string[];
+};
+
 export type FlashType = {
   type: "success" | "warning" | "fail";
   message: string;

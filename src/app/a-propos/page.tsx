@@ -30,7 +30,6 @@ export default function About() {
         <div className={styles.left}>
           <div className={styles.items}>
             <h2>Notre mission est simple :</h2>
-
             <ol>
               <li>Offrir une plateforme fiable et simple d’utilisation</li>
               <li>Proposer des hébergements variés et de qualité</li>
@@ -40,7 +39,6 @@ export default function About() {
               </li>
             </ol>
           </div>
-
           <div className={styles.slogan}>
             Que vous cherchiez un appartement cosy en centre-ville, une maison
             en bord de mer ou un chalet à la montagne, Kasa vous accompagne pour
@@ -49,12 +47,7 @@ export default function About() {
         </div>
 
         <div className={styles.pictureWrapper}>
-          <Image
-            src="/pictures/about2.png"
-            alt=""
-            fill
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
+          <Image fill src="/pictures/about2.png" alt="" />
         </div>
       </section>
     </>

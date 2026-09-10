@@ -39,33 +39,32 @@ export default function Property() {
     <>
       <section className={styles.top}>
         <Link href="/">
-        <div className={styles.backToProperties}>
-          <img src="/pictures/back-arrow.svg" alt=""/>
-        <span>Retour aux annonces</span>
-        </div>
-      </Link>
-      {loading && (
-        <div role="status" aria-live="polite">
-          <Loader />
-          <span className="sr-only">Chargement des logements…</span>
-        </div>
-      )}
+          <div className={styles.backToProperties}>
+            <img src="/pictures/back-arrow.svg" alt="" />
+            <span>Retour aux annonces</span>
+          </div>
+        </Link>
+        {loading && (
+          <div role="status" aria-live="polite">
+            <Loader />
+            <span className="sr-only">Chargement des logements…</span>
+          </div>
+        )}
       </section>
-      
+
       <div className={styles.mainWrapper}>
         <section className={styles.property}>
           <div className={styles.grid}>
             <div className={styles.item}>
               {property?.cover && (
                 <Image
-                src={property?.cover}
-                fill
-                alt={`image de couverture de la propriété ${property?.title}`}
-                className={styles.cover}
-                priority
-              />
+                  src={property?.cover}
+                  fill
+                  alt={`image de couverture de la propriété ${property?.title}`}
+                  className={styles.cover}
+                  priority
+                />
               )}
-              
             </div>
             {property?.pictures?.slice(1).map((picture, index) => (
               <div key={index} className={styles.item}>
@@ -90,7 +89,7 @@ export default function Property() {
               <h2>Equipements</h2>
               <div className={styles.tags}>
                 {property?.equipments?.map((equipment) => (
-                  <Tag key={equipment} item={equipment} />
+                  <Tag key={equipment} item={equipment} select={false} />
                 ))}
               </div>
             </div>
@@ -98,7 +97,7 @@ export default function Property() {
               <h2>Catégorie</h2>
               <div className={styles.tags}>
                 {property?.tags?.map((tag) => (
-                  <Tag key={tag} item={tag} />
+                  <Tag key={tag} item={tag} select={true} />
                 ))}
               </div>
             </div>
@@ -110,27 +109,25 @@ export default function Property() {
             <div>
               {property?.host.picture && (
                 <Image
-                src={property?.host.picture ?? ""}
-                alt={property?.host.name ?? ""}
-                height="82"
-                width="82"
-              />
+                  src={property?.host.picture ?? ""}
+                  alt={property?.host.name ?? ""}
+                  height="82"
+                  width="82"
+                />
               )}
-              
             </div>
             <p>{property?.host.name}</p>
             <div className={styles.rating}>
               <img src="/pictures/star-full.svg" alt="" />
               {property?.rating_avg ?? 0}
             </div>
-            
           </div>
           <Link href="#" className={styles.link}>
-              Contacter l&apos;hôte
-            </Link>
-            <Link href="#" className={styles.link}>
-              Envoyer un message
-            </Link>
+            Contacter l&apos;hôte
+          </Link>
+          <Link href="#" className={styles.link}>
+            Envoyer un message
+          </Link>
         </section>
       </div>
     </>

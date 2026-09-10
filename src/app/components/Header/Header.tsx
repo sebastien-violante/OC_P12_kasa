@@ -50,7 +50,7 @@ export default function Header() {
               </Link>
             </li>
             <li>
-              <Link href="/add-property" className={styles.button}>
+              <Link href="/ajouter-une-propriete" className={styles.button}>
                 +Ajouter un logement
               </Link>
             </li>
