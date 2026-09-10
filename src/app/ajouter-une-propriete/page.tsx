@@ -15,7 +15,7 @@ export default function Addproperty() {
       ...formData,
       cover: cover,
       profile: profile,
-      pictures: images
+      pictures: images,
     };
 
     console.log("FORMDATA", data);
@@ -45,40 +45,37 @@ export default function Addproperty() {
 
   // Captation des données d'enregistrement dans FormData
   const handleInputValue = (
-  event: ChangeEvent<
-    HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-  >
-) => {
-  const target = event.target;
+    event: ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    const target = event.target;
 
-  if (
-    target instanceof HTMLInputElement &&
-    target.type === "checkbox"
-  ) {
-    setFormData((prev) => {
-      if (target.checked) {
+    if (target instanceof HTMLInputElement && target.type === "checkbox") {
+      setFormData((prev) => {
+        if (target.checked) {
+          return {
+            ...prev,
+            equipments: [...prev.equipments, target.name],
+          };
+        }
+
         return {
           ...prev,
-          equipments: [...prev.equipments, target.name],
+          equipments: prev.equipments.filter(
+            (equipment) => equipment !== target.name,
+          ),
         };
-      }
+      });
 
-      return {
-        ...prev,
-        equipments: prev.equipments.filter(
-          (equipment) => equipment !== target.name
-        ),
-      };
-    });
+      return;
+    }
 
-    return;
-  }
-
-  setFormData((prev) => ({
-    ...prev,
-    [target.name]: target.value,
-  }));
-};
+    setFormData((prev) => ({
+      ...prev,
+      [target.name]: target.value,
+    }));
+  };
 
   function handleCoverChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -95,19 +92,19 @@ export default function Addproperty() {
   }
 
   function handleImageChange(
-  index: number,
-  event: ChangeEvent<HTMLInputElement>
-) {
-  const file = event.target.files?.[0];
+    index: number,
+    event: ChangeEvent<HTMLInputElement>,
+  ) {
+    const file = event.target.files?.[0];
 
-  if (!file) return;
+    if (!file) return;
 
-  setImages((prev) => {
-    const newImages = [...prev];
-    newImages[index] = file;
-    return newImages;
-  });
-}
+    setImages((prev) => {
+      const newImages = [...prev];
+      newImages[index] = file;
+      return newImages;
+    });
+  }
 
   function handleNewTagChange(value: string) {
     setNewTag(value);
@@ -162,18 +159,23 @@ export default function Addproperty() {
   return (
     <>
       <section className={styles.header}>
-        <Link href="/">
-          <button className={styles.backToProperties}>
-            <img src="/pictures/back-arrow.svg" alt="" />
-            <span>Retour</span>
-          </button>
+        <Link href="/" className={styles.backToProperties}>
+          <img src="/pictures/back-arrow.svg" alt="" />
+          <span>Retour</span>
         </Link>
+        
+      </section>
+      <form
+        className={styles.form}
+        onSubmit={(event) => {
+          event.preventDefault();
+          addPorperty();
+        }}
+      >
         <div className={styles.top}>
           <h1>Ajouter une propriété</h1>
-          <button onClick={addPorperty}>Ajouter</button>
+          <button type="submit">Ajouter</button>
         </div>
-      </section>
-      <form className={styles.form}>
         <article className={styles.mainData}>
           <div className={styles.formGroup}>
             <label htmlFor="title">Titre de la propriété</label>
@@ -225,16 +227,20 @@ export default function Addproperty() {
           <div className={styles.choosePictures}>
             <div className={styles.formGroup}>
               {/* Image de couverture */}
-              <label>Image de couverture</label>
+              <label htmlFor="coverFileName">Image de couverture</label>
               <div className={styles.inputWrapper}>
                 <input
+                  id="coverFileName"
                   type="text"
                   value={cover?.name || ""}
                   onChange={handleInputValue}
                   readOnly
                 />
                 <label htmlFor="coverImage" className={styles.addButton}>
-                  +
+                  <span aria-hidden="true">+</span>
+                  <span className={styles.srOnly}>
+                    Choisir une image de couverture
+                  </span>
                 </label>
                 <input
                   id="coverImage"
@@ -246,18 +252,26 @@ export default function Addproperty() {
               </div>
 
               {/* Images du logement */}
-              <label>Images du logement</label>
+              <label htmlFor="propertyPictures">Images du logement</label>
 
               {images?.map((image, index) => (
                 <div className={styles.formGroup} key={index}>
                   <div className={styles.inputWrapper}>
-                    <input type="text" value={image?.name || ""} readOnly />
+                    <input
+                      id="propertyPictures"
+                      type="text"
+                      value={image?.name || ""}
+                      readOnly
+                    />
 
                     <label
                       htmlFor={`image-${index}`}
                       className={styles.addButton}
                     >
-                      +
+                      <span aria-hidden="true">+</span>
+                      <span className={styles.srOnly}>
+                        Choisir une image du logement
+                      </span>
                     </label>
 
                     <input
@@ -293,10 +307,11 @@ export default function Addproperty() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Photo de profil</label>
+                <label htmlFor="profilePicture">Photo de profil</label>
 
                 <div className={styles.inputWrapper}>
                   <input
+                    id="profilePicture"
                     type="text"
                     value={profile?.name || ""}
                     onChange={handleInputValue}
@@ -304,7 +319,10 @@ export default function Addproperty() {
                   />
 
                   <label htmlFor="profile" className={styles.addButton}>
-                    +
+                    <span aria-hidden="true">+</span>
+                    <span className={styles.srOnly}>
+                      Choisir une photo de profil
+                    </span>
                   </label>
 
                   <input
@@ -319,8 +337,8 @@ export default function Addproperty() {
             </div>
           </div>
         </article>
-        <article className={styles.equipments}>
-          <p className={styles.sectionLabel}>Équipements</p>
+        <fieldset className={styles.equipments}>
+          <legend className={styles.sectionLabel}>Équipements</legend>
           <div className={styles.checkboxes}>
             {equipements.map((equipment) => (
               <div className={styles.checkbox} key={equipment}>
@@ -328,15 +346,16 @@ export default function Addproperty() {
                   type="checkbox"
                   id={equipment}
                   name={equipment}
+                  checked={formData.equipments.includes(equipment)}
                   onChange={handleInputValue}
                 />
                 <label htmlFor={equipment}>{equipment}</label>
               </div>
             ))}
           </div>
-        </article>
-        <article className={styles.categories}>
-          <p className={styles.sectionLabel}>Catégories</p>
+        </fieldset>
+        <fieldset className={styles.categories}>
+          <legend className={styles.sectionLabel}>Catégories</legend>
           <div className={styles.categoryList}>
             {tags.map((tag) => (
               <Tag
@@ -349,7 +368,7 @@ export default function Addproperty() {
             ))}
           </div>
 
-          <label>Ajouter une catégorie personnalisée</label>
+          <label htmlFor="newTag">Ajouter une catégorie personnalisée</label>
 
           <div className={styles.formGroup}>
             <div className={styles.inputWrapper}>
@@ -360,16 +379,17 @@ export default function Addproperty() {
                 value={newTag}
               />
 
-              <label
-                htmlFor="newTag"
+              <button
+                type="button"
                 className={styles.addButton}
                 onClick={() => handleAddTag()}
+                aria-label="Ajouter la catégorie"
               >
-                +
-              </label>
+                 <span aria-hidden="true">+</span>
+              </button>
             </div>
           </div>
-        </article>
+        </fieldset>
       </form>
     </>
   );

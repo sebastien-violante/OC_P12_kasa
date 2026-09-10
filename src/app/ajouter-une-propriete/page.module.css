@@ -157,7 +157,7 @@
     .categoryList {
       display: flex;
       flex-wrap: wrap;
-      gap:10px;
+      gap: 10px;
       margin-bottom: 16px;
     }
 
@@ -166,7 +166,17 @@
     }
   }
 
-
+  .srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 }
 
 @media screen and (max-width: 1200px) {
@@ -187,8 +197,7 @@
     .mainData,
     .pictures,
     .equipments,
-    .categories
-     {
+    .categories {
       padding: 16px;
       width: 100%;
     }
