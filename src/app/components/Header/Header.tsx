@@ -3,13 +3,21 @@
 import { useState, useRef, useEffect } from "react";
 import styles from "./Header.module.css";
 import Link from "next/link";
+import Cookies from "js-cookie";
 
 export default function Header() {
   const [menuExpanded, setMenuExpanded] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+
   const menuRef = useRef<HTMLDivElement>(null); // reférence pour détecter un clic hors du menu et le refermer
   const expandMenu = () => {
     setMenuExpanded((prev) => !prev);
   };
+
+  useEffect(() => {
+    setToken(token);
+    console.log(token);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -49,21 +57,36 @@ export default function Header() {
                 />
               </Link>
             </li>
-            <li>
-              <Link href="/ajouter-une-propriete" className={styles.button}>
-                +Ajouter un logement
+
+            {token && (
+              <>
+                <li>
+                  <Link href="/ajouter-une-propriete" className={styles.button}>
+                    +Ajouter un logement
+                  </Link>
+                </li>
+                <li className={styles.icon}>
+                  <Link href="/mes-favoris" aria-label="Mes favoris">
+                    <img src="/pictures/heart-nav.svg" alt="" />
+                  </Link>
+                </li>
+                <li className={styles.icon}>
+                  <Link href="/" aria-label="Mes messages">
+                    <img src="/pictures/message-nav.svg" alt="" />
+                  </Link>
+                </li>
+                <li className={styles.icon}>
+                  <Link href="/" aria-label="Déconnexion">
+                    <img src="/pictures/cross.svg" alt="" />
+                  </Link>
+                </li>
+              </>
+            )}
+            {!token && (
+              <Link href="/connexion" className={styles.button}>
+                Connexion
               </Link>
-            </li>
-            <li className={styles.icon}>
-              <Link href="/mes-favoris" aria-label="Mes favoris">
-                <img src="/pictures/heart-nav.svg" alt="" />
-              </Link>
-            </li>
-            <li className={styles.icon}>
-              <Link href="/" aria-label="Mes messages">
-                <img src="/pictures/message-nav.svg" alt="" />
-              </Link>
-            </li>
+            )}
           </ul>
         </div>
         <div className={styles.mobileMenu} ref={menuRef}>
@@ -74,7 +97,10 @@ export default function Header() {
               className={styles.logoMobile}
             />
             <button onClick={expandMenu}>
-              <img src={`/pictures/${menuExpanded ? "cross" : "burger"}.svg`} alt="ouverture/fermeture du menu"/>
+              <img
+                src={`/pictures/${menuExpanded ? "cross" : "burger"}.svg`}
+                alt="ouverture/fermeture du menu"
+              />
             </button>
           </div>
 
@@ -90,21 +116,38 @@ export default function Header() {
                   A propos
                 </Link>
               </li>
-              <li>
+              {token && (
+                <>
+                <li>
                 <Link href="/messages" aria-label="Mes messages">
                   Messagerie
                 </Link>
               </li>
               <li>
-                <Link href="/favorites" aria-label="Mes favoris">
+                <Link href="/mes-favoris" aria-label="Mes favoris">
                   Favoris
                 </Link>
               </li>
               <li>
-                <Link href="/add-property" aria-label="Mes favoris">
+                <Link href="/ajouter-une-propriete" aria-label="Ajouter un logement">
                   Ajouter un logement
                 </Link>
               </li>
+              <li>
+                <Link href="/" aria-label="Déconnexion">
+                  Déconnexion
+                </Link>
+              </li>
+                </>
+              )}
+              {!token && (
+                <li>
+                <Link href="/connexion" aria-label="Déconnexion">
+                  Connexion
+                </Link>
+              </li>
+              )}
+              
             </ul>
           )}
         </div>

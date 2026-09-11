@@ -5,6 +5,8 @@
   background: white;
   margin: 0 auto;
   padding: 0;
+  display: flex;
+  align-items: center;
 }
 
 .nav {
@@ -40,12 +42,17 @@
   width: 16px;
 }
 
-.desktopMenu .icon:has(img[src*="heart-nav"]) {
+.desktopMenu .icon:has(img[src*="heart-nav"]),
+.desktopMenu .icon:has(img[src*="message-nav"])
+{
   position: relative;
   margin-right: 16px;
 }
 
-.desktopMenu .icon:has(img[src*="heart-nav"])::before {
+.desktopMenu .icon:has(img[src*="heart-nav"])::before,
+.desktopMenu .icon:has(img[src*="message-nav"])::before
+
+ {
   content: "";
   position: absolute;
   right: -8px;
