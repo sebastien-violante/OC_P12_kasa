@@ -8,46 +8,37 @@ import PropertyCard from "./components/PropertyCard/PropertyCard";
 import Tile from "./components/Tile/Tile";
 import styles from "./page.module.css";
 import Image from "next/image";
-import Cookies from "js-cookie";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
-  const [properties, setProperties] = useState<Property[] | null>(null);
+  const [properties, setProperties] = useState<Property[]>([]);
   const [visibleCards, setVisibleCards] = useState(6); // nombre de cartes visibles par lot
-  const [token, setToken] = useState<string | null>(null);
   const loadMoreProperties = () => {
     setVisibleCards((prev) => prev + 6);
   };
-  const [categories, setCategories] = useState<string[]>([]);
 
   useEffect(() => {
-    const loadProperties = async () => {
-      try {
-        const properties = await getRequest<Property[]>("api/properties");
-        setProperties(properties);
-        setLoading(false);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  const loadProperties = async () => {
+    try {
+      const properties = await getRequest<Property[]>({
+        url: "/api/properties",
+      });
+      setProperties(properties);
+      setLoading(false);
 
-    loadProperties();
-  }, []);
-
-  useEffect(() => {
-    const token = Cookies.get("token");
-    if (token) {
-      setToken(token);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
     }
-  }, [token]);
+  };
+
+  loadProperties();
+}, []);
 
   return (
     <main className={styles.homeWrapper}>
       <section className={styles.hero}>
-        {token && <p>{token}</p>}
-        {categories.map((category)=> (
-          <p key={category}>{category}</p>
-        ))}
+              
         <h1>Chez vous, partout et ailleurs</h1>
         <p>
           Avec Kasa, vivez des séjours uniques dans des hébergements chaleureux,

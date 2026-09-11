@@ -19,13 +19,9 @@ export default function Property() {
 
   useEffect(() => {
     const loadProperty = async () => {
-      console.log(`/api/properties/${propertyId}`);
       try {
-        const property = await getRequest<Property>(
-          `/api/properties/${propertyId}`,
-        );
+        const property = await getRequest<Property>({url: `/api/properties/${propertyId}`})
         setProperty(property);
-        console.log(property);
         setLoading(false);
       } catch (error) {
         console.error(error);

@@ -104,3 +104,7 @@ export type FlashType = {
   type: "success" | "warning" | "fail";
   message: string;
 };
+
+export type GetPropertyData = {
+  property: Property;
+}

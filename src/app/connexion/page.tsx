@@ -57,14 +57,18 @@ export default function Connexion() {
       });
       if (result.data) {
         const token = result.data.token;
-        const user = result.data.user;
+        const userId = result.data.user.id;
 
         // enregistrement du token en cookie
-        Cookies.set("token", result.data.token, {
+        Cookies.set("token", token, {
           expires: 1 / 24,
           secure: true,
           sameSite: "strict",
         });
+
+        // enregistrement du user.id en local storage
+        localStorage.setItem("userId", String(userId))
+
         // réinitialisation erroeurs et formulaire
         setApiError("");
         setErrors([]);

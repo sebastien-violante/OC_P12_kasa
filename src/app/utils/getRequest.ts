@@ -1,19 +1,54 @@
+import type { ApiErrorDetail } from "../types/types";
 
-/**
- * Effectue une requête en GET à l'API qui renvoie les données demandées
- * @param {string} url - endpoint de l'API
- * @returns {Object} - données renvoyées par l'API
- */
-export default async function getRequest<T>(url : string): Promise<T> {
-  
-    const headers: HeadersInit = { "Content-Type": "application/json" };
-    const response = await fetch(url, { method: "GET", headers });
-    //const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-    if (!response.ok) {
-        throw new Error(`Erreur HTTP : ${response.status}`);
-    }
-    //await sleep(5000);
+type GetRequestProps = {
+  url: string;
+  token?: string | null;
+};
 
-    return response.json();
+export default async function getRequest<TResponse = unknown>({
+  url,
+  token,
+}: GetRequestProps): Promise<TResponse> {
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
 
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers,
+    cache: "no-store",
+  });
+
+  let result: unknown;
+
+  try {
+    result = await response.json();
+  } catch {
+    throw {
+      status: response.status,
+      message: "Réponse invalide du serveur.",
+    };
+  }
+
+  if (!response.ok) {
+    const error = result as {
+      error?: string;
+      message?: string;
+      details?: ApiErrorDetail[];
+    };
+
+    throw {
+      status: response.status,
+      message:
+        error.message || error.error || "Une erreur serveur est survenue.",
+      error: error.error,
+      details: error.details,
+    };
+  }
+
+  return result as TResponse;
 }

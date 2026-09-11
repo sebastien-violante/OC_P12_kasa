@@ -55,7 +55,7 @@ export default function Header() {
               </Link>
             </li>
             <li className={styles.icon}>
-              <Link href="/favorites" aria-label="Mes favoris">
+              <Link href="/mes-favoris" aria-label="Mes favoris">
                 <img src="/pictures/heart-nav.svg" alt="" />
               </Link>
             </li>

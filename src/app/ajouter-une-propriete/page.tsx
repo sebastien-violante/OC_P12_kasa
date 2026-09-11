@@ -2,7 +2,7 @@
 
 import styles from "./page.module.css";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { equipements } from "../data/equipments";
 import getRequest from "../utils/getRequest";
 import Tag from "../components/Tag/Tag";
@@ -26,7 +26,10 @@ export default function Addproperty() {
   const [profile, setProfile] = useState<File | null>(null);
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState<string>("");
-  //const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const profileInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+
+  const pictureInputRef = useRef<(HTMLInputElement | null)[]>([]);
 
   const initFormData: PropertyFormData = {
     title: "",
@@ -147,8 +150,8 @@ export default function Addproperty() {
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const tags = await getRequest<string[]>("api/tags");
-        setTags(tags);
+        const tags = await getRequest<string[]>({url : "api/tags"});
+        setTags(tags)
       } catch (error) {
         console.error(error);
       }
@@ -163,7 +166,7 @@ export default function Addproperty() {
           <img src="/pictures/back-arrow.svg" alt="" />
           <span>Retour</span>
         </Link>
-        
+        <h1>Ajouter une propriété</h1>
       </section>
       <form
         className={styles.form}
@@ -172,10 +175,10 @@ export default function Addproperty() {
           addPorperty();
         }}
       >
-        <div className={styles.top}>
-          <h1>Ajouter une propriété</h1>
-          <button type="submit">Ajouter</button>
-        </div>
+        <button type="submit" className={styles.submitBtn}>
+          Ajouter
+        </button>
+
         <article className={styles.mainData}>
           <div className={styles.formGroup}>
             <label htmlFor="title">Titre de la propriété</label>
@@ -236,13 +239,16 @@ export default function Addproperty() {
                   onChange={handleInputValue}
                   readOnly
                 />
-                <label htmlFor="coverImage" className={styles.addButton}>
+                <button
+                  type="button"
+                  className={styles.addButton}
+                  onClick={() => coverInputRef.current?.click()}
+                  aria-label="Choisir une photo de couverture"
+                >
                   <span aria-hidden="true">+</span>
-                  <span className={styles.srOnly}>
-                    Choisir une image de couverture
-                  </span>
-                </label>
+                </button>
                 <input
+                  ref={coverInputRef}
                   id="coverImage"
                   type="file"
                   accept="image/*"
@@ -254,36 +260,43 @@ export default function Addproperty() {
               {/* Images du logement */}
               <label htmlFor="propertyPictures">Images du logement</label>
 
-              {images?.map((image, index) => (
-                <div className={styles.formGroup} key={index}>
-                  <div className={styles.inputWrapper}>
-                    <input
-                      id="propertyPictures"
-                      type="text"
-                      value={image?.name || ""}
-                      readOnly
-                    />
-
-                    <label
-                      htmlFor={`image-${index}`}
-                      className={styles.addButton}
-                    >
-                      <span aria-hidden="true">+</span>
-                      <span className={styles.srOnly}>
-                        Choisir une image du logement
-                      </span>
-                    </label>
-
-                    <input
-                      id={`image-${index}`}
-                      type="file"
-                      accept="image/*"
-                      hidden
-                      onChange={(e) => handleImageChange(index, e)}
-                    />
+              {images?.map((image, index) => {
+                const inputId = `propertyPicture-${index}`;
+                return (
+                  <div className={styles.formGroup} key={index}>
+                    {" "}
+                    <div className={styles.inputWrapper}>
+                      {" "}
+                      <input
+                        id={`${inputId}-name`}
+                        type="text"
+                        value={image?.name || ""}
+                        readOnly
+                        aria-label={`Photo du logement ${index + 1}`}
+                      />{" "}
+                      <button
+                        type="button"
+                        className={styles.addButton}
+                        onClick={() => pictureInputRef.current[index]?.click()}
+                        aria-label={`Choisir la photo du logement ${index + 1}`}
+                      >
+                        {" "}
+                        <span aria-hidden="true">+</span>{" "}
+                      </button>{" "}
+                      <input
+                        id={inputId}
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        onChange={(e) => handleImageChange(index, e)}
+                        ref={(element) => {
+                          pictureInputRef.current[index] = element;
+                        }}
+                      />{" "}
+                    </div>{" "}
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               <button
                 type="button"
@@ -308,7 +321,7 @@ export default function Addproperty() {
               </div>
               <div className={styles.formGroup}>
                 <label htmlFor="profilePicture">Photo de profil</label>
-
+                {/* 
                 <div className={styles.inputWrapper}>
                   <input
                     id="profilePicture"
@@ -331,6 +344,35 @@ export default function Addproperty() {
                     accept="image/*"
                     hidden
                     onChange={(e) => handleProfileChange(e)}
+                  />
+                </div>
+                */}
+
+                <div className={styles.inputWrapper}>
+                  <input
+                    id="profilePicture"
+                    type="text"
+                    value={profile?.name || ""}
+                    readOnly
+                    aria-label="Photo de profil sélectionnée"
+                  />
+
+                  <button
+                    type="button"
+                    className={styles.addButton}
+                    onClick={() => profileInputRef.current?.click()}
+                    aria-label="Choisir une photo de profil"
+                  >
+                    <span aria-hidden="true">+</span>
+                  </button>
+
+                  <input
+                    ref={profileInputRef}
+                    id="profile"
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={handleProfileChange}
                   />
                 </div>
               </div>
@@ -385,7 +427,7 @@ export default function Addproperty() {
                 onClick={() => handleAddTag()}
                 aria-label="Ajouter la catégorie"
               >
-                 <span aria-hidden="true">+</span>
+                <span aria-hidden="true">+</span>
               </button>
             </div>
           </div>
