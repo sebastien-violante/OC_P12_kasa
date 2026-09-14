@@ -4,14 +4,14 @@ import { useState, useRef, useEffect } from "react";
 import styles from "./Header.module.css";
 import Link from "next/link";
 import Cookies from "js-cookie";
-import { useAuth } from "./context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [menuExpanded, setMenuExpanded] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const { logout, user } = useAuth()
-   const router = useRouter();
+  const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null); // reférence pour détecter un clic hors du menu et le refermer
   const expandMenu = () => {
     setMenuExpanded((prev) => !prev);
@@ -24,7 +24,6 @@ export default function Header() {
   useEffect(() => {
     const storedToken = Cookies.get("token");
     setToken(storedToken ?? null);
-    console.log(storedToken);
   }, []);
 
   useEffect(() => {

@@ -3,7 +3,7 @@ import type { ApiResponse } from "../types/types";
 type PostRequestProps<TPayload> = {
   url: string;
   token?: string;
-  payload: TPayload;
+  payload?: TPayload;
 };
 
 /**

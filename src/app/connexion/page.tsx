@@ -1,22 +1,30 @@
 "use client";
 
 import styles from "./page.module.css";
-import { useState, useEffect, ChangeEvent, SubmitEvent, useContext } from "react";
+import {
+  useState,
+  useEffect,
+  ChangeEvent,
+  SubmitEvent,
+  useContext,
+} from "react";
 import type {
   FlashType,
   LoginFormData,
   AuthenticationPayload,
   AuthenticationResponse,
   ApiError,
+  Property
 } from "../types/types";
 import FlashMessage from "../components/FlashMessage/FlashMessage";
 import Link from "next/link";
 import z from "zod";
 import { authSchema } from "../types/schemas/authSchema";
 import postRequest from "../utils/postRequest";
+import getRequest from "../utils/getRequest";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../components/Header/context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 export default function Connexion() {
   const initFormData = {
@@ -59,7 +67,7 @@ export default function Connexion() {
       });
       if (result.data) {
         const token = result.data.token;
-        const user = result.data.user
+        const user = result.data.user;
 
         // enregistrement du token en cookie
         Cookies.set("token", token, {
@@ -68,10 +76,20 @@ export default function Connexion() {
           sameSite: "strict",
         });
 
-        // enregistrement du user en context 
-        login(user)
+        // enregistrement du user en context
+        login(user);
 
-        // réinitialisation erroeurs et formulaire
+        // chargement des favoris
+        try {
+          const result = await getRequest<Property[]>({
+            url: `/api/users/${user.id}/favorites`,
+            token,
+          });
+          localStorage.setItem("favorites", JSON.stringify(result))
+        } catch (error) {
+          console.error("Erreur lors du chargement des favoris :", error);
+        }
+        // réinitialisation erreurs et formulaire
         setApiError("");
         setErrors([]);
         setFormData(initFormData);
@@ -88,6 +106,7 @@ export default function Connexion() {
   const getFieldError = (fieldName: string) => {
     return errors.find((error) => error.path.includes(fieldName));
   };
+
   useEffect(() => {
     const flashBag = localStorage.getItem("flash");
     if (flashBag) {
@@ -127,7 +146,6 @@ export default function Connexion() {
             aria-invalid={getFieldError("email") ? "true" : "false"}
             className={getFieldError("email") ? styles.inputOnError : ""}
             autoComplete="email"
-
           ></input>
           {getFieldError("email") && (
             <p id="email-error" className={styles.fieldError} role="alert">

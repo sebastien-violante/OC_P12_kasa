@@ -1,0 +1,51 @@
+[
+  {
+    "id": "1234",
+    "slug": "ma-maison",
+    "title": "Ma maison",
+    "description": "C'est chez moi et j'y suis bien !",
+    "cover": "https://s3-eu-west-1.amazonaws.com/course.oc-static.com/projects/front-end-kasa-project/accommodation-20-1.jpg",
+    "location": "10 downing street",
+    "price_per_night": 2563,
+    "rating_avg": 5,
+    "ratings_count": 2,
+    "host": {
+      "id": 1456,
+      "name": "Sebastien",
+      "picture": "https://s3-eu-west-1.amazonaws.com/course.oc-static.com/projects/front-end-kasa-project/profile-picture-12.jpg"
+    }
+  },
+  {
+    "id": "2345",
+    "slug": "chez-moi",
+    "title": "Chez moi",
+    "description": "C'est chez moi et j'y suis bien !",
+    "cover": "https://s3-eu-west-1.amazonaws.com/course.oc-static.com/projects/front-end-kasa-project/accommodation-20-1.jpg",
+    "location": "10 downing street",
+    "price_per_night": 2563,
+    "rating_avg": 5,
+    "ratings_count": 2,
+    "host": {
+      "id": 1456,
+      "name": "Sebastien",
+      "picture": "https://s3-eu-west-1.amazonaws.com/course.oc-static.com/projects/front-end-kasa-project/profile-picture-12.jpg"
+    }
+  },
+  {
+    "id": "3456",
+    "slug": "my-casa",
+    "title": "My casa",
+    "description": "C'est chez moi et j'y suis bien !",
+    "cover": "https://s3-eu-west-1.amazonaws.com/course.oc-static.com/projects/front-end-kasa-project/accommodation-20-1.jpg",
+    "location": "10 downing street",
+    "price_per_night": 2563,
+    "rating_avg": 5,
+    "ratings_count": 2,
+    "host": {
+      "id": 1456,
+      "name": "Sebastien",
+      "picture": "https://s3-eu-west-1.amazonaws.com/course.oc-static.com/projects/front-end-kasa-project/profile-picture-12.jpg"
+    }
+  }
+ 
+]

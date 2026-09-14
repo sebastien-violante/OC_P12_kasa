@@ -1,0 +1,28 @@
+.banner {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    margin: 70px auto;
+
+    h1 {
+        font-size: 32px;
+        color: var(--mainRed);
+        font-weight: var(--weight-bold);
+    }
+
+    p {
+        text-align: center;
+        font-size: 14px;
+    }
+}
+
+.favoritesWrapper {
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+    max-width: 1113px;
+    margin: auto;
+}

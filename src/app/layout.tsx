@@ -3,7 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
-import { AuthProvider } from "./components/Header/context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
+import { FavoritesProvider } from "./context/FavoritesContext";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -21,9 +22,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="fr" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <AuthProvider>
-          <Header />
-          <main>{children}</main>
-          <Footer />
+          <FavoritesProvider>
+            <Header />
+            <main>{children}</main>
+            <Footer />
+          </FavoritesProvider>
         </AuthProvider>
       </body>
     </html>

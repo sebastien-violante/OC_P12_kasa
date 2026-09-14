@@ -5,60 +5,54 @@ import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Loader from "../components/Loader/Loader";
-import getRequest from "../utils/getRequest";
 import type { Property } from "../types/types";
+import PropertyCard from "../components/PropertyCard/PropertyCard";
+import getRequest from "../utils/getRequest";
 
 export default function Favorites() {
   const router = useRouter();
 
-  const [token, setToken] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [token] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<Property[]>([]);
+  const [favoriteIds, setFavoriteIds] = useState<string[] | []>([]);
 
-  // Récupération des informations d'authentification
+  // Redirection en l'absence de token
   useEffect(() => {
-    const storedToken = Cookies.get("token");
-    const storedUserId = localStorage.getItem("userId");
-
-    if (!storedToken) {
-      router.replace("/connexion");
-      return;
-    }
-
-    if (!storedUserId) {
-      router.replace("/404");
-      return;
-    }
-
-    setToken(storedToken);
-    setUserId(storedUserId);
-  }, [router]);
-
-  // Récupération des favoris
-  useEffect(() => {
-    if (!token || !userId) {
-      return;
-    }
-
     async function loadFavorites() {
-      try {
-        const result = await getRequest<Property[]>({
-          url: `/api/users/${userId}/favorites`,
-          token,
-        });
 
-        console.log("Favoris :", result);
-        setFavorites(result);
-      } catch (error) {
-        console.error("Erreur lors du chargement des favoris :", error);
-      } finally {
-        setLoading(false);
+      const token = Cookies.get("token");
+      const userCookie = Cookies.get("user")
+      
+      if (!token) {
+        router.replace("/connexion");
+        return;
+      }
+
+      if(userCookie) {
+        const user = JSON.parse(userCookie)
+        try {
+          const result = await getRequest<Property[]>({
+            url: `/api/users/${user.id}/favorites`,
+            token,
+          });
+          
+          setFavorites(result)
+          setFavoriteIds(result.map((favorite) => favorite.id))
+          // mise à jour du local storage
+          localStorage.setItem("favorites", JSON.stringify(favorites))
+
+        } catch(error) {
+          console.error(error)
+        } finally {
+          setLoading(false)
+        }
       }
     }
+    loadFavorites()
+  }, [token]);
 
-    loadFavorites();
-  }, [token, userId]);
+ 
 
   if (loading) {
     return (
@@ -86,8 +80,10 @@ export default function Favorites() {
           <p>Vous n&apos;avez aucun favori enregistré.</p>
         ) : (
           favorites.map((property) => (
-            
-            <div key={property.slug}>{property.title}</div>
+            <PropertyCard
+              key={property.id}
+              property={property}
+            />
           ))
         )}
       </section>

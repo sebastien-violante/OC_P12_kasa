@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
+
 import type { User } from "@/app/types/types";
 import Cookies from "js-cookie";
 
@@ -9,12 +16,12 @@ type AuthContextType = {
   login: (user: User) => void;
   logout: () => void;
 };
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-
 function getUserFromCookie(): User | null {
-  
   const cookie = Cookies.get("user");
+
   if (!cookie) {
     return null;
   }
@@ -26,21 +33,13 @@ function getUserFromCookie(): User | null {
   }
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-
-  return context;
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  
-  const [user, setUser] = useState<User | null>(() => {
-    return getUserFromCookie()
-  });
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const storedUser = getUserFromCookie();
+    setUser(storedUser);
+  }, []);
 
   const login = (user: User) => {
     setUser(user);
@@ -49,12 +48,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null);
+
     Cookies.remove("user");
+    Cookies.remove("token");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+
+  return context;
 }
