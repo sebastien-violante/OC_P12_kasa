@@ -4,19 +4,27 @@ import { useState, useRef, useEffect } from "react";
 import styles from "./Header.module.css";
 import Link from "next/link";
 import Cookies from "js-cookie";
+import { useAuth } from "./context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [menuExpanded, setMenuExpanded] = useState(false);
   const [token, setToken] = useState<string | null>(null);
-
+  const { logout, user } = useAuth()
+   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null); // reférence pour détecter un clic hors du menu et le refermer
   const expandMenu = () => {
     setMenuExpanded((prev) => !prev);
   };
 
+  function handleLogout() {
+    logout();
+    router.push('/')
+  }
   useEffect(() => {
-    setToken(token);
-    console.log(token);
+    const storedToken = Cookies.get("token");
+    setToken(storedToken ?? null);
+    console.log(storedToken);
   }, []);
 
   useEffect(() => {
@@ -58,7 +66,7 @@ export default function Header() {
               </Link>
             </li>
 
-            {token && (
+            {user ? (
               <>
                 <li>
                   <Link href="/ajouter-une-propriete" className={styles.button}>
@@ -76,13 +84,14 @@ export default function Header() {
                   </Link>
                 </li>
                 <li className={styles.icon}>
-                  <Link href="/" aria-label="Déconnexion">
+                  <button onClick={handleLogout}>
                     <img src="/pictures/cross.svg" alt="" />
-                  </Link>
+                  </button>
                 </li>
               </>
-            )}
-            {!token && (
+            )
+            :
+            (
               <Link href="/connexion" className={styles.button}>
                 Connexion
               </Link>
@@ -116,38 +125,43 @@ export default function Header() {
                   A propos
                 </Link>
               </li>
-              {token && (
+              {user ? (
                 <>
-                <li>
-                <Link href="/messages" aria-label="Mes messages">
-                  Messagerie
-                </Link>
-              </li>
-              <li>
-                <Link href="/mes-favoris" aria-label="Mes favoris">
-                  Favoris
-                </Link>
-              </li>
-              <li>
-                <Link href="/ajouter-une-propriete" aria-label="Ajouter un logement">
-                  Ajouter un logement
-                </Link>
-              </li>
-              <li>
-                <Link href="/" aria-label="Déconnexion">
-                  Déconnexion
-                </Link>
-              </li>
+                  <li>
+                    <Link href="/messages" aria-label="Mes messages">
+                      Messagerie
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/mes-favoris" aria-label="Mes favoris">
+                      Favoris
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/ajouter-une-propriete"
+                      aria-label="Ajouter un logement"
+                    >
+                      Ajouter un logement
+                    </Link>
+                  </li>
+                  <li>
+                    <button onClick={handleLogout}>
+                   
+                      Déconnexion
+                    
+                    </button>
+                  </li>
                 </>
-              )}
-              {!token && (
+              )
+              :
+              (
                 <li>
-                <Link href="/connexion" aria-label="Déconnexion">
-                  Connexion
-                </Link>
-              </li>
+                  <Link href="/connexion" aria-label="Déconnexion">
+                    Connexion
+                  </Link>
+                </li>
               )}
-              
             </ul>
           )}
         </div>

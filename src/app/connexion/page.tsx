@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./page.module.css";
-import { useState, useEffect, ChangeEvent, SubmitEvent } from "react";
+import { useState, useEffect, ChangeEvent, SubmitEvent, useContext } from "react";
 import type {
   FlashType,
   LoginFormData,
@@ -16,6 +16,7 @@ import { authSchema } from "../types/schemas/authSchema";
 import postRequest from "../utils/postRequest";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../components/Header/context/AuthContext";
 
 export default function Connexion() {
   const initFormData = {
@@ -28,6 +29,7 @@ export default function Connexion() {
   const [apiError, setApiError] = useState("");
   const [flash, setFlash] = useState<FlashType | null>(null);
   const router = useRouter();
+  const { login } = useAuth();
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -57,7 +59,7 @@ export default function Connexion() {
       });
       if (result.data) {
         const token = result.data.token;
-        const userId = result.data.user.id;
+        const user = result.data.user
 
         // enregistrement du token en cookie
         Cookies.set("token", token, {
@@ -66,8 +68,8 @@ export default function Connexion() {
           sameSite: "strict",
         });
 
-        // enregistrement du user.id en local storage
-        localStorage.setItem("userId", String(userId))
+        // enregistrement du user en context 
+        login(user)
 
         // réinitialisation erroeurs et formulaire
         setApiError("");
