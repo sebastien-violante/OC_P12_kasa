@@ -36,13 +36,13 @@ export default function Home() {
   }, []);
 
   return (
-    <main className={styles.homeWrapper}>
+    < div className={styles.homeWrapper}>
       <section className={styles.hero}>
         <h1>Chez vous, partout et ailleurs</h1>
 
         <p>
-          Avec Kasa, vivez des séjours uniques dans des hébergements
-          chaleureux, sélectionnés avec soin par nos hôtes.
+          Avec Kasa, vivez des séjours uniques dans des hébergements chaleureux,
+          sélectionnés avec soin par nos hôtes.
         </p>
 
         <div className={styles.heroPictureContainer}>
@@ -51,32 +51,25 @@ export default function Home() {
       </section>
 
       {loading && (
-        <div role="status" aria-live="polite">
+        <div role="status" aria-live="polite" aria-label="chargement des logements">
           <Loader />
-          <span className="sr-only">
-            Chargement des logements…
-          </span>
+          <span className="sr-only">Chargement des logements…</span>
         </div>
       )}
 
       <section
         className={styles.cardWrapper}
-        aria-label="nos logements"
+        aria-labelledby="properties-title"
       >
-        {properties
-          .slice(0, visibleCards)
-          .map((property) => (
-            <PropertyCard
-              property={property}
-              key={property.slug}
-            />
-          ))}
+        <h2 id="properties-title" className="sr-only">
+          Nos logements
+        </h2>
+        {properties.slice(0, visibleCards).map((property) => (
+          <PropertyCard property={property} key={property.slug} />
+        ))}
 
         {visibleCards < properties.length && (
-          <button
-            onClick={loadMoreProperties}
-            className={styles.loadMore}
-          >
+          <button type="button" onClick={loadMoreProperties} className={styles.loadMore}>
             Voir plus de logements...
           </button>
         )}
@@ -86,8 +79,8 @@ export default function Home() {
         <h2>Comment ça marche ?</h2>
 
         <p>
-          Que vous partiez pour un week-end improvisé, des vacances
-          en famille ou un voyage professionnel, <br />
+          Que vous partiez pour un week-end improvisé, des vacances en famille
+          ou un voyage professionnel, <br />
           Kasa vous aide à trouver un lieu qui vous ressemble.
         </p>
 
@@ -108,6 +101,6 @@ export default function Home() {
           />
         </div>
       </section>
-    </main>
+    </div>
   );
 }

@@ -3,8 +3,9 @@
 import styles from "./PropertyCard.module.css";
 import type { Property } from "@/app/types/types";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import postRequest from "@/app/utils/postRequest";
+import deleteRequest from "@/app/utils/deleteRequest";
 import Cookies from "js-cookie";
 import { useFavorites } from "@/app/context/FavoritesContext";
 
@@ -12,27 +13,16 @@ type PropertyCardProps = {
   property: Property;
 };
 
-export default function PropertyCard({
-  property,
-}: PropertyCardProps) {
-  const router = useRouter();
+export default function PropertyCard({ property }: PropertyCardProps) {
   const token = Cookies.get("token");
 
-  const {
-    favoriteIds,
-    addFavorite,
-    removeFavorite,
-  } = useFavorites();
+  const { favoriteIds, addFavorite, removeFavorite } = useFavorites();
 
   const isFavorite = favoriteIds.includes(property.id);
 
-  async function toggleFavorite(
-    event: React.MouseEvent<HTMLButtonElement>
-  ) {
-    event.stopPropagation();
-
+  async function toggleFavorite() {
     if (!token) {
-      alert("pas connecté");
+      alert("Vous devez être connecté pour ajouter un logement aux favoris.");
       return;
     }
 
@@ -53,23 +43,30 @@ export default function PropertyCard({
       return;
     }
 
-    // TODO : faire ici ton DELETE
-    // await deleteRequest(...)
+    try {
+      const result = await deleteRequest({
+        url: `/api/properties/${property.id}/favorite`,
+        token,
+      });
 
-    removeFavorite(property.id);
+      if (result.data) {
+        removeFavorite(property.id);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
     <article className={styles.card}>
-      <div
-        onClick={() =>
-          router.push(`/property/${property.id}`)
-        }
+      <Link
+        href={`/property/${property.id}`}
+        className={styles.propertyLink}
       >
         <div className={styles.pictureContainer}>
           <Image
             src={property.cover}
-            alt={`photo du logement ${property.title}`}
+            alt={`Photo du logement : ${property.title}`}
             fill
           />
         </div>
@@ -80,10 +77,6 @@ export default function PropertyCard({
               {property.title}
             </h2>
 
-            <p>
-              {isFavorite ? "Favori" : "non"}
-            </p>
-
             <p className={styles.cardDescription}>
               {property.location}
             </p>
@@ -91,30 +84,40 @@ export default function PropertyCard({
 
           <p>
             <span className={styles.price}>
-              {property.price_per_night}€
+              {property.price_per_night} €
             </span>
 
             <span className={styles.label}>
-              {" "}par nuit
+              {" "}
+              par nuit
             </span>
           </p>
         </div>
+      </Link>
 
-        <button
-          type="button"
-          className={styles.favorite}
-          onClick={toggleFavorite}
-        >
-          <img
-            alt=""
-            src={
-              isFavorite
-                ? "/pictures/heart-red.svg"
-                : "/pictures/heart.svg"
-            }
-          />
-        </button>
-      </div>
+      <button
+        type="button"
+        className={styles.favorite}
+        onClick={toggleFavorite}
+        aria-label={
+          isFavorite
+            ? `Retirer ${property.title} des favoris`
+            : `Ajouter ${property.title} aux favoris`
+        }
+        aria-pressed={isFavorite}
+      >
+        <Image
+          src={
+            isFavorite
+              ? "/pictures/heart-red.svg"
+              : "/pictures/heart.svg"
+          }
+          alt=""
+          width={24}
+          height={24}
+          aria-hidden="true"
+        />
+      </button>
     </article>
   );
 }

@@ -73,7 +73,7 @@
   z-index: 30;
 }
 
-.mobileMenu .header {
+.mobileMenu .mobileHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
