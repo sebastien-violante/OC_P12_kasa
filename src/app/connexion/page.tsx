@@ -14,7 +14,7 @@ import type {
   AuthenticationPayload,
   AuthenticationResponse,
   ApiError,
-  Property
+  Property,
 } from "../types/types";
 import FlashMessage from "../components/FlashMessage/FlashMessage";
 import Link from "next/link";
@@ -38,6 +38,8 @@ export default function Connexion() {
   const [flash, setFlash] = useState<FlashType | null>(null);
   const router = useRouter();
   const { login } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -85,7 +87,7 @@ export default function Connexion() {
             url: `/api/users/${user.id}/favorites`,
             token,
           });
-          localStorage.setItem("favorites", JSON.stringify(result))
+          localStorage.setItem("favorites", JSON.stringify(result));
         } catch (error) {
           console.error("Erreur lors du chargement des favoris :", error);
         }
@@ -99,6 +101,8 @@ export default function Connexion() {
     } catch (error) {
       const apiError = error as ApiError;
       setApiError(apiError.message);
+      setFormData(initFormData)
+      setErrors([])
     }
   }
 
@@ -117,7 +121,7 @@ export default function Connexion() {
       });
       localStorage.removeItem("flash");
     }
-  });
+  }, []);
 
   return (
     <section className={styles.formWrapper}>
@@ -129,16 +133,19 @@ export default function Connexion() {
           ce qui rend vos séjours uniques.
         </p>
       </div>
-      <form onSubmit={handleLogin} className={styles.form}>
-        <p className={styles.apiError} role="alert">
-          {apiError}
-        </p>
+      <form onSubmit={handleLogin} className={styles.form} noValidate>
+        {apiError && (
+          <p id="api-error" role="alert">
+            {apiError}
+          </p>
+        )}
         <div className={styles.formGroup}>
           <label htmlFor="email">Adresse email</label>
           <input
             id="email"
             name="email"
             type="email"
+            value={formData.email}
             onChange={handleChange}
             aria-describedby={
               getFieldError("email") ? "email-error" : undefined
@@ -159,13 +166,14 @@ export default function Connexion() {
             id="password"
             name="password"
             type="password"
+            value={formData.password}
             onChange={handleChange}
             aria-describedby={
               getFieldError("password") ? "password-error" : undefined
             }
             aria-invalid={getFieldError("password") ? "true" : "false"}
             className={getFieldError("password") ? styles.inputOnError : ""}
-            autoComplete="password"
+            autoComplete="current-password"
           ></input>
           {getFieldError("password") && (
             <p id="password-error" className={styles.fieldError} role="alert">
@@ -174,8 +182,8 @@ export default function Connexion() {
           )}
         </div>
 
-        <button className={styles.submitBtn} type="submit">
-          Se connecter
+        <button className={styles.submitBtn} disabled={isSubmitting} aria-busy={isSubmitting}>
+          {isSubmitting ? "Connexion en cours…" : "Se connecter"}
         </button>
       </form>
       <p className={styles.link}>

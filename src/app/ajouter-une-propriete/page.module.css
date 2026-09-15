@@ -19,13 +19,10 @@
     cursor: pointer;
   }
 
-
-    h1 {
-      font-size: 24px;
-      font-weight: var(--weight-medium);
-    }
-
-  
+  h1 {
+    font-size: 24px;
+    font-weight: var(--weight-medium);
+  }
 }
 
 .form {
@@ -38,14 +35,14 @@
   position: relative;
 
   .submitBtn {
-      background: var(--mainRed);
-      padding: 8px 23px;
-      color: white;
-      border-radius: 10px;
-      cursor: pointer;
-      position: absolute;
-      top: -80px;
-      right: 0;
+    background: var(--mainRed);
+    padding: 8px 23px;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+    position: absolute;
+    top: -80px;
+    right: 0;
   }
 
   .mainData {
@@ -86,7 +83,15 @@
       border-radius: 4px;
       padding-left: 10px;
     }
-
+    .fieldError {
+      color: var(--mainRed);
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+    .inputOnError {
+      background: var(--mainRedOpacified);
+    }
+    
     .inputWrapper {
       display: flex;
       align-items: center;

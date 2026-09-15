@@ -27,6 +27,10 @@ body {
   margin: 0;
 }
 
+main {
+  padding-top: 96px;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -39,8 +43,8 @@ body {
   border: 0;
 }
 
-@media (min-width: 767px) {
-  body {
-    margin-top: 40px;
+@media screen and (max-width: 767px) {
+  main {
+    padding-top: 96px;
   }
 }

@@ -8,19 +8,10 @@ import getRequest from "../utils/getRequest";
 import Tag from "../components/Tag/Tag";
 import { ChangeEvent } from "react";
 import type { PropertyFormData } from "../types/types";
+import z from "zod";
+import { newPropertySchema } from "../types/schemas/newPropertySchema";
 
 export default function Addproperty() {
-  function addPorperty() {
-    const data = {
-      ...formData,
-      cover: cover,
-      profile: profile,
-      pictures: images,
-    };
-
-    console.log("FORMDATA", data);
-  }
-
   const [cover, setCover] = useState<File | null>(null);
   const [images, setImages] = useState<(File | null)[]>([null]);
   const [profile, setProfile] = useState<File | null>(null);
@@ -28,7 +19,7 @@ export default function Addproperty() {
   const [newTag, setNewTag] = useState<string>("");
   const profileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
-
+  const [errors, setErrors] = useState<z.core.$ZodIssue[]>([]);
   const pictureInputRef = useRef<(HTMLInputElement | null)[]>([]);
 
   const initFormData: PropertyFormData = {
@@ -127,6 +118,7 @@ export default function Addproperty() {
 
     setNewTag("");
   };
+
   const handleTagToggle = (tag: string) => {
     setFormData((prev) => {
       if (prev.categories.includes(tag)) {
@@ -147,11 +139,39 @@ export default function Addproperty() {
     setImages((prev) => [...prev, null]);
   }
 
+  // Récupération de l'erreur correspondant à un champ
+  const getFieldError = (fieldName: string) => {
+    return errors.find((error) => error.path.includes(fieldName));
+  };
+
+  function addPorperty() {
+    const data = {
+      ...formData,
+      cover: cover,
+      profile: profile,
+      pictures: images,
+    };
+
+    console.log("FORMDATA", data);
+    // vérification Zod et affichage erreurs
+    const zodValidation = newPropertySchema.safeParse(formData);
+    if (!zodValidation.success) {
+      setErrors(zodValidation.error.issues);
+      console.log(errors);
+      return;
+    }
+    // si pas possible vérification taille, vérif taille et affichage erreurs
+    // création payload (attention formatag champs)
+    // bouclage pictures et réception url publiques
+    // ajout des pictures et cover au POST de property
+    // envoi profile en PATCH de user
+  }
+
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const tags = await getRequest<string[]>({url : "api/tags"});
-        setTags(tags)
+        const tags = await getRequest<string[]>({ url: "api/tags" });
+        setTags(tags);
       } catch (error) {
         console.error(error);
       }
@@ -174,6 +194,7 @@ export default function Addproperty() {
           event.preventDefault();
           addPorperty();
         }}
+        noValidate
       >
         <button type="submit" className={styles.submitBtn}>
           Ajouter
@@ -189,7 +210,17 @@ export default function Addproperty() {
               placeholder="Ex : Appartement cosy au coeur de paris"
               onChange={handleInputValue}
               required
+              aria-describedby={
+                getFieldError("title") ? "title-error" : undefined
+              }
+              aria-invalid={getFieldError("title") ? "true" : "false"}
+              className={getFieldError("title") ? styles.inputOnError : ""}
             />
+            {getFieldError("title") && (
+              <p id="title-error" className={styles.fieldError} role="alert">
+                {getFieldError("title")?.message}
+              </p>
+            )}
           </div>
           <div className={styles.formGroup}>
             <label htmlFor="description">Description</label>
@@ -200,7 +231,23 @@ export default function Addproperty() {
               rows={3}
               required
               onChange={handleInputValue}
+              aria-describedby={
+                getFieldError("description") ? "description-error" : undefined
+              }
+              aria-invalid={getFieldError("description") ? "true" : "false"}
+              className={
+                getFieldError("description") ? styles.inputOnError : ""
+              }
             />
+            {getFieldError("description") && (
+              <p
+                id="description-error"
+                className={styles.fieldError}
+                role="alert"
+              >
+                {getFieldError("description")?.message}
+              </p>
+            )}
           </div>
           <div className={styles.formGroup}>
             <label htmlFor="postalCode">Code postal</label>
@@ -213,7 +260,21 @@ export default function Addproperty() {
               name="postalCode"
               onChange={handleInputValue}
               required
+              aria-describedby={
+                getFieldError("postalCode") ? "postalCode-error" : undefined
+              }
+              aria-invalid={getFieldError("postalCode") ? "true" : "false"}
+              className={getFieldError("postalCode") ? styles.inputOnError : ""}
             />
+            {getFieldError("postalCode") && (
+              <p
+                id="postalCode-error"
+                className={styles.fieldError}
+                role="alert"
+              >
+                {getFieldError("postalCode")?.message}
+              </p>
+            )}
           </div>
           <div className={styles.formGroup}>
             <label htmlFor="location">Localisation</label>
@@ -223,7 +284,37 @@ export default function Addproperty() {
               name="location"
               onChange={handleInputValue}
               required
+              aria-describedby={
+                getFieldError("location") ? "location-error" : undefined
+              }
+              aria-invalid={getFieldError("location") ? "true" : "false"}
+              className={getFieldError("location") ? styles.inputOnError : ""}
             />
+            {getFieldError("location") && (
+              <p id="location-error" className={styles.fieldError} role="alert">
+                {getFieldError("location")?.message}
+              </p>
+            )}
+          </div>
+          <div className={styles.formGroup}>
+            <label htmlFor="location">Prix par nuitée (€)</label>
+            <input
+              type="text"
+              id="price_per_night"
+              name="price_per_night"
+              onChange={handleInputValue}
+              required
+              aria-describedby={
+                getFieldError("price_per_night") ? "price_per_night-error" : undefined
+              }
+              aria-invalid={getFieldError("price_per_night") ? "true" : "false"}
+              className={getFieldError("price_per_night") ? styles.inputOnError : ""}
+            />
+            {getFieldError("price_per_night") && (
+              <p id="price_per_night-error" className={styles.fieldError} role="alert">
+                {getFieldError("price_per_night")?.message}
+              </p>
+            )}
           </div>
         </article>
         <article className={styles.pictures}>
@@ -317,37 +408,20 @@ export default function Addproperty() {
                   name="name"
                   onChange={handleInputValue}
                   required
+                  aria-describedby={
+                    getFieldError("name") ? "name-error" : undefined
+                  }
+                  aria-invalid={getFieldError("name") ? "true" : "false"}
+                  className={getFieldError("name") ? styles.inputOnError : ""}
                 />
+                {getFieldError("name") && (
+                  <p id="name-error" className={styles.fieldError} role="alert">
+                    {getFieldError("name")?.message}
+                  </p>
+                )}
               </div>
               <div className={styles.formGroup}>
                 <label htmlFor="profilePicture">Photo de profil</label>
-                {/* 
-                <div className={styles.inputWrapper}>
-                  <input
-                    id="profilePicture"
-                    type="text"
-                    value={profile?.name || ""}
-                    onChange={handleInputValue}
-                    readOnly
-                  />
-
-                  <label htmlFor="profile" className={styles.addButton}>
-                    <span aria-hidden="true">+</span>
-                    <span className={styles.srOnly}>
-                      Choisir une photo de profil
-                    </span>
-                  </label>
-
-                  <input
-                    id="profile"
-                    type="file"
-                    accept="image/*"
-                    hidden
-                    onChange={(e) => handleProfileChange(e)}
-                  />
-                </div>
-                */}
-
                 <div className={styles.inputWrapper}>
                   <input
                     id="profilePicture"

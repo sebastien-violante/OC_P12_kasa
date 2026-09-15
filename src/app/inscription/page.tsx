@@ -9,7 +9,7 @@ import {
   RegistrationFormData,
   ApiError,
 } from "../types/types";
-import z from "zod";
+import z from "zod"
 import { registerSchema } from "../types/schemas/registerSchema";
 import postRequest from "../utils/postRequest";
 import { useRouter } from "next/navigation";
@@ -83,6 +83,8 @@ export default function Inscription() {
     } catch (error) {
       const apiError = error as ApiError;
       setApiError(apiError.message);
+      setFormData(initFormData)
+      setErrors([])
     }
   };
 
@@ -106,6 +108,7 @@ export default function Inscription() {
             id="name"
             name="name"
             type="text"
+            value={formData.name}
             onChange={handleChange}
             aria-describedby={
               getFieldError("name") ? "name-error" : undefined
@@ -126,6 +129,7 @@ export default function Inscription() {
             id="firstname"
             name="firstname"
             type="text"
+            value={formData.firstname}
             onChange={handleChange}
             aria-describedby={
               getFieldError("firstname") ? "firstname-error" : undefined
@@ -146,6 +150,7 @@ export default function Inscription() {
             id="email"
             name="email"
             type="email"
+            value={formData.email}
             onChange={handleChange}
             aria-describedby={
               getFieldError("email") ? "email-error" : undefined
@@ -166,6 +171,7 @@ export default function Inscription() {
             id="password"
             name="password"
             type="password"
+            value={formData.password}
             onChange={handleChange}
             aria-describedby={
               getFieldError("password") ? "password-error" : undefined
@@ -185,6 +191,7 @@ export default function Inscription() {
             type="checkbox"
             id="acceptCgu"
             name="acceptCgu"
+            checked={formData.acceptCgu}
             onChange={handleChange}
             aria-describedby={
               getFieldError("acceptCgu") ? "acceptCgu-error" : undefined

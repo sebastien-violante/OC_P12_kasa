@@ -25,6 +25,7 @@ export type RegistrationFormData = {
     firstname: string;
     email: string;
     password: string;
+    acceptCgu: boolean;
 }
 
 export type LoginFormData = {
