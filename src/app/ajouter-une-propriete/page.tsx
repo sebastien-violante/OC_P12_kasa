@@ -15,7 +15,7 @@ import Cookies from "js-cookie";
 import patchRequest from "../utils/patchRequest";
 import postRequest from "../utils/postRequest";
 import getPictureUrls from "../utils/getPictureUrls";
-import type { Property } from "../types/types";
+import type { Property, User } from "../types/types";
 
 export default function Addproperty() {
   const token = Cookies.get("token");
@@ -30,7 +30,7 @@ export default function Addproperty() {
   const pictureInputRef = useRef<(HTMLInputElement | null)[]>([]);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [profileFileName, setProfileFileName] = useState("");
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const initFormData: PropertyFormData = {
   title: "",
   description: "",
@@ -38,14 +38,24 @@ export default function Addproperty() {
   location: "",
   cover: null,
   pictures: [],
-  name: user?.name ?? "",
+  name: "",
   profile: null,
   equipments: [],
   categories: [],
   price_per_night: "",
 };
 
-  const [formData, setFormData] = useState(initFormData);
+const [formData, setFormData] = useState<PropertyFormData>(initFormData);
+useEffect(() => {
+  if (!user) return;
+
+  console.log("Je mets le nom dans le formulaire :", user.name);
+
+  setFormData((prev) => ({
+    ...prev,
+    name: user.name,
+  }));
+}, [user]);
 
   // Captation des données d'enregistrement dans FormData
   const handleInputValue = (
@@ -155,12 +165,42 @@ export default function Addproperty() {
     return errors.find((error) => error.path.includes(fieldName));
   };
 
+  async function updateProfilePicture(profilePicture: string) {
+    if (!user) {
+      return null;
+    }
+
+    const payload = {
+      picture: profilePicture,
+    };
+
+    try {
+      const result = await patchRequest<{ picture: string }, User>({
+        url: `/api/users/${user.id}`,
+        token,
+        payload,
+      });
+
+      if (result.data) {
+        console.log("UPDATED USER", result.data);
+
+        updateUser(result.data);
+
+        return result.data;
+      }
+
+      return null;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
   async function addPorperty() {
     if (!user) {
       console.error("Utilisateur non connecté");
       return;
     }
-
+console.log("ADD PROPERTY - user =", user);
     const data = {
       ...formData,
       cover,
@@ -205,10 +245,11 @@ export default function Addproperty() {
     });
 
     const token = Cookies.get("token");
+
     const pictureUrls = await getPictureUrls(pictures, token);
 
     let coverPicture = "";
-    let profilePicture = "";
+    let profilePicture = user.picture ?? "";
     const propertyPictures: string[] = [];
 
     pictureUrls.forEach((picture) => {
@@ -226,6 +267,16 @@ export default function Addproperty() {
           break;
       }
     });
+
+    // Si une nouvelle photo de profil a été fournie,
+    // on met à jour le profil
+    if (profilePicture !== (user.picture ?? "")) {
+      const updatedUser = await updateProfilePicture(profilePicture);
+
+      if (updatedUser?.picture) {
+        profilePicture = updatedUser.picture;
+      }
+    }
 
     const payload: CreatePropertyPayload = {
       title: data.title.charAt(0) + data.title.slice(1).trim(),
@@ -255,7 +306,7 @@ export default function Addproperty() {
 
       console.log(result);
     } catch (error) {
-      console.error("Erreur lors du chargement des favoris :", error);
+      console.error("Erreur lors de l'enregistrement de la propriété :", error);
     }
   }
 
@@ -263,11 +314,14 @@ export default function Addproperty() {
   useEffect(() => {
     if (user?.role === "client") {
       const changeRole = async () => {
-        const payload : {role:"owner"} = {
+        const payload: { role: "owner" } = {
           role: "owner",
         };
         try {
-          const result = await patchRequest<{ role: "owner" }, { token: string }>({
+          const result = await patchRequest<
+            { role: "owner" },
+            { token: string }
+          >({
             url: `/api/users/${user.id}`,
             token,
             payload,
@@ -291,8 +345,8 @@ export default function Addproperty() {
     setFormData((prev) => ({ ...prev, name: user.name }));
   }, [user]);
 
+  // Chargement des tags
   useEffect(() => {
-    // Chargement des tags
     const loadTags = async () => {
       try {
         const tags = await getRequest<string[]>({ url: "api/tags" });
@@ -302,28 +356,14 @@ export default function Addproperty() {
       }
     };
 
-    // Chargement de l'image de profile
-    const loadDefaultProfile = async () => {
-      try {
-        const result = await fetch(
-          "/pictures/default-pictures/default-profile.jpg",
-        );
-
-        const blob = await result.blob();
-
-        const file = new File([blob], "default-profile.jpg", {
-          type: blob.type,
-        });
-
-        setProfile(file);
-      } finally {
-        setIsLoadingProfile(false);
-      }
-    };
-
     loadTags();
-    loadDefaultProfile();
+
   }, []);
+
+  useEffect(() => {
+  console.log("USER DANS Addproperty :", user);
+  console.log("USER.NAME :", user?.name);
+}, [user]);
 
   return (
     <>
@@ -577,7 +617,7 @@ export default function Addproperty() {
                   id="name"
                   name="name"
                   onChange={handleInputValue}
-                  value={user?.name ?? ""}
+                  value={formData.name ?? ""}
                   aria-describedby={
                     getFieldError("name") ? "name-error" : undefined
                   }

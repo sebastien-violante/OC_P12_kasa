@@ -14,6 +14,7 @@ import Cookies from "js-cookie";
 type AuthContextType = {
   user: User | null;
   login: (user: User) => void;
+  updateUser: (user: User) => void;
   logout: () => void;
 };
 
@@ -42,6 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = (user: User) => {
+     console.log("LOGIN - objet reçu :", user);
+    setUser(user);
+    Cookies.set("user", JSON.stringify(user));
+  };
+
+  const updateUser = (user: User) => {
     setUser(user);
     Cookies.set("user", JSON.stringify(user));
   };
@@ -53,11 +60,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     Cookies.remove("token");
   };
 
+  console.log("AUTH PROVIDER - user =", user);
   return (
     <AuthContext.Provider
       value={{
         user,
         login,
+        updateUser,
         logout,
       }}
     >
@@ -72,6 +81,5 @@ export function useAuth() {
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
-
   return context;
 }

@@ -43,6 +43,7 @@ export const newPropertySchema = z.object({
       (file) => ["image/jpeg", "image/png", "image/webp"].includes(file.type),
       "Format accepté : JPEG, PNG ou WebP",
     )
+    .nullable()
     .optional(),
 
   price_per_night: z.coerce

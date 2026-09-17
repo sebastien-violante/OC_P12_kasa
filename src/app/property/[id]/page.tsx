@@ -25,6 +25,7 @@ export default function Property() {
           url: `/api/properties/${propertyId}`,
         });
         setProperty(property);
+        console.log(property)
         setLoading(false);
       } catch (error) {
         console.error(error);
@@ -32,6 +33,7 @@ export default function Property() {
     };
 
     loadProperty();
+
   }, []);
 
   return (
