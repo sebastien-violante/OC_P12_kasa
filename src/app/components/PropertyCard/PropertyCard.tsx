@@ -1,13 +1,16 @@
 "use client";
 
 import styles from "./PropertyCard.module.css";
-import type { Property } from "@/app/types/types";
+import type { Property, FlashMessageType } from "@/app/types/types";
 import Image from "next/image";
 import Link from "next/link";
 import postRequest from "@/app/utils/postRequest";
 import deleteRequest from "@/app/utils/deleteRequest";
 import Cookies from "js-cookie";
 import { useFavorites } from "@/app/context/FavoritesContext";
+import FlashMessage from "../FlashMessage/FlashMessage";
+import { useState } from "react";
+import formatUrl from "@/app/utils/formatUrl";
 
 type PropertyCardProps = {
   property: Property;
@@ -15,26 +18,37 @@ type PropertyCardProps = {
 
 export default function PropertyCard({ property }: PropertyCardProps) {
   const token = Cookies.get("token");
-
+  const [flashMessage, setFlashMessage] = useState<FlashMessageType | null>(
+    null,
+  );
   const { favoriteIds, addFavorite, removeFavorite } = useFavorites();
 
-  const isFavorite = favoriteIds.includes(property.id);
+  // Une propriété affichée dans une PropertyCard doit avoir un id.
+  if (!property.id) {
+    return null;
+  }
+
+  const propertyId = property.id;
+  const isFavorite = favoriteIds.includes(propertyId);
 
   async function toggleFavorite() {
     if (!token) {
-      alert("Vous devez être connecté pour ajouter un logement aux favoris.");
+      setFlashMessage({
+        status: false,
+        message: "Vous devez être connecté.e pour ajouter un favori",
+      });
       return;
     }
 
     if (!isFavorite) {
       try {
         const result = await postRequest({
-          url: `/api/properties/${property.id}/favorite`,
+          url: `/api/properties/${propertyId}/favorite`,
           token,
         });
 
         if (result.data) {
-          addFavorite(property.id);
+          addFavorite(propertyId);
         }
       } catch (error) {
         console.error(error);
@@ -45,12 +59,12 @@ export default function PropertyCard({ property }: PropertyCardProps) {
 
     try {
       const result = await deleteRequest({
-        url: `/api/properties/${property.id}/favorite`,
+        url: `/api/properties/${propertyId}/favorite`,
         token,
       });
 
       if (result.data) {
-        removeFavorite(property.id);
+        removeFavorite(propertyId);
       }
     } catch (error) {
       console.error(error);
@@ -60,12 +74,12 @@ export default function PropertyCard({ property }: PropertyCardProps) {
   return (
     <article className={styles.card}>
       <Link
-        href={`/property/${property.id}`}
+        href={`/property/${propertyId}`}
         className={styles.propertyLink}
       >
         <div className={styles.pictureContainer}>
           <Image
-            src={property.cover}
+            src={formatUrl(property.cover)}
             alt={`Photo du logement : ${property.title}`}
             fill
           />
@@ -73,13 +87,9 @@ export default function PropertyCard({ property }: PropertyCardProps) {
 
         <div className={styles.cardData}>
           <div className={styles.cardHeader}>
-            <h2 className={styles.cardTitle}>
-              {property.title}
-            </h2>
+            <h2 className={styles.cardTitle}>{property.title}</h2>
 
-            <p className={styles.cardDescription}>
-              {property.location}
-            </p>
+            <p className={styles.cardDescription}>{property.location}</p>
           </div>
 
           <p>
@@ -87,10 +97,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
               {property.price_per_night} €
             </span>
 
-            <span className={styles.label}>
-              {" "}
-              par nuit
-            </span>
+            <span className={styles.label}> par nuit</span>
           </p>
         </div>
       </Link>
@@ -118,6 +125,13 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           aria-hidden="true"
         />
       </button>
+
+      {flashMessage && (
+        <FlashMessage
+          status={flashMessage.status}
+          message={flashMessage.message}
+        />
+      )}
     </article>
   );
 }

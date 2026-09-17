@@ -2,12 +2,12 @@ export type Property = {
     cover : string;
     description: string;
     host: Host;
-    id: string;
+    id?: string;
     location: string;
     price_per_night: number;
-    rating_avg: number;
-    rating_counts: number;
-    slug: string;
+    rating_avg?: number;
+    rating_counts?: number;
+    slug?: string;
     title: string;
     pictures?: string[];
     equipments?: string[];
@@ -15,7 +15,7 @@ export type Property = {
 };
 
 export type Host = {
-    id: number;
+    id?: number;
     name: string;
     picture: string;
 }
@@ -93,19 +93,36 @@ export type PropertyFormData = {
   description: string;
   postalCode: string;
   location: string;
-  cover: string;
-  pictures: string[];
+  cover: File | null;
+  pictures: (File | null)[];
   name: string;
-  profile: string;
+  profile: File | null;
   equipments: string[];
   categories: string[];
+  price_per_night: string;
 };
 
-export type FlashType = {
-  type: "success" | "warning" | "fail";
-  message: string;
-};
 
 export type GetPropertyData = {
   property: Property;
 }
+
+export type FlashMessageType = {
+  status: boolean;
+  message: string;
+};
+
+export type FlashType = "success" | "error" | "info";
+
+export type CreatePropertyPayload = {
+  title: string;
+  description: string;
+  cover: string;
+  location: string;
+  price_per_night: number;
+  host_id: number;
+  host: Host;
+  pictures: string[];
+  equipments: string[];
+  tags: string[];
+};

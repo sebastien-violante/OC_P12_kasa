@@ -17,11 +17,13 @@ export const newPropertySchema = z.object({
     .string()
     .regex(
       /^[A-Za-zÀ-ÖØ-öø-ÿÀ-ÿ' -]+$/,
-      "Le nom doit comprendre au moins 3 caractères (alphabétiques, espaces et tirets)",
+      "3 caractères minimum (alphabétiques, espaces et tirets)",
     ),
 
   cover: z
-    .instanceof(File)
+    .instanceof(File, {
+      message: "Le choix d'une image est obligatoire",
+    })
     .refine(
       (file) => file.size <= 5 * 1024 * 1024,
       "L'image ne doit pas dépasser 5 Mo",
@@ -31,21 +33,25 @@ export const newPropertySchema = z.object({
       "Format accepté : JPEG, PNG ou WebP",
     ),
 
-profile: z
-  .instanceof(File)
-  .refine(
-    (file) => file.size <= 5 * 1024 * 1024,
-    "L'image ne doit pas dépasser 5 Mo"
-  )
-  .refine(
-    (file) => ["image/jpeg", "image/png", "image/webp"].includes(file.type),
-    "Format accepté : JPEG, PNG ou WebP"
-  ),
+  profile: z
+    .instanceof(File)
+    .refine(
+      (file) => file.size <= 5 * 1024 * 1024,
+      "L'image ne doit pas dépasser 5 Mo",
+    )
+    .refine(
+      (file) => ["image/jpeg", "image/png", "image/webp"].includes(file.type),
+      "Format accepté : JPEG, PNG ou WebP",
+    )
+    .optional(),
 
-price_per_night: z
-    .coerce
+  price_per_night: z.coerce
     .number("Le montant doit être entier sans décimale")
     .int()
     .nonnegative("Le montant ne peut pas être négatif")
-    .min(10, "Le montant de la nuitée doit être au moins de 10 euros")
+    .min(10, "Le montant de la nuitée doit être au moins de 10 euros"),
+
+  equipments: z
+    .array(z.string())
+    .min(1, "Veuillez sélectionner au moins un équipement."),
 });

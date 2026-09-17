@@ -9,7 +9,7 @@ import {
   useContext,
 } from "react";
 import type {
-  FlashType,
+  FlashMessageType,
   LoginFormData,
   AuthenticationPayload,
   AuthenticationResponse,
@@ -35,7 +35,7 @@ export default function Connexion() {
   const [formData, setFormData] = useState<LoginFormData>(initFormData);
   const [errors, setErrors] = useState<z.core.$ZodIssue[]>([]);
   const [apiError, setApiError] = useState("");
-  const [flash, setFlash] = useState<FlashType | null>(null);
+  const [flash, setFlash] = useState<FlashMessageType | null>(null);
   const router = useRouter();
   const { login } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -114,10 +114,10 @@ export default function Connexion() {
   useEffect(() => {
     const flashBag = localStorage.getItem("flash");
     if (flashBag) {
-      const pasedFlashBag = JSON.parse(flashBag);
+      const parsedFlashBag = JSON.parse(flashBag);
       setFlash({
-        type: pasedFlashBag.type,
-        message: pasedFlashBag.message,
+        status: parsedFlashBag.type,
+        message: parsedFlashBag.message,
       });
       localStorage.removeItem("flash");
     }
@@ -125,7 +125,7 @@ export default function Connexion() {
 
   return (
     <section className={styles.formWrapper}>
-      {flash && <FlashMessage type={flash.type} message={flash.message} />}
+      {flash && <FlashMessage status={flash.status} message={flash.message} />}
       <div className={styles.formHeader}>
         <h1>Heureux de vous revoir</h1>
         <p>

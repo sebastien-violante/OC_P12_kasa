@@ -7,11 +7,18 @@ import { equipements } from "../data/equipments";
 import getRequest from "../utils/getRequest";
 import Tag from "../components/Tag/Tag";
 import { ChangeEvent } from "react";
-import type { PropertyFormData } from "../types/types";
+import type { CreatePropertyPayload, PropertyFormData } from "../types/types";
 import z from "zod";
 import { newPropertySchema } from "../types/schemas/newPropertySchema";
+import { useAuth } from "../context/AuthContext";
+import Cookies from "js-cookie";
+import patchRequest from "../utils/patchRequest";
+import postRequest from "../utils/postRequest";
+import getPictureUrls from "../utils/getPictureUrls";
+import type { Property } from "../types/types";
 
 export default function Addproperty() {
+  const token = Cookies.get("token");
   const [cover, setCover] = useState<File | null>(null);
   const [images, setImages] = useState<(File | null)[]>([null]);
   const [profile, setProfile] = useState<File | null>(null);
@@ -21,19 +28,22 @@ export default function Addproperty() {
   const coverInputRef = useRef<HTMLInputElement>(null);
   const [errors, setErrors] = useState<z.core.$ZodIssue[]>([]);
   const pictureInputRef = useRef<(HTMLInputElement | null)[]>([]);
-
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const [profileFileName, setProfileFileName] = useState("");
+  const { user } = useAuth();
   const initFormData: PropertyFormData = {
-    title: "",
-    description: "",
-    postalCode: "",
-    location: "",
-    cover: "",
-    pictures: [],
-    name: "",
-    profile: "",
-    equipments: [],
-    categories: [],
-  };
+  title: "",
+  description: "",
+  postalCode: "",
+  location: "",
+  cover: null,
+  pictures: [],
+  name: user?.name ?? "",
+  profile: null,
+  equipments: [],
+  categories: [],
+  price_per_night: "",
+};
 
   const [formData, setFormData] = useState(initFormData);
 
@@ -83,6 +93,7 @@ export default function Addproperty() {
     if (!file) return;
 
     setProfile(file);
+    setProfileFileName(file.name);
   }
 
   function handleImageChange(
@@ -144,30 +155,144 @@ export default function Addproperty() {
     return errors.find((error) => error.path.includes(fieldName));
   };
 
-  function addPorperty() {
+  async function addPorperty() {
+    if (!user) {
+      console.error("Utilisateur non connecté");
+      return;
+    }
+
     const data = {
       ...formData,
-      cover: cover,
-      profile: profile,
+      cover,
+      profile,
       pictures: images,
     };
 
-    console.log("FORMDATA", data);
-    // vérification Zod et affichage erreurs
-    const zodValidation = newPropertySchema.safeParse(formData);
+    const zodValidation = newPropertySchema.safeParse(data);
+
     if (!zodValidation.success) {
       setErrors(zodValidation.error.issues);
-      console.log(errors);
+      console.log(zodValidation.error.issues);
       return;
     }
-    // si pas possible vérification taille, vérif taille et affichage erreurs
-    // création payload (attention formatag champs)
-    // bouclage pictures et réception url publiques
-    // ajout des pictures et cover au POST de property
-    // envoi profile en PATCH de user
+
+    const pictures: {
+      file: File;
+      purpose: "property-cover" | "user-picture" | "property-picture";
+    }[] = [];
+
+    if (data.cover) {
+      pictures.push({
+        file: data.cover,
+        purpose: "property-cover",
+      });
+    }
+
+    if (data.profile) {
+      pictures.push({
+        file: data.profile,
+        purpose: "user-picture",
+      });
+    }
+
+    data.pictures.forEach((picture) => {
+      if (picture) {
+        pictures.push({
+          file: picture,
+          purpose: "property-picture",
+        });
+      }
+    });
+
+    const token = Cookies.get("token");
+    const pictureUrls = await getPictureUrls(pictures, token);
+
+    let coverPicture = "";
+    let profilePicture = "";
+    const propertyPictures: string[] = [];
+
+    pictureUrls.forEach((picture) => {
+      switch (picture.purpose) {
+        case "property-cover":
+          coverPicture = picture.url;
+          break;
+
+        case "user-picture":
+          profilePicture = picture.url;
+          break;
+
+        case "property-picture":
+          propertyPictures.push(picture.url);
+          break;
+      }
+    });
+
+    const payload: CreatePropertyPayload = {
+      title: data.title.charAt(0) + data.title.slice(1).trim(),
+      description:
+        data.description.charAt(0) + data.description.slice(1).trim(),
+      cover: coverPicture,
+      location: data.location.charAt(0) + data.location.slice(1).trim(),
+      price_per_night: Number(data.price_per_night),
+      host_id: user.id,
+      host: {
+        name: user.name,
+        picture: profilePicture,
+      },
+      pictures: propertyPictures,
+      equipments: data.equipments,
+      tags: data.categories,
+    };
+
+    console.log(JSON.stringify(payload));
+
+    try {
+      const result = await postRequest<Property, CreatePropertyPayload>({
+        url: `/api/properties`,
+        payload,
+        token,
+      });
+
+      console.log(result);
+    } catch (error) {
+      console.error("Erreur lors du chargement des favoris :", error);
+    }
   }
 
+  // Update rôle utilisateur client->owner si ce n'est pas déjà fait et placement en cookies du nouveau token
   useEffect(() => {
+    if (user?.role === "client") {
+      const changeRole = async () => {
+        const payload : {role:"owner"} = {
+          role: "owner",
+        };
+        try {
+          const result = await patchRequest<{ role: "owner" }, { token: string }>({
+            url: `/api/users/${user.id}`,
+            token,
+            payload,
+          });
+          if (result.data) {
+            const newToken = result.data.token;
+            Cookies.set("token", newToken);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      changeRole();
+    }
+  }, [user]);
+
+  // Chargement de nom de l'utilisateur dans le formulaire
+  useEffect(() => {
+    if (!user) return;
+    setFormData((prev) => ({ ...prev, name: user.name }));
+  }, [user]);
+
+  useEffect(() => {
+    // Chargement des tags
     const loadTags = async () => {
       try {
         const tags = await getRequest<string[]>({ url: "api/tags" });
@@ -177,8 +302,29 @@ export default function Addproperty() {
       }
     };
 
+    // Chargement de l'image de profile
+    const loadDefaultProfile = async () => {
+      try {
+        const result = await fetch(
+          "/pictures/default-pictures/default-profile.jpg",
+        );
+
+        const blob = await result.blob();
+
+        const file = new File([blob], "default-profile.jpg", {
+          type: blob.type,
+        });
+
+        setProfile(file);
+      } finally {
+        setIsLoadingProfile(false);
+      }
+    };
+
     loadTags();
+    loadDefaultProfile();
   }, []);
+
   return (
     <>
       <section className={styles.header}>
@@ -199,7 +345,6 @@ export default function Addproperty() {
         <button type="submit" className={styles.submitBtn}>
           Ajouter
         </button>
-
         <article className={styles.mainData}>
           <div className={styles.formGroup}>
             <label htmlFor="title">Titre de la propriété</label>
@@ -305,13 +450,21 @@ export default function Addproperty() {
               onChange={handleInputValue}
               required
               aria-describedby={
-                getFieldError("price_per_night") ? "price_per_night-error" : undefined
+                getFieldError("price_per_night")
+                  ? "price_per_night-error"
+                  : undefined
               }
               aria-invalid={getFieldError("price_per_night") ? "true" : "false"}
-              className={getFieldError("price_per_night") ? styles.inputOnError : ""}
+              className={
+                getFieldError("price_per_night") ? styles.inputOnError : ""
+              }
             />
             {getFieldError("price_per_night") && (
-              <p id="price_per_night-error" className={styles.fieldError} role="alert">
+              <p
+                id="price_per_night-error"
+                className={styles.fieldError}
+                role="alert"
+              >
                 {getFieldError("price_per_night")?.message}
               </p>
             )}
@@ -329,7 +482,22 @@ export default function Addproperty() {
                   value={cover?.name || ""}
                   onChange={handleInputValue}
                   readOnly
+                  required
+                  aria-describedby={
+                    getFieldError("cover") ? "cover-error" : undefined
+                  }
+                  aria-invalid={getFieldError("cover") ? "true" : "false"}
+                  className={getFieldError("cover") ? styles.inputOnError : ""}
                 />
+                {getFieldError("cover") && (
+                  <p
+                    id="cover-error"
+                    className={styles.fieldError}
+                    role="alert"
+                  >
+                    {getFieldError("cover")?.message}
+                  </p>
+                )}
                 <button
                   type="button"
                   className={styles.addButton}
@@ -341,13 +509,15 @@ export default function Addproperty() {
                 <input
                   ref={coverInputRef}
                   id="coverImage"
+                  name="cover"
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp"
                   hidden
                   onChange={handleCoverChange}
                 />
               </div>
-
+            </div>
+            <div className={styles.formGroup}>
               {/* Images du logement */}
               <label htmlFor="propertyPictures">Images du logement</label>
 
@@ -407,7 +577,7 @@ export default function Addproperty() {
                   id="name"
                   name="name"
                   onChange={handleInputValue}
-                  required
+                  value={user?.name ?? ""}
                   aria-describedby={
                     getFieldError("name") ? "name-error" : undefined
                   }
@@ -421,15 +591,25 @@ export default function Addproperty() {
                 )}
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="profilePicture">Photo de profil</label>
+                <label htmlFor="profileFileName">Photo de profil</label>
                 <div className={styles.inputWrapper}>
                   <input
-                    id="profilePicture"
+                    id="profileFileName"
                     type="text"
-                    value={profile?.name || ""}
+                    name="profile"
+                    value={profileFileName}
                     readOnly
                     aria-label="Photo de profil sélectionnée"
                   />
+                  {getFieldError("profile") && (
+                    <p
+                      id="profile-error"
+                      className={styles.fieldError}
+                      role="alert"
+                    >
+                      {getFieldError("profile")?.message}
+                    </p>
+                  )}
 
                   <button
                     type="button"
@@ -453,8 +633,8 @@ export default function Addproperty() {
             </div>
           </div>
         </article>
-        <fieldset className={styles.equipments}>
-          <legend className={styles.sectionLabel}>Équipements</legend>
+        <section className={styles.equipments}>
+          <h2 className={styles.sectionLabel}>Équipements</h2>
           <div className={styles.checkboxes}>
             {equipements.map((equipment) => (
               <div className={styles.checkbox} key={equipment}>
@@ -468,10 +648,19 @@ export default function Addproperty() {
                 <label htmlFor={equipment}>{equipment}</label>
               </div>
             ))}
+            {getFieldError("equipments") && (
+              <p
+                id="equipments-error"
+                className={styles.fieldError}
+                role="alert"
+              >
+                {getFieldError("equipments")?.message}
+              </p>
+            )}
           </div>
-        </fieldset>
-        <fieldset className={styles.categories}>
-          <legend className={styles.sectionLabel}>Catégories</legend>
+        </section>
+        <section className={styles.categories}>
+          <h2 className={styles.sectionLabel}>Catégories</h2>
           <div className={styles.categoryList}>
             {tags.map((tag) => (
               <Tag
@@ -505,7 +694,7 @@ export default function Addproperty() {
               </button>
             </div>
           </div>
-        </fieldset>
+        </section>
       </form>
     </>
   );

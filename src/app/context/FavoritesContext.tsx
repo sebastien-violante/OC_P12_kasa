@@ -42,6 +42,8 @@ export function FavoritesProvider({
       return;
     }
 
+    const userId = user.id
+
     async function fetchFavorites() {
       const token = Cookies.get("token");
 
@@ -52,11 +54,13 @@ export function FavoritesProvider({
 
       try {
         const result = await getRequest<Property[]>({
-          url: `/api/users/${user!.id}/favorites`,
+          url: `/api/users/${userId}/favorites`,
           token,
         });
 
-        const ids = result.map((favorite) => favorite.id);
+        const ids = result
+          .map((favorite) => favorite.id)
+          .filter((id): id is string => id !== undefined);
 
         setFavoriteIds(ids);
       } catch (error) {

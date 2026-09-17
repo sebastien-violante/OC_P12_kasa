@@ -20,39 +20,39 @@ export default function Favorites() {
   // Redirection en l'absence de token
   useEffect(() => {
     async function loadFavorites() {
-
       const token = Cookies.get("token");
-      const userCookie = Cookies.get("user")
-      
+      const userCookie = Cookies.get("user");
+
       if (!token) {
         router.replace("/connexion");
         return;
       }
 
-      if(userCookie) {
-        const user = JSON.parse(userCookie)
+      if (userCookie) {
+        const user = JSON.parse(userCookie);
         try {
           const result = await getRequest<Property[]>({
             url: `/api/users/${user.id}/favorites`,
             token,
           });
-          
-          setFavorites(result)
-          setFavoriteIds(result.map((favorite) => favorite.id))
-          // mise à jour du local storage
-          localStorage.setItem("favorites", JSON.stringify(favorites))
 
-        } catch(error) {
-          console.error(error)
+          setFavorites(result);
+          const ids = result
+            .map((favorite) => favorite.id)
+            .filter((id): id is string => id !== undefined);
+
+          setFavoriteIds(ids);
+          // mise à jour du local storage
+          localStorage.setItem("favorites", JSON.stringify(favorites));
+        } catch (error) {
+          console.error(error);
         } finally {
-          setLoading(false)
+          setLoading(false);
         }
       }
     }
-    loadFavorites()
+    loadFavorites();
   }, [token]);
-
- 
 
   if (loading) {
     return (
@@ -80,10 +80,7 @@ export default function Favorites() {
           <p>Vous n&apos;avez aucun favori enregistré.</p>
         ) : (
           favorites.map((property) => (
-            <PropertyCard
-              key={property.id}
-              property={property}
-            />
+            <PropertyCard key={property.id} property={property} />
           ))
         )}
       </section>

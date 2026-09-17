@@ -56,6 +56,7 @@
 .property .item:first-child {
   grid-row: span 1;
   grid-column: span 4;
+  width: 358px;
 }
 
 .property .item img {
@@ -120,6 +121,9 @@
 .host .data img {
   border-radius: 10px;
   overflow: hidden;
+  width: 82px;
+  height: 82px;
+  object-fit: cover;
 }
 
 .host .data .rating {
@@ -152,14 +156,15 @@
 
 @media screen and (min-width: 767px) {
   .property .grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(2, 174px);
-  gap: 10px;
-}
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 174px);
+    gap: 10px;
+  }
   .property .item:first-child {
     grid-row: span 2;
     grid-column: span 2;
+    width: 302px;
   }
 }
 @media screen and (min-width: 1021px) {
@@ -168,6 +173,7 @@
     align-items: flex-start;
     width: 971px;
   }
+
   .host {
     width: 345px;
   }

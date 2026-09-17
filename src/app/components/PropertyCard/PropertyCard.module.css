@@ -45,6 +45,11 @@
     z-index: 20;
 }
 
+.favorite:hover {
+    transform: scale(1.1);
+    cursor: pointer;   
+}
+
 .label {
     color: var(--grisDark);
 }

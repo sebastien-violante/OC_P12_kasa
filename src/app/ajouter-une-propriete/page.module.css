@@ -69,6 +69,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    position: relative;
 
     label {
       font-size: 14px;
@@ -87,6 +88,10 @@
       color: var(--mainRed);
       font-size: 12px;
       margin-bottom: 5px;
+      position: absolute;
+      top: 20px;
+      left: 5px;
+      z-index: 100;
     }
     .inputOnError {
       background: var(--mainRedOpacified);
@@ -96,6 +101,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+    
     }
 
     .inputWrapper input[type="text"] {
@@ -136,6 +142,21 @@
     width: 48%;
     padding: 80px;
     margin-top: 40px;
+    position: relative;
+
+    h2 {
+      margin-bottom: 16px
+    }
+
+    .fieldError {
+      width: 100%;
+      text-align:center;
+      color: var(--mainRed);
+      font-size: 12px;
+      margin-bottom: 5px;
+     
+      z-index: 100;
+    }
 
     .checkboxes {
       display: flex;
@@ -151,9 +172,6 @@
       width: 150px;
     }
 
-    .sectionLabel {
-      margin-bottom: 10px;
-    }
   }
 
   .categories {

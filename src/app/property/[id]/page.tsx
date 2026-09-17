@@ -9,6 +9,7 @@ import Loader from "@/app/components/Loader/Loader";
 import Link from "next/link";
 import Image from "next/image";
 import Tag from "@/app/components/Tag/Tag";
+import formatUrl from "@/app/utils/formatUrl";
 
 export default function Property() {
   const params = useParams<{ id: string }>();
@@ -20,7 +21,9 @@ export default function Property() {
   useEffect(() => {
     const loadProperty = async () => {
       try {
-        const property = await getRequest<Property>({url: `/api/properties/${propertyId}`})
+        const property = await getRequest<Property>({
+          url: `/api/properties/${propertyId}`,
+        });
         setProperty(property);
         setLoading(false);
       } catch (error) {
@@ -54,7 +57,7 @@ export default function Property() {
             <div className={styles.item}>
               {property?.cover && (
                 <Image
-                  src={property?.cover}
+                  src={formatUrl(property?.cover)}
                   fill
                   alt={`image de couverture de la propriété ${property?.title}`}
                   className={styles.cover}
@@ -62,10 +65,10 @@ export default function Property() {
                 />
               )}
             </div>
-            {property?.pictures?.slice(1).map((picture, index) => (
+            {property?.pictures?.map((picture, index) => (
               <div key={index} className={styles.item}>
                 <Image
-                  src={picture}
+                  src={formatUrl(picture)}
                   fill
                   alt=""
                   className={styles.image}
@@ -105,7 +108,7 @@ export default function Property() {
             <div>
               {property?.host.picture && (
                 <Image
-                  src={property?.host.picture ?? ""}
+                  src={formatUrl(property?.host.picture) ?? ""}
                   alt={property?.host.name ?? ""}
                   height="82"
                   width="82"
