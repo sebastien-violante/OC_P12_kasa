@@ -2,16 +2,18 @@
 
 import { useEffect, useState } from "react";
 import getRequest from "./utils/getRequest";
-import type { Property } from "./types/types";
+import type { Property, FlashMessageType } from "./types/types";
 import Loader from "./components/Loader/Loader";
 import PropertyCard from "./components/PropertyCard/PropertyCard";
 import Tile from "./components/Tile/Tile";
 import styles from "./page.module.css";
+import FlashMessage from "./components/FlashMessage/FlashMessage";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [properties, setProperties] = useState<Property[]>([]);
   const [visibleCards, setVisibleCards] = useState(6);
+  const [flash, setFlash] = useState<FlashMessageType | null>(null);
 
   const loadMoreProperties = () => {
     setVisibleCards((prev) => prev + 6);
@@ -35,8 +37,21 @@ export default function Home() {
     loadProperties();
   }, []);
 
+  useEffect(() => {
+    const flashBag = localStorage.getItem("flash");
+    if (flashBag) {
+      const parsedFlashBag = JSON.parse(flashBag);
+      setFlash({
+        status: parsedFlashBag.type,
+        message: parsedFlashBag.message,
+      });
+      localStorage.removeItem("flash");
+    }
+  }, []);
+
   return (
-    < div className={styles.homeWrapper}>
+    <div className={styles.homeWrapper}>
+      {flash && <FlashMessage status={flash.status} message={flash.message} />}
       <section className={styles.hero}>
         <h1>Chez vous, partout et ailleurs</h1>
 
@@ -51,7 +66,11 @@ export default function Home() {
       </section>
 
       {loading && (
-        <div role="status" aria-live="polite" aria-label="chargement des logements">
+        <div
+          role="status"
+          aria-live="polite"
+          aria-label="chargement des logements"
+        >
           <Loader />
           <span className="sr-only">Chargement des logements…</span>
         </div>
@@ -69,7 +88,11 @@ export default function Home() {
         ))}
 
         {visibleCards < properties.length && (
-          <button type="button" onClick={loadMoreProperties} className={styles.loadMore}>
+          <button
+            type="button"
+            onClick={loadMoreProperties}
+            className={styles.loadMore}
+          >
             Voir plus de logements...
           </button>
         )}

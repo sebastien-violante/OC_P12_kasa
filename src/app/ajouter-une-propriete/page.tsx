@@ -16,9 +16,12 @@ import patchRequest from "../utils/patchRequest";
 import postRequest from "../utils/postRequest";
 import getPictureUrls from "../utils/getPictureUrls";
 import type { Property, User } from "../types/types";
+import { useRouter } from "next/navigation";
+
 
 export default function Addproperty() {
   const token = Cookies.get("token");
+  const router = useRouter()
   const [cover, setCover] = useState<File | null>(null);
   const [images, setImages] = useState<(File | null)[]>([null]);
   const [profile, setProfile] = useState<File | null>(null);
@@ -305,6 +308,20 @@ console.log("ADD PROPERTY - user =", user);
       });
 
       console.log(result);
+
+      localStorage.setItem(
+          "flash",
+          JSON.stringify({
+            type: "success",
+            message:
+              "Votre logement a bien été enregistré",
+          }),
+        );
+        //setApiError("");
+        setErrors([]);
+        setFormData(initFormData);
+        router.push("/");
+
     } catch (error) {
       console.error("Erreur lors de l'enregistrement de la propriété :", error);
     }
@@ -616,6 +633,7 @@ console.log("ADD PROPERTY - user =", user);
                   type="text"
                   id="name"
                   name="name"
+                  disabled
                   onChange={handleInputValue}
                   value={formData.name ?? ""}
                   aria-describedby={

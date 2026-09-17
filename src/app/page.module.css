@@ -82,6 +82,10 @@
     gap: 16px;
 }
 
+.flash {
+  z-index: 500;
+}
+
 @media (min-width: 767px) {
   .explanations {
     padding: 40px;

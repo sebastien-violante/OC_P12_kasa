@@ -114,8 +114,9 @@ export default function Header() {
                     type="button"
                     onClick={handleLogout}
                     aria-label="Se déconnecter"
+                    className={styles.navBtn}
                   >
-                    <img src="/pictures/cross.svg" alt="" />
+                    <img src="/pictures/logements.svg" alt="" />
                   </button>
                 </li>
               </>
