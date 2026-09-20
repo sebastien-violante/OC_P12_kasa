@@ -126,3 +126,61 @@ export type CreatePropertyPayload = {
   equipments: string[];
   tags: string[];
 };
+
+// TYPES POUR LA MESSAGERIE
+export type SendMessagePayload = {
+  content: string;
+}
+
+export type Message = {
+  id: number;
+  conversationId: number;
+  sender: {
+    id: number;
+    name: string;
+    picture: string | null;
+  };
+  content: string;
+  createdAt: string;
+  readAt: string | null;
+}
+
+export type Conversation = {
+  id: number;
+  property: {
+    id: number;
+    title: string;
+  };
+  otherUser: {
+    id: number;
+    name: string;
+    picture: string | null;
+  };
+  lastMessage: {
+    content: string;
+    createdAt: string;
+  } | null;
+  unreadCount: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateConversationPayload = {
+  propertyId: string;
+};
+
+export type CreatedConversation = {
+  id: number;
+  property: {
+    id: number;
+    title: string;
+  };
+  clientId: number;
+  host: {
+    id: number;
+    name: string;
+    picture: string | null;
+  };
+  createdAt: string;
+  updatedAt: string;
+};

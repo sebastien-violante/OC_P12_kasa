@@ -3,20 +3,80 @@
 import styles from "./page.module.css";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import type { Property } from "@/app/types/types";
+import type {
+  Property,
+  SendMessagePayload,
+  Message,
+  CreateConversationPayload,
+  CreatedConversation,
+} from "@/app/types/types";
 import getRequest from "@/app/utils/getRequest";
 import Loader from "@/app/components/Loader/Loader";
 import Link from "next/link";
 import Image from "next/image";
 import Tag from "@/app/components/Tag/Tag";
 import formatUrl from "@/app/utils/formatUrl";
+import { useAuth } from "@/app/context/AuthContext";
+import { useRouter } from "next/navigation";
+import postRequest from "@/app/utils/postRequest";
+import Cookies from "js-cookie";
 
 export default function Property() {
   const params = useParams<{ id: string }>();
+  const { user, updateUser } = useAuth();
+  const router = useRouter();
+
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [messageError, setMessageError] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const propertyId = params.id;
   const [property, setProperty] = useState<Property | null>(null);
+  const token = Cookies.get("token");
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!property || !message.trim()) {
+      return;
+    }
+    setSendingMessage(true);
+    setMessageError(null);
+    try {
+      // Création de l'id de la conversation
+      const conversationResponse = await postRequest<
+        CreateConversationPayload,
+        CreatedConversation
+      >({
+        url: "/api/conversations",
+        token,
+        payload: { propertyId },
+      });
+      if (!conversationResponse.data) {
+        throw new Error("La conversation n'a pas pu être créée.");
+      }
+      const conversationId = conversationResponse.data.id;
+
+      // envoi du message correspondant au numéro d'id de la conversation
+      const messageResponse = await postRequest<{ content: string }, Message>({
+        url: `/api/conversations/${conversationId}/messages`,
+        token,
+        payload: {
+          content: message,
+        },
+      });
+
+
+      setMessage("");
+      setIsMessageModalOpen(false);
+    } catch (error) {
+      console.error(error);
+      setMessageError("Impossible d'envoyer le message. Réessayez.");
+    } finally {
+      setSendingMessage(false);
+    }
+  };
 
   useEffect(() => {
     const loadProperty = async () => {
@@ -25,7 +85,8 @@ export default function Property() {
           url: `/api/properties/${propertyId}`,
         });
         setProperty(property);
-        console.log(property)
+        console.log("PROPERTY", property);
+
         setLoading(false);
       } catch (error) {
         console.error(error);
@@ -33,8 +94,11 @@ export default function Property() {
     };
 
     loadProperty();
-
   }, []);
+
+  useEffect(() => {
+    console.log("USER", user);
+  }, [user]);
 
   return (
     <>
@@ -108,9 +172,16 @@ export default function Property() {
           <h2>Votre hôte</h2>
           <div className={styles.data}>
             <div>
-              {property?.host.picture && (
+              {property?.host.picture ? (
                 <Image
-                  src={formatUrl(property?.host.picture) ?? ""}
+                  src={formatUrl(property?.host.picture)}
+                  alt={property?.host.name ?? ""}
+                  height="82"
+                  width="82"
+                />
+              ) : (
+                <Image
+                  src="/pictures/default-pictures/default-profile.jpg"
                   alt={property?.host.name ?? ""}
                   height="82"
                   width="82"
@@ -123,14 +194,73 @@ export default function Property() {
               {property?.rating_avg ?? 0}
             </div>
           </div>
-          <Link href="#" className={styles.link}>
-            Contacter l&apos;hôte
-          </Link>
-          <Link href="#" className={styles.link}>
-            Envoyer un message
-          </Link>
+          {property?.host.id !== user?.id && (
+            <>
+              <Link href="#" className={styles.link}>
+                Contacter l&apos;hôte
+              </Link>
+              <button
+                type="button"
+                onClick={() => setIsMessageModalOpen(true)}
+                className={styles.link}
+              >
+                Envoyer un message
+              </button>
+            </>
+          )}
         </section>
       </div>
+      {isMessageModalOpen && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setIsMessageModalOpen(false)}
+        >
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className={styles.closeButton}
+              onClick={() => setIsMessageModalOpen(false)}
+              aria-label="Fermer"
+            >
+              ×
+            </button>
+
+            <h2>Contacter l&apos;hôte</h2>
+
+            <p>Envoyez un message à l&apos;hôte à propos de ce logement.</p>
+
+            <form onSubmit={handleSendMessage}>
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Écrivez votre message..."
+                rows={6}
+                disabled={sendingMessage}
+                required
+              />
+
+              {messageError && <p className={styles.error}>{messageError}</p>}
+
+              <div className={styles.modalActions}>
+                <button
+                  type="button"
+                  onClick={() => setIsMessageModalOpen(false)}
+                  disabled={sendingMessage}
+                >
+                  Annuler
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={sendingMessage || !message.trim()}
+                >
+                  {sendingMessage ? "Envoi..." : "Envoyer"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 }

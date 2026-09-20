@@ -52,7 +52,6 @@ const [formData, setFormData] = useState<PropertyFormData>(initFormData);
 useEffect(() => {
   if (!user) return;
 
-  console.log("Je mets le nom dans le formulaire :", user.name);
 
   setFormData((prev) => ({
     ...prev,
@@ -185,7 +184,6 @@ useEffect(() => {
       });
 
       if (result.data) {
-        console.log("UPDATED USER", result.data);
 
         updateUser(result.data);
 
@@ -203,7 +201,6 @@ useEffect(() => {
       console.error("Utilisateur non connecté");
       return;
     }
-console.log("ADD PROPERTY - user =", user);
     const data = {
       ...formData,
       cover,
@@ -215,7 +212,6 @@ console.log("ADD PROPERTY - user =", user);
 
     if (!zodValidation.success) {
       setErrors(zodValidation.error.issues);
-      console.log(zodValidation.error.issues);
       return;
     }
 
@@ -298,7 +294,6 @@ console.log("ADD PROPERTY - user =", user);
       tags: data.categories,
     };
 
-    console.log(JSON.stringify(payload));
 
     try {
       const result = await postRequest<Property, CreatePropertyPayload>({
@@ -307,7 +302,6 @@ console.log("ADD PROPERTY - user =", user);
         token,
       });
 
-      console.log(result);
 
       localStorage.setItem(
           "flash",
@@ -377,11 +371,7 @@ console.log("ADD PROPERTY - user =", user);
 
   }, []);
 
-  useEffect(() => {
-  console.log("USER DANS Addproperty :", user);
-  console.log("USER.NAME :", user?.name);
-}, [user]);
-
+  
   return (
     <>
       <section className={styles.header}>

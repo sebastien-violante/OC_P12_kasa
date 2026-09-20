@@ -43,7 +43,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = (user: User) => {
-     console.log("LOGIN - objet reçu :", user);
     setUser(user);
     Cookies.set("user", JSON.stringify(user));
   };
@@ -60,7 +59,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     Cookies.remove("token");
   };
 
-  console.log("AUTH PROVIDER - user =", user);
   return (
     <AuthContext.Provider
       value={{

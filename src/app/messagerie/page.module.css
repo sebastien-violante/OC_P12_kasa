@@ -1,0 +1,94 @@
+.mainWrapper {
+  display: flex;
+  max-width: 1113px;
+  min-height: 65vh;
+  margin: auto;
+
+  .messages {
+    width: 376px;
+    padding: 8px;
+    background: white;
+
+    .back {
+      width: 100%;
+      height: 68px;
+      display: flex;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+  }
+
+  .details {
+    flex: 1;
+    padding: 40px 40px 0 40px;
+    display: flex;
+    flex-direction: column;
+
+    .messageDate {
+        width: 100%;
+        text-align: center;
+        font-size: 8px;
+        border-bottom: 1px solid var(--grisDark);
+        position: relative;
+        margin-bottom: 24px;
+
+        span {
+            display: block;
+            width: 90px;
+            background: var(--lightOrange);
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--grisDark);
+
+        }
+    }
+
+    .backToList {
+      display: none;
+    }
+
+    .messageForm {
+        height: 137px;
+        background: white;
+        padding: 20px 30px;
+        position: relative;
+
+        .messageInput {
+            border: 1px solid var(--grisLight);
+            border-radius: 10px;
+            width: 100%;
+            height: 100%;
+            padding: 10px;
+        }
+        .sendButton {
+            position: absolute;
+            bottom: 29px;
+            right: 44px;
+        }
+    }
+  }
+}
+
+@media screen and (max-width: 1021px) {
+  .mainWrapper {
+    flex-direction: column;
+
+    .messages,
+    details {
+      width: 100%;
+    }
+
+    .details {
+      .backToList {
+        display: block;
+      }
+    }
+    .messages {
+      display: none;
+    }
+  }
+}

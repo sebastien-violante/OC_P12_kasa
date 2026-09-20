@@ -1,0 +1,48 @@
+.conversationTile {
+  padding: 8px;
+  display: flex;
+  gap: 20px;
+  border-bottom: 1px solid var(--grisLight);
+
+  .square {
+    width: 45px;
+    height: 45px;
+    background: var(--grisLight);
+    border-radius: 10px;
+  }
+
+  .date {
+    width: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+
+    .hour {
+      font-size: 10px;
+    }
+  }
+
+  .data {
+    flex: 1;
+
+    .user {
+      font-size: 14px;
+    }
+
+    .message {
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 10px;
+    }
+  }
+
+  .redBubble {
+    width: 10px;
+    height: 10px;
+    background: var(--mainRed);
+    border-radius: 50%;
+  }
+}

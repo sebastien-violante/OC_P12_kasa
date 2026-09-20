@@ -104,7 +104,7 @@ export default function Header() {
                 </li>
 
                 <li className={styles.icon}>
-                  <Link href="/messages" aria-label="Mes messages">
+                  <Link href="/messagerie" aria-label="Mes messages">
                     <img src="/pictures/message-nav.svg" alt="" />
                   </Link>
                 </li>
