@@ -7,7 +7,7 @@ import { equipements } from "../data/equipments";
 import getRequest from "../utils/getRequest";
 import Tag from "../components/Tag/Tag";
 import { ChangeEvent } from "react";
-import type { CreatePropertyPayload, PropertyFormData } from "../types/types";
+import type { CreatePropertyPayload, PropertyFormData, ApiError } from "../types/types";
 import z from "zod";
 import { newPropertySchema } from "../types/schemas/newPropertySchema";
 import { useAuth } from "../context/AuthContext";
@@ -18,10 +18,9 @@ import getPictureUrls from "../utils/getPictureUrls";
 import type { Property, User } from "../types/types";
 import { useRouter } from "next/navigation";
 
-
 export default function Addproperty() {
   const token = Cookies.get("token");
-  const router = useRouter()
+  const router = useRouter();
   const [cover, setCover] = useState<File | null>(null);
   const [images, setImages] = useState<(File | null)[]>([null]);
   const [profile, setProfile] = useState<File | null>(null);
@@ -31,33 +30,32 @@ export default function Addproperty() {
   const coverInputRef = useRef<HTMLInputElement>(null);
   const [errors, setErrors] = useState<z.core.$ZodIssue[]>([]);
   const pictureInputRef = useRef<(HTMLInputElement | null)[]>([]);
-  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [profileFileName, setProfileFileName] = useState("");
   const { user, updateUser } = useAuth();
+  const [apiError, setApiError] = useState("");
   const initFormData: PropertyFormData = {
-  title: "",
-  description: "",
-  postalCode: "",
-  location: "",
-  cover: null,
-  pictures: [],
-  name: "",
-  profile: null,
-  equipments: [],
-  categories: [],
-  price_per_night: "",
-};
+    title: "",
+    description: "",
+    postalCode: "",
+    location: "",
+    cover: null,
+    pictures: [],
+    name: "",
+    profile: null,
+    equipments: [],
+    categories: [],
+    price_per_night: "",
+  };
 
-const [formData, setFormData] = useState<PropertyFormData>(initFormData);
-useEffect(() => {
-  if (!user) return;
+  const [formData, setFormData] = useState<PropertyFormData>(initFormData);
+  useEffect(() => {
+    if (!user) return;
 
-
-  setFormData((prev) => ({
-    ...prev,
-    name: user.name,
-  }));
-}, [user]);
+    setFormData((prev) => ({
+      ...prev,
+      name: user.name,
+    }));
+  }, [user]);
 
   // Captation des données d'enregistrement dans FormData
   const handleInputValue = (
@@ -184,7 +182,6 @@ useEffect(() => {
       });
 
       if (result.data) {
-
         updateUser(result.data);
 
         return result.data;
@@ -294,7 +291,6 @@ useEffect(() => {
       tags: data.categories,
     };
 
-
     try {
       const result = await postRequest<Property, CreatePropertyPayload>({
         url: `/api/properties`,
@@ -302,22 +298,25 @@ useEffect(() => {
         token,
       });
 
-
       localStorage.setItem(
-          "flash",
-          JSON.stringify({
-            type: "success",
-            message:
-              "Votre logement a bien été enregistré",
-          }),
-        );
-        //setApiError("");
-        setErrors([]);
-        setFormData(initFormData);
-        router.push("/");
-
+        "flash",
+        JSON.stringify({
+          type: "success",
+          message: "Votre logement a bien été enregistré",
+        }),
+      );
+      setErrors([]);
+      setFormData(initFormData);
+      router.push("/");
     } catch (error) {
-      console.error("Erreur lors de l'enregistrement de la propriété :", error);
+      const apiError = error as ApiError;
+      if (apiError.status === 403) {
+        setApiError(
+          "Vous n'aves pas les droits nécessaires pour créer un logement",
+        );
+      } else {
+        setApiError(apiError.message);
+      }
     }
   }
 
@@ -368,10 +367,8 @@ useEffect(() => {
     };
 
     loadTags();
-
   }, []);
 
-  
   return (
     <>
       <section className={styles.header}>
@@ -380,6 +377,11 @@ useEffect(() => {
           <span>Retour</span>
         </Link>
         <h1>Ajouter une propriété</h1>
+        {apiError && (
+          <p id="api-error" role="alert" className={styles.apiError}>
+            {apiError}
+          </p>
+        )}
       </section>
       <form
         className={styles.form}
@@ -681,8 +683,15 @@ useEffect(() => {
             </div>
           </div>
         </article>
-        <section className={styles.equipments}>
+        <section
+          className={`${styles.equipments} ${getFieldError("equipments") ? styles.inputOnError : ""}`}
+        >
           <h2 className={styles.sectionLabel}>Équipements</h2>
+          {getFieldError("equipments") && (
+            <p id="equipments-error" className={styles.fieldError} role="alert">
+              {getFieldError("equipments")?.message}
+            </p>
+          )}
           <div className={styles.checkboxes}>
             {equipements.map((equipment) => (
               <div className={styles.checkbox} key={equipment}>
@@ -696,15 +705,6 @@ useEffect(() => {
                 <label htmlFor={equipment}>{equipment}</label>
               </div>
             ))}
-            {getFieldError("equipments") && (
-              <p
-                id="equipments-error"
-                className={styles.fieldError}
-                role="alert"
-              >
-                {getFieldError("equipments")?.message}
-              </p>
-            )}
           </div>
         </section>
         <section className={styles.categories}>

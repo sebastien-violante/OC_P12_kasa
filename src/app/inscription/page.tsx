@@ -9,7 +9,7 @@ import {
   RegistrationFormData,
   ApiError,
 } from "../types/types";
-import z from "zod"
+import z from "zod";
 import { registerSchema } from "../types/schemas/registerSchema";
 import postRequest from "../utils/postRequest";
 import { useRouter } from "next/navigation";
@@ -52,7 +52,12 @@ export default function Inscription() {
 
     // création de la payload
     const payload = {
-      name: formData.firstname + " " + formData.name,
+      name:
+        formData.firstname.charAt(0).toUpperCase() +
+        formData.firstname.slice(1).trim() +
+        " " +
+        formData.name.charAt(0).toUpperCase() +
+        formData.name.slice(1).trim(),
       email: formData.email,
       password: formData.password,
     };
@@ -71,8 +76,7 @@ export default function Inscription() {
           "flash",
           JSON.stringify({
             type: "success",
-            message:
-              "Votre inscription a bien été prise en compte. Vous pouvez vous connecter",
+            message: "Votre inscription a réussi. Rejoignez-nous !",
           }),
         );
         setApiError("");
@@ -82,9 +86,14 @@ export default function Inscription() {
       }
     } catch (error) {
       const apiError = error as ApiError;
-      setApiError(apiError.message);
-      setFormData(initFormData)
-      setErrors([])
+      console.log(apiError.status);
+      if (apiError.status === 409) {
+        setApiError("Cet email est déjà utilisé !");
+      } else {
+        setApiError(apiError.message);
+      }
+      setFormData(initFormData);
+      setErrors([]);
     }
   };
 
@@ -110,9 +119,7 @@ export default function Inscription() {
             type="text"
             value={formData.name}
             onChange={handleChange}
-            aria-describedby={
-              getFieldError("name") ? "name-error" : undefined
-            }
+            aria-describedby={getFieldError("name") ? "name-error" : undefined}
             aria-invalid={getFieldError("name") ? "true" : "false"}
             className={getFieldError("name") ? styles.inputOnError : ""}
             autoComplete="family-name"

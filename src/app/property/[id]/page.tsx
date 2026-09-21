@@ -9,6 +9,7 @@ import type {
   Message,
   CreateConversationPayload,
   CreatedConversation,
+  FlashMessageType,
 } from "@/app/types/types";
 import getRequest from "@/app/utils/getRequest";
 import Loader from "@/app/components/Loader/Loader";
@@ -20,6 +21,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
 import postRequest from "@/app/utils/postRequest";
 import Cookies from "js-cookie";
+import FlashMessage from "@/app/components/FlashMessage/FlashMessage";
 
 export default function Property() {
   const params = useParams<{ id: string }>();
@@ -29,20 +31,25 @@ export default function Property() {
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [sendingMessage, setSendingMessage] = useState(false);
-  const [messageError, setMessageError] = useState<string | null>(null);
+  const [apiError, setApiError] = useState("");
 
   const [loading, setLoading] = useState(true);
   const propertyId = params.id;
   const [property, setProperty] = useState<Property | null>(null);
   const token = Cookies.get("token");
+  const [flash, setFlash] = useState<FlashMessageType | null>(null);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!property || !message.trim()) {
+    if (!property) {
+      return;
+    }
+    if (!message) {
+      setApiError("Vous devez saisir un message avant d'envoyer");
       return;
     }
     setSendingMessage(true);
-    setMessageError(null);
+    setApiError("");
     try {
       // Création de l'id de la conversation
       const conversationResponse = await postRequest<
@@ -66,13 +73,15 @@ export default function Property() {
           content: message,
         },
       });
-
-
       setMessage("");
       setIsMessageModalOpen(false);
+      setFlash({
+        status: true,
+        message: "Votre message a bien été envoyé",
+      });
     } catch (error) {
       console.error(error);
-      setMessageError("Impossible d'envoyer le message. Réessayez.");
+      setApiError("Impossible d'envoyer le message. Réessayez plus tard.");
     } finally {
       setSendingMessage(false);
     }
@@ -85,7 +94,6 @@ export default function Property() {
           url: `/api/properties/${propertyId}`,
         });
         setProperty(property);
-        console.log("PROPERTY", property);
 
         setLoading(false);
       } catch (error) {
@@ -96,12 +104,9 @@ export default function Property() {
     loadProperty();
   }, []);
 
-  useEffect(() => {
-    console.log("USER", user);
-  }, [user]);
-
   return (
     <>
+      {flash && <FlashMessage status={flash.status} message={flash.message} />}
       <section className={styles.top}>
         <Link href="/">
           <div className={styles.backToProperties}>
@@ -213,7 +218,10 @@ export default function Property() {
       {isMessageModalOpen && (
         <div
           className={styles.modalOverlay}
-          onClick={() => setIsMessageModalOpen(false)}
+          onClick={() => {
+            setIsMessageModalOpen(false);
+            setApiError("");
+          }}
         >
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <button
@@ -225,11 +233,14 @@ export default function Property() {
               ×
             </button>
 
-            <h2>Contacter l&apos;hôte</h2>
+            <h2>Message pour {property?.host.name} :</h2>
+            {apiError && (
+              <p id="api-error" role="alert" className={styles.apiError}>
+                {apiError}
+              </p>
+            )}
 
-            <p>Envoyez un message à l&apos;hôte à propos de ce logement.</p>
-
-            <form onSubmit={handleSendMessage}>
+            <form onSubmit={handleSendMessage} noValidate>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -239,12 +250,14 @@ export default function Property() {
                 required
               />
 
-              {messageError && <p className={styles.error}>{messageError}</p>}
-
               <div className={styles.modalActions}>
                 <button
                   type="button"
-                  onClick={() => setIsMessageModalOpen(false)}
+                  className="rounded-lg bg-red-600 px-6 py-2 text-white shadow-lg"
+                  onClick={() => {
+                    setIsMessageModalOpen(false);
+                    setApiError("");
+                  }}
                   disabled={sendingMessage}
                 >
                   Annuler
@@ -252,7 +265,7 @@ export default function Property() {
 
                 <button
                   type="submit"
-                  disabled={sendingMessage || !message.trim()}
+                  className="rounded-lg bg-emerald-600 px-6 py-2 text-white shadow-lg"
                 >
                   {sendingMessage ? "Envoi..." : "Envoyer"}
                 </button>

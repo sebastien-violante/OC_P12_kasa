@@ -100,9 +100,14 @@ export default function Connexion() {
       }
     } catch (error) {
       const apiError = error as ApiError;
-      setApiError(apiError.message);
-      setFormData(initFormData)
-      setErrors([])
+      if (apiError.status === 401) {
+        setApiError("Identifiants invalides");
+      } else {
+        setApiError(apiError.message);
+      }
+
+      setFormData(initFormData);
+      setErrors([]);
     }
   }
 
@@ -135,7 +140,7 @@ export default function Connexion() {
       </div>
       <form onSubmit={handleLogin} className={styles.form} noValidate>
         {apiError && (
-          <p id="api-error" role="alert">
+          <p id="api-error" role="alert" className={styles.apiError}>
             {apiError}
           </p>
         )}
@@ -182,7 +187,11 @@ export default function Connexion() {
           )}
         </div>
 
-        <button className={styles.submitBtn} disabled={isSubmitting} aria-busy={isSubmitting}>
+        <button
+          className={styles.submitBtn}
+          disabled={isSubmitting}
+          aria-busy={isSubmitting}
+        >
           {isSubmitting ? "Connexion en cours…" : "Se connecter"}
         </button>
       </form>

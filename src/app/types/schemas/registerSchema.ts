@@ -1,11 +1,17 @@
 import { z } from "zod";
 
 export const registerSchema = z.object({
-  firstname: z.string().regex(/^[A-Za-zÀ-ÖØ-öø-ÿ]{2,}$/, {
-    message: "Le prénom doit contenir au moins 2 caractères",
+  firstname: z
+    .string()
+    .min(2, "Le prénom doit comprendre au moins 2 caractères")
+    .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ]+$/, {
+    message: "Le prénom doit contenir des caractères alphabétiques ",
   }),
-  name: z.string().regex(/^[A-Za-zÀ-ÖØ-öø-ÿ]{2,}$/, {
-    message: "Le nom doit contenir au moins 2 caractères",
+  name: z
+    .string()
+    .min(2, "Le nom doit comprendre au moins 2 caractères")
+    .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ]+$/, {
+    message: "Le nom doit contenir des caractères alphabétiques",
   }),
   email: z.email("Le format de l'email est invalide"),
   password: z

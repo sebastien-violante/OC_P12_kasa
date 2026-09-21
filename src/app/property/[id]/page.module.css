@@ -220,6 +220,14 @@
   margin-top: 8px;
 }
 
+.apiError {
+    color: red;
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 12px;
+}
+
 @media screen and (min-width: 1021px) {
   .mainWrapper {
     flex-direction: row;
