@@ -6,11 +6,12 @@ import Link from "next/link";
 import Cookies from "js-cookie";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
+import getRequest from "@/app/utils/getRequest";
+import type { Conversation } from "@/app/types/types";
 
 export default function Header() {
   const [menuExpanded, setMenuExpanded] = useState(false);
   const [token, setToken] = useState<string | null>(null);
-
   const { logout, user } = useAuth();
   const router = useRouter();
 
@@ -60,6 +61,7 @@ export default function Header() {
       document.removeEventListener("keydown", handleEscape);
     };
   }, [menuExpanded]);
+
 
   return (
     <header className={styles.header}>
@@ -116,7 +118,7 @@ export default function Header() {
                     aria-label="Se déconnecter"
                     className={styles.navBtn}
                   >
-                    <img src="/pictures/logements.svg" alt="" />
+                    <img src="/pictures/logout.png" alt="" />
                   </button>
                 </li>
               </>

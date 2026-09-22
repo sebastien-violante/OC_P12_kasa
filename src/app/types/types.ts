@@ -184,3 +184,7 @@ export type CreatedConversation = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type StoreMessage = Message & {
+  temporary?: boolean;
+};

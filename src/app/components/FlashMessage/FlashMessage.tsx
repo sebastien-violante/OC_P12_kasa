@@ -7,16 +7,21 @@ type FlashMessageProps = {
   message: string;
 };
 
-export default function FlashMessage({ status, message }: FlashMessageProps) {
+export default function FlashMessage({
+  status,
+  message,
+}: FlashMessageProps) {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
+    setIsVisible(true);
+
     const timer = setTimeout(() => {
       setIsVisible(false);
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [message, status]);
 
   if (!isVisible) {
     return null;

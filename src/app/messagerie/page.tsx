@@ -4,62 +4,80 @@ import styles from "./page.module.css";
 import ConversationTile from "../components/ConversationTile/ConversationTile";
 import { useEffect, useState } from "react";
 import getRequest from "../utils/getRequest";
-import type { Conversation, Message } from "../types/types";
+import type { Conversation, Message, FlashMessageType } from "../types/types";
 import Cookies from "js-cookie";
 import Loader from "../components/Loader/Loader";
 import MessageTile from "../components/MessageTile/MessageTile";
-import { formatDate } from "../utils/formatDate";
 import { Fragment } from "react";
 import postRequest from "../utils/postRequest";
+import patchRequest from "../utils/patchRequest";
+import FlashMessage from "../components/FlashMessage/FlashMessage";
+import { useMessageStore } from "../store/messageStore";
 
 export default function Messagerie() {
   const token = Cookies.get("token");
   const [conversations, setConversations] = useState<Conversation[] | []>([]);
-  const [messages, setMessages] = useState<Message[] | []>([]);
-  const [selectedConversationId, setSelectedConversationId] = useState<
-    number | null
-  >(null);
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [flash, setFlash] = useState<FlashMessageType | null>(null);
+  const {
+    messages,
+    selectedConversationId,
+    setSelectedConversationId,
+    setMessages,
+    addMessage,
+  } = useMessageStore();
+  const loadMessages = useMessageStore((state) => state.loadMessages);
 
-  const initFomData = {
-    message: "",
-  };
-  const [formData, setFormData] = useState(initFomData);
+  async function handleSendMessage(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-  async function handleSendMessage() {
+    if (selectedConversationId === null) {
+      setFlash({
+        status: false,
+        message:
+          "Vous devez sélectionner une conversation pour pouvoir envoyer un message",
+      });
+      return;
+    }
+
+    if (!message.trim()) {
+      setFlash({
+        status: false,
+        message: "Vous devez saisir un message avant d'envoyer",
+      });
+      return;
+    }
+
     try {
-      if (message === "") {
-        throw new Error(
-          "Vous devez saisir un texte avant d'nevoyer votre message",
-        );
-      }
-      if (!selectedConversationId)
-        throw new Error(
-          "Vous devez sélectionner une conversation avant d'envoyer un message",
-        );
       const messageResponse = await postRequest<{ content: string }, Message>({
         url: `/api/conversations/${selectedConversationId}/messages`,
         token,
         payload: {
-          content: message,
+          content: message.trim(),
         },
+      });
+      // Ajout immédiat dans Zustand
+      if(messageResponse.data) {
+        addMessage(messageResponse.data);
+      }
+
+      // Vide le textarea
+      setMessage("");
+
+      setFlash({
+        status: true,
+        message: "Votre message a bien été envoyé",
       });
     } catch (error) {
       console.error(error);
-    }
 
-    /* 
-    const messageResponse = await postRequest<{ content: string }, Message>({
-            url: `/api/conversations/${selectedConversationId}/messages`,
-            token,
-            payload: {
-              content: message,
-            },
-          });
-    
-          console.log("message reponse", messageResponse);
-*/
+      setFlash({
+        status: false,
+        message: "Une erreur est survenue lors de l'envoi du message",
+      });
+    }
   }
 
   const isSameDay = (date1: string, date2: string): boolean => {
@@ -79,32 +97,39 @@ export default function Messagerie() {
   }, []);
 
   useEffect(() => {
-    if (selectedConversationId) {
-      setLoading(true);
-      const loadMessages = async () => {
-        try {
-          const messages = await getRequest<Message[]>({
-            url: `/api/conversations/${selectedConversationId}/messages`,
-            token,
-          });
-
-          setMessages(messages);
-          console.log("MESSAGES", messages);
-        } catch (error) {
-          console.error(error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      loadMessages();
+    if (selectedConversationId === null) {
+      return;
     }
-  }, [selectedConversationId]);
+
+    const load = async () => {
+      setLoading(true);
+
+      try {
+        await loadMessages(selectedConversationId, token);
+
+        await patchRequest({
+          url: `/api/conversations/${selectedConversationId}/read`,
+          token,
+        });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, [selectedConversationId, setMessages, token]);
 
   return (
     <div className={styles.mainWrapper}>
+      {flash && <FlashMessage status={flash.status} message={flash.message} />}
+
       <section className={styles.messages}>
         <div className={styles.back}>
-          <button>Retour</button>
+          <button>
+            <img alt="" src="/pictures/back-arrow.svg"/>
+            Retour</button>
         </div>
 
         <h1>Messages</h1>
@@ -169,6 +194,7 @@ export default function Messagerie() {
             placeholder="Envoyer un message..."
             rows={1}
             onChange={(e) => setMessage(e.target.value)}
+            value={message}
           />
 
           <button

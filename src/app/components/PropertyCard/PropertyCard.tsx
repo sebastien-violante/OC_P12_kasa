@@ -23,7 +23,6 @@ export default function PropertyCard({ property }: PropertyCardProps) {
   );
   const { favoriteIds, addFavorite, removeFavorite } = useFavorites();
 
-  // Une propriété affichée dans une PropertyCard doit avoir un id.
   if (!property.id) {
     return null;
   }

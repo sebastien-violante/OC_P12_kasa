@@ -46,3 +46,8 @@
     border-radius: 50%;
   }
 }
+
+.conversationTile:hover {
+  cursor: pointer;
+  background: var(--lightOrange);
+}
