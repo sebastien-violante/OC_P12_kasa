@@ -1,41 +1,261 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+##########   ___   ____  ________
+##########  |   | /   / |   __   |
+##########  |   |/   /  |  |__|  |
+##########  |   /   /   |   __   |
+##########  |   \   \   |  |  |  |
+##########  |   |\   \  |  |  |  |
+##########  |___| \___\ |__|  |__|
+##########   
 
-## Getting Started
 
-First, run the development server:
+
+# Frontend — Kasa
+
+Application frontend développée avec **Next.js**, **React** et **TypeScript**.
+
+## 🚀 Technologies
+
+* [Next.js](https://nextjs.org/)
+* [React](https://react.dev/)
+* TypeScript
+* CSS Modules
+* ESLint
+* Zod
+* Zustand
+* Tailwind
+
+## 📋 Prérequis
+
+Avant de commencer, assurez-vous d'avoir installé :
+
+* Node.js `>= 20`
+* npm ou yarn ou pnpm
+
+Vérifier les versions :
+
+```bash
+node -v
+npm -v
+```
+
+## ⚙️ Installation
+
+Cloner le repository :
+
+```bash
+git clone <URL_DU_REPOSITORY>
+cd <NOM_DU_PROJET>
+```
+
+Installer les dépendances :
+
+```bash
+npm install
+```
+
+## 🏃 Lancer le projet
+
+### Développement
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+L'application sera disponible sur :
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Production
 
-## Learn More
+Construire l'application :
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Lancer l'application :
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run start
+```
 
-## Deploy on Vercel
+## 🧹 Lint
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Vérifier les erreurs ESLint :
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run lint
+```
+
+## 📁 Architecture
+
+```text
+src/
+├── app/
+│   ├── ├── a-propos
+│   │   ├── ajouter-une-propriete
+│   │   ├── connexion
+│   │   ├── inscription
+│   │   ├── mes-favoris
+│   │   ├── messagerie
+│   │   ├── connexion
+│   │   ├── logement/
+│   │   │   └── [id]/
+│   │   └── not-found.tsx
+│   │
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── not-found.tsx
+│
+├── components/
+│   └── ...
+│
+├── context/
+│   └── authContext
+│   └── favoritesContext
+│
+└── utils/
+    ├── api.ts
+    ├── formatDate.ts
+    ├── formatHour.ts
+    ├── formatUrl.ts
+    ├── postRequest.ts
+    ├── getRequest.ts
+    ├── deleteRequest.ts
+    ├── patchRequest.ts
+    ├── portFileRequest.ts
 
 
-## Dépendances
+    
+```
 
-Vercel pour mener les tests
+### `app/`
+
+Contient les différentes routes de l'application et les layouts Next.js.
+
+### `components/`
+
+Contient les composants React réutilisables.
+
+### `context/`
+
+Contient les Context Providers utilisés pour partager des données ou de l'état dans l'application.
+
+### `utils/`
+
+Contient les fonctions utilitaires, notamment les fonctions permettant de communiquer avec l'API.
+
+## 🧭 Navigation
+
+L'application utilise l'**App Router** de Next.js.
+
+Principales routes :
+
+| Route          | Description                       |
+| -------------- | --------------------------------- |
+| `/`            | Page d'accueil / authentification |
+| `/compte`      | Gestion du compte                 |
+| `/dashboard`   | Tableau de bord                   |
+| `/projets`     | Liste des projets                 |
+| `/projet/[id]` | Détail d'un projet                |
+
+Les dossiers entre parenthèses, comme `(site)`, sont des **Route Groups Next.js** et ne sont pas présents dans l'URL.
+
+Par exemple :
+
+```text
+src/app/(site)/dashboard/page.tsx
+```
+
+correspond à :
+
+```text
+/dashboard
+```
+
+## ❌ Gestion des pages inexistantes
+
+Deux niveaux de `not-found.tsx` sont utilisés dans l'application :
+
+```text
+src/app/not-found.tsx
+src/app/(site)/not-found.tsx
+```
+
+La page `not-found.tsx` globale gère les pages inexistantes au niveau général.
+
+La page `not-found.tsx` du groupe `(site)` permet de gérer les erreurs liées aux pages de l'application.
+
+
+## 🔌 Communication avec l'API
+
+Les appels à l'API sont centralisés dans le dossier :
+
+```text
+src/utils/
+```
+
+Fonctions disponibles :
+
+```text
+getRequest.ts
+postRequest.ts
+putRequest.ts
+deleteRequest.ts
+```
+
+Cela permet d'éviter de dupliquer la logique de communication avec le backend dans les différents composants mais aussi de garder de la lisibilité sur le rôle de la requête.
+
+## 🧩 Conventions
+
+### Composants
+
+Les composants React sont écrits en **TypeScript** et utilisent des fichiers `.tsx`.
+
+```tsx
+export default function MyComponent() {
+  return (
+    <div>
+      ...
+    </div>
+  );
+}
+```
+
+### Styles
+
+Les styles spécifiques aux composants/pages utilisent de préférence les **CSS Modules** :
+
+```text
+page.tsx
+page.module.css
+```
+
+Puis :
+
+```tsx
+import styles from "./page.module.css";
+
+export default function Page() {
+  return <div className={styles.container}>...</div>;
+}
+```
+
+### Nommage
+
+* Composants : `PascalCase`
+* Fonctions : `camelCase`
+* Variables : `camelCase`
+* Fichiers de composants : `PascalCase.tsx`
+* Fichiers utilitaires : `camelCase.ts`
+* CSS Modules : `*.module.css`
+
+## 👥 Équipe
+
+Projet développé par :
+
+* Sébastien VIOLANTE
+
+dans le cadre du projet 12 de la formation Concepteur d'application React d'OpenClassrooms
