@@ -33,6 +33,7 @@ export default function Addproperty() {
   const [profileFileName, setProfileFileName] = useState("");
   const { user, updateUser } = useAuth();
   const [apiError, setApiError] = useState("");
+  const [pictureQuantity, setPictureQuantity] = useState(1)
   const initFormData: PropertyFormData = {
     title: "",
     description: "",
@@ -157,7 +158,11 @@ export default function Addproperty() {
   };
 
   function addImage() {
-    setImages((prev) => [...prev, null]);
+    if(pictureQuantity <= 3) {
+      setPictureQuantity(prev => prev+1)
+      setImages((prev) => [...prev, null]);
+    }
+    
   }
 
   // Récupération de l'erreur correspondant à un champ
@@ -568,7 +573,7 @@ export default function Addproperty() {
             </div>
             <div className={styles.formGroup}>
               {/* Images du logement */}
-              <label htmlFor="propertyPictures">Images du logement</label>
+              <label htmlFor="propertyPictures">Images du logement {pictureQuantity}</label>
 
               {images?.map((image, index) => {
                 const inputId = `propertyPicture-${index}`;
@@ -607,14 +612,16 @@ export default function Addproperty() {
                   </div>
                 );
               })}
-
-              <button
+              {pictureQuantity <=3 && (
+                <button
                 type="button"
                 className={styles.addImage}
                 onClick={addImage}
               >
                 +Ajouter une image
               </button>
+              )}
+              
             </div>
           </div>
           <div className={styles.chooseProfile}>

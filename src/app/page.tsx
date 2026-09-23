@@ -8,7 +8,6 @@ import PropertyCard from "./components/PropertyCard/PropertyCard";
 import Tile from "./components/Tile/Tile";
 import styles from "./page.module.css";
 import FlashMessage from "./components/FlashMessage/FlashMessage";
-import OrganizationStructuredData from "./components/StructuredData/OrganizationStructuredData";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -52,7 +51,6 @@ export default function Home() {
 
   return (
     <>
-      <OrganizationStructuredData />
       <div className={styles.homeWrapper}>
         {flash && (
           <FlashMessage status={flash.status} message={flash.message} />

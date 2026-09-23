@@ -4,7 +4,7 @@
   min-height: 65vh;
   margin: auto;
 
-  .messages {
+  .conversations {
     width: 376px;
     padding: 8px;
     background: white;
@@ -31,11 +31,12 @@
     }
   }
 
-  .details {
+  .messages {
     flex: 1;
     padding: 40px 40px 0 40px;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
 
     .messageDate {
         width: 100%;
@@ -88,17 +89,17 @@
   .mainWrapper {
     flex-direction: column;
 
-    .messages,
-    details {
+    .conversations,
+    messages {
       width: 100%;
     }
 
-    .details {
+    .messages {
       .backToList {
         display: block;
       }
     }
-    .messages {
+    .conversations {
       display: none;
     }
   }

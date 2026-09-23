@@ -17,7 +17,6 @@ import { useMessageStore } from "../store/messageStore";
 export default function Messagerie() {
   const token = Cookies.get("token");
   const [conversations, setConversations] = useState<Conversation[] | []>([]);
-
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [flash, setFlash] = useState<FlashMessageType | null>(null);
@@ -30,9 +29,11 @@ export default function Messagerie() {
   } = useMessageStore();
   const loadMessages = useMessageStore((state) => state.loadMessages);
 
+  // Envoi d'un message
   async function handleSendMessage(event: React.FormEvent<HTMLFormElement>) {
+    
     event.preventDefault();
-
+    // Empêche l'envoi d'un message sans sélection d'une conversation
     if (selectedConversationId === null) {
       setFlash({
         status: false,
@@ -42,6 +43,7 @@ export default function Messagerie() {
       return;
     }
 
+    // Empêche l'envoi d'un message vide
     if (!message.trim()) {
       setFlash({
         status: false,
@@ -50,6 +52,7 @@ export default function Messagerie() {
       return;
     }
 
+    // Envoi du message
     try {
       const messageResponse = await postRequest<{ content: string }, Message>({
         url: `/api/conversations/${selectedConversationId}/messages`,
@@ -58,14 +61,13 @@ export default function Messagerie() {
           content: message.trim(),
         },
       });
-      // Ajout immédiat dans Zustand
+      // Ajout dans le store
       if(messageResponse.data) {
         addMessage(messageResponse.data);
       }
 
-      // Vide le textarea
+      // Vidage du champ message et affichage du Flash
       setMessage("");
-
       setFlash({
         status: true,
         message: "Votre message a bien été envoyé",
@@ -84,29 +86,29 @@ export default function Messagerie() {
     return new Date(date1).toDateString() === new Date(date2).toDateString();
   };
 
+  // Chargement de toutes les conversations de l'utilisateur
   useEffect(() => {
     const loadConversations = async () => {
       const data = await getRequest<Conversation[]>({
         url: "/api/conversations",
         token,
       });
-      console.log("CONVERSATIONS", data);
       setConversations(data);
     };
     loadConversations();
   }, []);
 
+  // Chargement des messages correspondant à la conversation sélectionnée
   useEffect(() => {
     if (selectedConversationId === null) {
       return;
     }
-
     const load = async () => {
       setLoading(true);
-
       try {
+        // Récupération des messages depuis le store
         await loadMessages(selectedConversationId, token);
-
+        // Lors de l'affichage des messages, tous les messages sont considérés lus
         await patchRequest({
           url: `/api/conversations/${selectedConversationId}/read`,
           token,
@@ -117,7 +119,6 @@ export default function Messagerie() {
         setLoading(false);
       }
     };
-
     load();
   }, [selectedConversationId, setMessages, token]);
 
@@ -125,7 +126,7 @@ export default function Messagerie() {
     <div className={styles.mainWrapper}>
       {flash && <FlashMessage status={flash.status} message={flash.message} />}
 
-      <section className={styles.messages}>
+      <section className={styles.conversations}>
         <div className={styles.back}>
           <button>
             <img alt="" src="/pictures/back-arrow.svg"/>
@@ -147,7 +148,7 @@ export default function Messagerie() {
           ))}
         </div>
       </section>
-      <section className={styles.details}>
+      <section className={styles.messages}>
         <div className={styles.backToList}>
           <button>Retour à la liste</button>
         </div>
