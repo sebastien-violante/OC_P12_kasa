@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Property } from "@/app/types/types";
 import PropertyContent from "./PropertyContent";
+import { apiUrl } from "@/app/utils/api";
 
 type PropertyPageProps = {
   params: Promise<{
@@ -10,7 +11,7 @@ type PropertyPageProps = {
 
 async function getProperty(id: string): Promise<Property | null> {
   const response = await fetch(
-    `http://localhost:8000/api/properties/${id}`,
+    apiUrl(`/api/properties/${id}`),
     {
       cache: "no-store",
     }
