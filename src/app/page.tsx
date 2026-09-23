@@ -8,6 +8,7 @@ import PropertyCard from "./components/PropertyCard/PropertyCard";
 import Tile from "./components/Tile/Tile";
 import styles from "./page.module.css";
 import FlashMessage from "./components/FlashMessage/FlashMessage";
+import { apiUrl } from "./utils/api";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -23,7 +24,7 @@ export default function Home() {
     const loadProperties = async () => {
       try {
         const properties = await getRequest<Property[]>({
-          url: "/api/properties",
+          url: apiUrl("/api/properties"),
         });
 
         setProperties(properties);
