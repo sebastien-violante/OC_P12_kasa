@@ -13,6 +13,7 @@ import postRequest from "../utils/postRequest";
 import patchRequest from "../utils/patchRequest";
 import FlashMessage from "../components/FlashMessage/FlashMessage";
 import { useMessageStore } from "../store/messageStore";
+import { apiUrl } from "../utils/api";
 
 export default function Messagerie() {
   const token = Cookies.get("token");
@@ -55,7 +56,7 @@ export default function Messagerie() {
     // Envoi du message
     try {
       const messageResponse = await postRequest<{ content: string }, Message>({
-        url: `/api/conversations/${selectedConversationId}/messages`,
+        url: apiUrl(`/api/conversations/${selectedConversationId}/messages`),
         token,
         payload: {
           content: message.trim(),
@@ -90,7 +91,7 @@ export default function Messagerie() {
   useEffect(() => {
     const loadConversations = async () => {
       const data = await getRequest<Conversation[]>({
-        url: "/api/conversations",
+        url: apiUrl("/api/conversations"),
         token,
       });
       setConversations(data);
@@ -110,7 +111,7 @@ export default function Messagerie() {
         await loadMessages(selectedConversationId, token);
         // Lors de l'affichage des messages, tous les messages sont considérés lus
         await patchRequest({
-          url: `/api/conversations/${selectedConversationId}/read`,
+          url: apiUrl(`/api/conversations/${selectedConversationId}/read`),
           token,
         });
       } catch (error) {

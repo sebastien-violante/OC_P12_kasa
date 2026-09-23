@@ -13,6 +13,7 @@ import z from "zod";
 import { registerSchema } from "../types/schemas/registerSchema";
 import postRequest from "../utils/postRequest";
 import { useRouter } from "next/navigation";
+import { apiUrl } from "../utils/api";
 
 export default function Inscription() {
   const router = useRouter();
@@ -68,7 +69,7 @@ export default function Inscription() {
         RegistrationPayload,
         RegistrationResponse
       >({
-        url: "/auth/register",
+        url: apiUrl("/auth/register"),
         payload,
       });
       if (result.data) {

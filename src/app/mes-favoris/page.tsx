@@ -8,6 +8,7 @@ import Loader from "../components/Loader/Loader";
 import type { Property } from "../types/types";
 import PropertyCard from "../components/PropertyCard/PropertyCard";
 import getRequest from "../utils/getRequest";
+import { apiUrl } from "../utils/api";
 
 export default function Favorites() {
   const router = useRouter();
@@ -32,7 +33,7 @@ export default function Favorites() {
         const user = JSON.parse(userCookie);
         try {
           const result = await getRequest<Property[]>({
-            url: `/api/users/${user.id}/favorites`,
+            url: apiUrl(`/api/users/${user.id}/favorites`),
             token,
           });
 

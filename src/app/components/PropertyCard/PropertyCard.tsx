@@ -11,6 +11,7 @@ import { useFavorites } from "@/app/context/FavoritesContext";
 import FlashMessage from "../FlashMessage/FlashMessage";
 import { useState } from "react";
 import formatUrl from "@/app/utils/formatUrl";
+import { apiUrl } from "@/app/utils/api";
 
 type PropertyCardProps = {
   property: Property;
@@ -42,7 +43,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
     if (!isFavorite) {
       try {
         const result = await postRequest({
-          url: `/api/properties/${propertyId}/favorite`,
+          url: apiUrl(`/api/properties/${propertyId}/favorite`),
           token,
         });
 
@@ -58,7 +59,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
 
     try {
       const result = await deleteRequest({
-        url: `/api/properties/${propertyId}/favorite`,
+        url: apiUrl(`/api/properties/${propertyId}/favorite`),
         token,
       });
 

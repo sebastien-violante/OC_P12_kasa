@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Message, StoreMessage } from "../types/types";
 import getRequest from "../utils/getRequest";
+import { apiUrl } from "../utils/api";
 
 type MessageStore = {
   messages: StoreMessage[];
@@ -43,7 +44,7 @@ export const useMessageStore = create<MessageStore>((set) => ({
 
   loadMessages: async (conversationId, token) => {
     const messages = await getRequest<Message[]>({
-      url: `/api/conversations/${conversationId}/messages`,
+      url: apiUrl(`/api/conversations/${conversationId}/messages`),
       token,
     });
 

@@ -17,6 +17,7 @@ import { useState } from "react";
 import postRequest from "@/app/utils/postRequest";
 import Cookies from "js-cookie";
 import FlashMessage from "@/app/components/FlashMessage/FlashMessage";
+import { apiUrl } from "@/app/utils/api";
 
 type PropertyContentProps = {
   property: Property;
@@ -48,7 +49,7 @@ export default function PropertyContent({ property }: PropertyContentProps) {
           CreateConversationPayload,
           CreatedConversation
         >({
-          url: "/api/conversations",
+          url: apiUrl("/api/conversations"),
           token,
           payload: {
             propertyId: property.id,
@@ -62,7 +63,7 @@ export default function PropertyContent({ property }: PropertyContentProps) {
         const conversationId = conversationResponse.data.id;
 
         await postRequest<{ content: string }, Message>({
-          url: `/api/conversations/${conversationId}/messages`,
+          url: apiUrl(`/api/conversations/${conversationId}/messages`),
           token,
           payload: { content: message },
         });

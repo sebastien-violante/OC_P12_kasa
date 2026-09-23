@@ -25,6 +25,7 @@ import getRequest from "../utils/getRequest";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
+import { apiUrl } from "../utils/api";
 
 export default function Connexion() {
   const initFormData = {
@@ -64,7 +65,7 @@ export default function Connexion() {
         AuthenticationPayload,
         AuthenticationResponse
       >({
-        url: "/auth/login",
+        url: apiUrl("/auth/login"),
         payload,
       });
       if (result.data) {
@@ -84,7 +85,7 @@ export default function Connexion() {
         // chargement des favoris
         try {
           const result = await getRequest<Property[]>({
-            url: `/api/users/${user.id}/favorites`,
+            url: apiUrl(`/api/users/${user.id}/favorites`),
             token,
           });
           localStorage.setItem("favorites", JSON.stringify(result));

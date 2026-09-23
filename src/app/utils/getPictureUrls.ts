@@ -1,4 +1,5 @@
 import postFileRequest from "./postFileRequest";
+import { apiUrl } from "./api";
 
 type PictureInput = {
   file: File;
@@ -29,7 +30,7 @@ export default async function getPictureUrls(
   for (const picture of pictures) {
     try {
       const result = await postFileRequest<UploadResponse>({
-        url: "/api/uploads/image",
+        url: apiUrl("/api/uploads/image"),
         token,
         file: picture.file,
         purpose: picture.purpose,

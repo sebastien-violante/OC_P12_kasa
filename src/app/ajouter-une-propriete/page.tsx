@@ -17,6 +17,7 @@ import postRequest from "../utils/postRequest";
 import getPictureUrls from "../utils/getPictureUrls";
 import type { Property, User } from "../types/types";
 import { useRouter } from "next/navigation";
+import { apiUrl } from "../utils/api";
 
 export default function Addproperty() {
   const token = Cookies.get("token");
@@ -181,7 +182,7 @@ export default function Addproperty() {
 
     try {
       const result = await patchRequest<{ picture: string }, User>({
-        url: `/api/users/${user.id}`,
+        url: apiUrl(`/api/users/${user.id}`),
         token,
         payload,
       });
@@ -298,7 +299,7 @@ export default function Addproperty() {
 
     try {
       const result = await postRequest<Property, CreatePropertyPayload>({
-        url: `/api/properties`,
+        url: apiUrl(`/api/properties`),
         payload,
         token,
       });
@@ -337,7 +338,7 @@ export default function Addproperty() {
             { role: "owner" },
             { token: string }
           >({
-            url: `/api/users/${user.id}`,
+            url: apiUrl(`/api/users/${user.id}`),
             token,
             payload,
           });
@@ -364,7 +365,7 @@ export default function Addproperty() {
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const tags = await getRequest<string[]>({ url: "api/tags" });
+        const tags = await getRequest<string[]>({ url: apiUrl("api/tags" )});
         setTags(tags);
       } catch (error) {
         console.error(error);

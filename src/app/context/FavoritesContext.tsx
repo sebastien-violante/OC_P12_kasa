@@ -9,7 +9,7 @@ import {
 } from "react";
 
 import Cookies from "js-cookie";
-
+import { apiUrl } from "../utils/api";
 import type { Property } from "@/app/types/types";
 
 import getRequest from "@/app/utils/getRequest";
@@ -54,7 +54,7 @@ export function FavoritesProvider({
 
       try {
         const result = await getRequest<Property[]>({
-          url: `/api/users/${userId}/favorites`,
+          url: apiUrl(`/api/users/${userId}/favorites`),
           token,
         });
 
