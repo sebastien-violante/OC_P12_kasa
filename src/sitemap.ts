@@ -18,9 +18,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const properties = (await response.json()) as Property[];
 
   const propertyUrls: MetadataRoute.Sitemap = properties
-    .filter((property) => property.slug || property.id)
+    .filter((property) => property.id)
     .map((property) => ({
-      url: `${BASE_URL}/logement/${property.slug ?? property.id}`,
+      url: `${BASE_URL}/logement/${property.id}`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.8,
