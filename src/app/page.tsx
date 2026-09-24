@@ -13,7 +13,7 @@ export default async function Home() {
       url: apiUrl("/api/properties"),
     });
   } catch (error) {
-    console.error(error);
+     console.error("Erreur récupération logements :", error);
   }
 
   return (
