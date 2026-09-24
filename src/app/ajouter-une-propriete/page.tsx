@@ -3,7 +3,6 @@
 import styles from "./page.module.css";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { equipements } from "../data/equipments";
 import getRequest from "../utils/getRequest";
 import Tag from "../components/Tag/Tag";
 import { ChangeEvent } from "react";
@@ -26,6 +25,7 @@ export default function Addproperty() {
   const [images, setImages] = useState<(File | null)[]>([null]);
   const [profile, setProfile] = useState<File | null>(null);
   const [tags, setTags] = useState<string[]>([]);
+  const [equipements, setEquipments] = useState<string[]>([])
   const [newTag, setNewTag] = useState<string>("");
   const profileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
@@ -373,6 +373,20 @@ export default function Addproperty() {
     };
 
     loadTags();
+  }, []);
+
+   // Chargement des équipementss
+  useEffect(() => {
+    const loadEquipements = async () => {
+      try {
+        const equipements = await getRequest<string[]>({ url: apiUrl("/api/equipments" )});
+        setEquipments(equipements);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    loadEquipements();
   }, []);
 
   return (
