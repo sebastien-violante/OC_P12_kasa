@@ -21,6 +21,10 @@ const nextConfig: NextConfig = {
         hostname: "s3-eu-west-1.amazonaws.com",
       },
       {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+      {
         protocol: "http",
         hostname: "localhost",
         port: "8000",
