@@ -365,7 +365,7 @@ export default function Addproperty() {
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const tags = await getRequest<string[]>({ url: apiUrl("api/tags" )});
+        const tags = await getRequest<string[]>({ url: apiUrl("/api/tags" )});
         setTags(tags);
       } catch (error) {
         console.error(error);
