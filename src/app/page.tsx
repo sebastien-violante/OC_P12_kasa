@@ -1,156 +1,64 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import type { Property } from "./types/types";
 import getRequest from "./utils/getRequest";
-import type { Property, FlashMessageType } from "./types/types";
-import Loader from "./components/Loader/Loader";
-import PropertyCard from "./components/PropertyCard/PropertyCard";
+import { apiUrl } from "./utils/api";
+import HomeContent from "./HomeContent";
 import Tile from "./components/Tile/Tile";
 import styles from "./page.module.css";
-import FlashMessage from "./components/FlashMessage/FlashMessage";
-import { apiUrl } from "./utils/api";
 
-export default function Home() {
-  const schema = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Organization",
-        name: "Kasa",
-        url: "https://oc-p12-kasa.vercel.app/",
-        logo: "https://oc-p12-kasa.vercel.app/logo-kasa-full.svg",
-      },
-      {
-        "@type": "WebSite",
-        name: "Kasa",
-        url: "https://oc-p12-kasa.vercel.app/",
-      },
-    ],
-  };
-  const [loading, setLoading] = useState(true);
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [visibleCards, setVisibleCards] = useState(6);
-  const [flash, setFlash] = useState<FlashMessageType | null>(null);
+export default async function Home() {
+  let properties: Property[] = [];
 
-  const loadMoreProperties = () => {
-    setVisibleCards((prev) => prev + 6);
-  };
-
-  useEffect(() => {
-    const loadProperties = async () => {
-      try {
-        const properties = await getRequest<Property[]>({
-          url: apiUrl("/api/properties"),
-        });
-
-        setProperties(properties);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProperties();
-  }, []);
-
-  useEffect(() => {
-    const flashBag = localStorage.getItem("flash");
-    if (flashBag) {
-      const parsedFlashBag = JSON.parse(flashBag);
-      setFlash({
-        status: parsedFlashBag.type,
-        message: parsedFlashBag.message,
-      });
-      localStorage.removeItem("flash");
-    }
-  }, []);
+  try {
+    properties = await getRequest<Property[]>({
+      url: apiUrl("/api/properties"),
+    });
+  } catch (error) {
+    console.error(error);
+  }
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(schema),
-        }}
-      />
-      <div className={styles.homeWrapper}>
-        {flash && (
-          <FlashMessage status={flash.status} message={flash.message} />
-        )}
-        <section className={styles.hero}>
-          <h1>Chez vous, partout et ailleurs</h1>
+    <div className={styles.homeWrapper}>
+      <section className={styles.hero}>
+        <h1>Chez vous, partout et ailleurs</h1>
 
-          <p>
-            Avec Kasa, vivez des séjours uniques dans des hébergements
-            chaleureux, sélectionnés avec soin par nos hôtes.
-          </p>
+        <p>
+          Avec Kasa, vivez des séjours uniques dans des hébergements
+          chaleureux, sélectionnés avec soin par nos hôtes.
+        </p>
 
-          <div className={styles.heroPictureContainer}>
-            <img src="/pictures/hero.png" alt="" />
-          </div>
-        </section>
+        <div className={styles.heroPictureContainer}>
+          <img src="/pictures/hero.png" alt="" />
+        </div>
+      </section>
 
-        {loading && (
-          <div
-            role="status"
-            aria-live="polite"
-            aria-label="chargement des logements"
-          >
-            <Loader />
-            <span className="sr-only">Chargement des logements…</span>
-          </div>
-        )}
+      <HomeContent properties={properties} />
 
-        <section
-          className={styles.cardWrapper}
-          aria-labelledby="properties-title"
-        >
-          <h2 id="properties-title" className="sr-only">
-            Nos logements
-          </h2>
-          {properties.slice(0, visibleCards).map((property) => (
-            <PropertyCard property={property} key={property.slug} />
-          ))}
+      <section className={styles.explanations}>
+        <h2>Comment ça marche ?</h2>
 
-          {visibleCards < properties.length && (
-            <button
-              type="button"
-              onClick={loadMoreProperties}
-              className={styles.loadMore}
-            >
-              Voir plus de logements...
-            </button>
-          )}
-        </section>
+        <p>
+          Que vous partiez pour un week-end improvisé, des vacances en famille
+          ou un voyage professionnel, <br />
+          Kasa vous aide à trouver un lieu qui vous ressemble.
+        </p>
 
-        <section className={styles.explanations}>
-          <h2>Comment ça marche ?</h2>
+        <div className={styles.tiles}>
+          <Tile
+            title="Recherchez"
+            description="Entrez votre destination, vos dates et laissez Kasa faire le reste"
+          />
 
-          <p>
-            Que vous partiez pour un week-end improvisé, des vacances en famille
-            ou un voyage professionnel, <br />
-            Kasa vous aide à trouver un lieu qui vous ressemble.
-          </p>
+          <Tile
+            title="Réservez"
+            description="Profitez d’une plateforme sécurisée et de profils d’hôtes vérifiés."
+          />
 
-          <div className={styles.tiles}>
-            <Tile
-              title="Recherchez"
-              description="Entrez votre destination, vos dates et laissez Kasa faire le reste"
-            />
-
-            <Tile
-              title="Réservez"
-              description="Profitez d’une plateforme sécurisée et de profils d’hôtes vérifiés."
-            />
-
-            <Tile
-              title="Vivez l'expérience"
-              description="Installez-vous, profitez de votre séjour, et sentez-vous chez vous, partout."
-            />
-          </div>
-        </section>
-      </div>
-    </>
+          <Tile
+            title="Vivez l'expérience"
+            description="Installez-vous, profitez de votre séjour, et sentez-vous chez vous, partout."
+          />
+        </div>
+      </section>
+    </div>
   );
 }
