@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
-import type { Property } from "./app/types/types";
-import { apiUrl } from "./app/utils/api";
+import type { Property } from "./types/types";
+import { apiUrl } from "./utils/api";
 
 const BASE_URL = "https://oc-p12-kasa.vercel.app";
 
