@@ -11,6 +11,22 @@ import FlashMessage from "./components/FlashMessage/FlashMessage";
 import { apiUrl } from "./utils/api";
 
 export default function Home() {
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        name: "Kasa",
+        url: "https://oc-p12-kasa.vercel.app/",
+        logo: "https://oc-p12-kasa.vercel.app/logo-kasa-full.svg",
+      },
+      {
+        "@type": "WebSite",
+        name: "Kasa",
+        url: "https://oc-p12-kasa.vercel.app/",
+      },
+    ],
+  };
   const [loading, setLoading] = useState(true);
   const [properties, setProperties] = useState<Property[]>([]);
   const [visibleCards, setVisibleCards] = useState(6);
@@ -52,6 +68,12 @@ export default function Home() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(schema),
+        }}
+      />
       <div className={styles.homeWrapper}>
         {flash && (
           <FlashMessage status={flash.status} message={flash.message} />
