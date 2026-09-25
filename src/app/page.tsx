@@ -4,26 +4,46 @@ import { apiUrl } from "./utils/api";
 import HomeContent from "./HomeContent";
 import Tile from "./components/Tile/Tile";
 import styles from "./page.module.css";
+import JsonLd from "./components/JsonLd/JsonLd";
 
 export default async function Home() {
   let properties: Property[] = [];
+
+  const homeSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        name: "Kasa",
+        url: "https://oc-p12-kasa.vercel.app",
+        logo: "https://oc-p12-kasa.vercel.app/pictures/logo-kasa-full.svg",
+        description: "Plateforme fictive de réservation d'appartements et de maisons entre particuliers. Ce site est un des projets de la formation Concepteur d'application React proposé par OpenClassrooms. Il a été développé par Sébastien VIOLANTE"
+      },
+      {
+        "@type": "WebSite",
+        name: "Kasa",
+        url: "https://oc-p12-kasa.vercel.app",
+      },
+    ],
+  };
 
   try {
     properties = await getRequest<Property[]>({
       url: apiUrl("/api/properties"),
     });
   } catch (error) {
-     console.error("Erreur récupération logements :", error);
+    console.error("Erreur récupération logements :", error);
   }
 
   return (
     <div className={styles.homeWrapper}>
+      <JsonLd data={homeSchema} />
       <section className={styles.hero}>
         <h1>Chez vous, partout et ailleurs</h1>
 
         <p>
-          Avec Kasa, vivez des séjours uniques dans des hébergements
-          chaleureux, sélectionnés avec soin par nos hôtes.
+          Avec Kasa, vivez des séjours uniques dans des hébergements chaleureux,
+          sélectionnés avec soin par nos hôtes.
         </p>
 
         <div className={styles.heroPictureContainer}>
