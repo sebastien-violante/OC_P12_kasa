@@ -1,5 +1,5 @@
 import type { Config } from "jest";
-import nextJest from "next/jest";
+import nextJest from "next/jest.js";
 
 const createJestConfig = nextJest({
   dir: "./",
@@ -7,9 +7,14 @@ const createJestConfig = nextJest({
 
 const config: Config = {
   testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.tsx"],
-  moduleNameMapper: { "^@/(.*)$": "<rootDir>/src/$1", }
-};
 
+  setupFiles: ["<rootDir>/jest.env.ts"],
+
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.tsx"],
+
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/src/$1",
+  },
+};
 
 export default createJestConfig(config);
