@@ -5,6 +5,7 @@ import HomeContent from "./HomeContent";
 import Tile from "./components/Tile/Tile";
 import styles from "./page.module.css";
 import JsonLd from "./components/JsonLd/JsonLd";
+import Image from "next/image";
 
 export default async function Home() {
   let properties: Property[] = [];
@@ -17,7 +18,8 @@ export default async function Home() {
         name: "Kasa",
         url: "https://oc-p12-kasa.vercel.app",
         logo: "https://oc-p12-kasa.vercel.app/pictures/logo-kasa-full.svg",
-        description: "Plateforme fictive de réservation d'appartements et de maisons entre particuliers. Ce site est un des projets de la formation Concepteur d'application React proposé par OpenClassrooms. Il a été développé par Sébastien VIOLANTE"
+        description:
+          "Plateforme fictive de réservation d'appartements et de maisons entre particuliers. Ce site est un des projets de la formation Concepteur d'application React proposé par OpenClassrooms. Il a été développé par Sébastien VIOLANTE",
       },
       {
         "@type": "WebSite",
@@ -47,7 +49,14 @@ export default async function Home() {
         </p>
 
         <div className={styles.heroPictureContainer}>
-          <img src="/pictures/hero.png" alt="" />
+          <Image
+            className={styles.heroPicture}
+            src="/pictures/hero.png"
+            alt=""
+            fill
+            priority
+            sizes="1115px"
+          />
         </div>
       </section>
 

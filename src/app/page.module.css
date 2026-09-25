@@ -44,20 +44,24 @@
   width: 100%;
   max-width: 1115px;
   height: 458px;
+  position: relative;
   border-radius: 20px;
   overflow: hidden;
-  position: relative;
   margin-top: 32px;
 }
 
-.heroPictureContainer img {
-  width: 1115px;
-  height: auto;
-  max-width: none;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+.heroPicture {
+  width: 1115px !important;
+  height: 893px !important;
+  max-width: none !important;
+
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+
+  transform: translate(-50%, -50%) !important;
 }
 
 .homeWrapper {

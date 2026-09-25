@@ -27,10 +27,6 @@ body {
   margin: 0;
 }
 
-main {
-  padding-top: 96px;
-}
-
 .sr-only {
   position: absolute;
   width: 1px;
