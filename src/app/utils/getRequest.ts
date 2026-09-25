@@ -20,7 +20,9 @@ export default async function getRequest<TResponse = unknown>({
   const response = await fetch(url, {
     method: "GET",
     headers,
-    cache: "no-store",
+    next: {
+      revalidate: 60,
+    },
   });
 
   let result: unknown;
