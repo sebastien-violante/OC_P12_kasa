@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   title: "Kasa",
   description:
     "La nouvelle version du site de location d'appartements et de maisons entre particuliers",
+  verification: {
+    google:"tKbFWZ9h6ulXC1uZ8u4Pm_vaeIfnbXLM9-LlCDpn9j8"
+  }
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
