@@ -5,7 +5,6 @@ import { apiUrl } from "./utils/api";
 const BASE_URL = "https://oc-p12-kasa.vercel.app";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  console.log("SITEMAP API URL:", apiUrl("/api/properties"));
   const response = await fetch(apiUrl("/api/properties"), {
     next: {
       revalidate: 3600,

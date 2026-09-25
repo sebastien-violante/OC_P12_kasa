@@ -6,6 +6,7 @@ import deleteRequest from "@/app/utils/deleteRequest";
 import Cookies from "js-cookie";
 import { useFavorites } from "@/app/context/FavoritesContext";
 import type { Property } from "@/app/types/types";
+import { apiUrl } from "@/app/utils/api";
 
 jest.mock("@/app/utils/postRequest");
 jest.mock("@/app/utils/deleteRequest");
@@ -162,7 +163,7 @@ describe("PropertyCard - favoris", () => {
 
     await waitFor(() => {
       expect(mockedPostRequest).toHaveBeenCalledWith({
-        url: `/api/properties/${property.id}/favorite`,
+        url: apiUrl(`/api/properties/${property.id}/favorite`),
         token: "fake-token",
       });
     });
@@ -219,7 +220,7 @@ describe("PropertyCard - favoris", () => {
 
     await waitFor(() => {
       expect(mockedDeleteRequest).toHaveBeenCalledWith({
-        url: `/api/properties/${property.id}/favorite`,
+        url: apiUrl(`/api/properties/${property.id}/favorite`),
         token: "fake-token",
       });
     });
