@@ -1,12 +1,13 @@
-##########   ___   ____  ________
-##########  |   | /   / |   __   |
-##########  |   |/   /  |  |__|  |
-##########  |   /   /   |   __   |
-##########  |   \   \   |  |  |  |
-##########  |   |\   \  |  |  |  |
-##########  |___| \___\ |__|  |__|
-##########   
-
+```text
+ ___   ____  ________    ______   ________
+|   | /   / |   __   |  |   ___| |   __   |
+|   |/   /  |  |__|  |  |  |___  |  |__|  |
+|   /   /   |   __   |  |___   | |   __   |
+|   \   \   |  |  |  |      |  | |  |  |  |
+|   |\   \  |  |  |  |   ___|  | |  |  |  |
+|___| \___\ |__|  |__|  |______| |__|  |__|  BY SEB !
+   
+```
 
 
 # Frontend — Kasa
@@ -141,7 +142,7 @@ Contient les composants React réutilisables.
 
 ### `context/`
 
-Contient les Context Providers utilisés pour partager des données ou de l'état dans l'application.
+Contient les Context Providers utilisés pour partager des données ou de l'état dans l'application, et en l'occurrence un provider pour l'utilisateur connecté et un autre pour les favoris
 
 ### `utils/`
 
@@ -153,27 +154,17 @@ L'application utilise l'**App Router** de Next.js.
 
 Principales routes :
 
-| Route          | Description                       |
-| -------------- | --------------------------------- |
-| `/`            | Page d'accueil / authentification |
-| `/compte`      | Gestion du compte                 |
-| `/dashboard`   | Tableau de bord                   |
-| `/projets`     | Liste des projets                 |
-| `/projet/[id]` | Détail d'un projet                |
+| Route                     | Description                         |
+| ------------------------- | ----------------------------------- |
+| `/`                       | Page d'accueil                      |
+| `/enregistrement`         | Création d'un compte utilisateur    |
+| `/connexion`              | Connexion à l'application           |
+| `/a-propos`               | A propos de l'application           |
+| `/logement/[id]`          | Détail d'un logement                |
+| `/messagerie`             | Liste des conversations et messages |
+| `/ajouter-une-propriété`  | Ajout d'un logement sur le site     |
 
-Les dossiers entre parenthèses, comme `(site)`, sont des **Route Groups Next.js** et ne sont pas présents dans l'URL.
 
-Par exemple :
-
-```text
-src/app/(site)/dashboard/page.tsx
-```
-
-correspond à :
-
-```text
-/dashboard
-```
 
 ## ❌ Gestion des pages inexistantes
 
@@ -181,13 +172,11 @@ Deux niveaux de `not-found.tsx` sont utilisés dans l'application :
 
 ```text
 src/app/not-found.tsx
-src/app/(site)/not-found.tsx
+src/app/logements/not-found.tsx
 ```
 
 La page `not-found.tsx` globale gère les pages inexistantes au niveau général.
-
-La page `not-found.tsx` du groupe `(site)` permet de gérer les erreurs liées aux pages de l'application.
-
+La page `not-found.tsx` du groupe `logement` permet de gérer les erreurs liées à l'identification d'un logement
 
 ## 🔌 Communication avec l'API
 
@@ -202,6 +191,7 @@ Fonctions disponibles :
 ```text
 getRequest.ts
 postRequest.ts
+postFileRequest.ts
 putRequest.ts
 deleteRequest.ts
 ```
