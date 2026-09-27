@@ -8,10 +8,11 @@ import Cookies from "js-cookie";
 // MOCK DES IMPORTS ///////////////////////////////////
 
 const mockLogin = jest.fn();
+const mockPush = jest.fn();
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
-    push: jest.fn(),
+    push: mockPush,
   }),
 }));
 
@@ -29,11 +30,23 @@ jest.mock("../utils/postRequest", () => ({
 jest.mock("../utils/getRequest", () => ({
   __esModule: true,
   default: jest.fn(),
-}))
+}));
 
 jest.mock("js-cookie", () => ({
   set: jest.fn(),
 }));
+
+// FONCTION DE FACTORISATION ////////////////////////////
+function setUpConnexion() {
+  const user = userEvent.setup();
+  render(<Connexion />);
+  const emailInput = screen.getByLabelText(/Adresse email/i);
+  const passwordInput = screen.getByLabelText(/Mot de passe/i);
+  const submitButton = screen.getByRole("button", {
+    name: /Se connecter/i,
+  });
+  return { user, emailInput, passwordInput, submitButton };
+}
 
 // TESTS ////////////////////////////////////////////////
 
@@ -72,14 +85,7 @@ describe("connexion", () => {
 
   // ✅ validation champs vides
   it("soulève des erreurs si les champs sont vides et place les inputs en aria-invalid", async () => {
-    const user = userEvent.setup();
-    render(<Connexion />);
-    const emailInput = screen.getByLabelText(/Adresse email/i);
-    const passwordInput = screen.getByLabelText(/Mot de passe/i);
-    const submitButton = screen.getByRole("button", {
-      name: /Se connecter/i,
-    });
-
+    const { user, emailInput, passwordInput, submitButton } = setUpConnexion();
     expect(emailInput).toHaveAttribute("aria-invalid", "false");
     expect(passwordInput).toHaveAttribute("aria-invalid", "false");
     await user.click(submitButton);
@@ -95,13 +101,7 @@ describe("connexion", () => {
 
   // ✅ validation email invalide
   it("affiche une erreur lorsque l'email est invalide", async () => {
-    const user = userEvent.setup();
-    render(<Connexion />);
-    const emailInput = screen.getByLabelText(/Adresse email/i);
-    const passwordInput = screen.getByLabelText(/Mot de passe/i);
-    const submitButton = screen.getByRole("button", {
-      name: /Se connecter/i,
-    });
+    const { user, emailInput, passwordInput, submitButton } = setUpConnexion();
 
     await user.type(emailInput, "john.doe");
     await user.type(passwordInput, "P@swworD123");
@@ -117,13 +117,7 @@ describe("connexion", () => {
 
   // ✅ API auth appelée et avec les bonnes données
   it("fetch l'API pour vérifier les données de connexion", async () => {
-    const user = userEvent.setup();
-    render(<Connexion />);
-    const emailInput = screen.getByLabelText(/Adresse email/i);
-    const passwordInput = screen.getByLabelText(/Mot de passe/i);
-    const submitButton = screen.getByRole("button", {
-      name: /Se connecter/i,
-    });
+    const { user, emailInput, passwordInput, submitButton } = setUpConnexion();
     const mockedPostRequest = jest.mocked(postRequest);
     const mockedValue = {
       data: {
@@ -155,13 +149,7 @@ describe("connexion", () => {
 
   // ✅ login appelée et avec les bonnes données
   it("fetch login", async () => {
-    const user = userEvent.setup();
-    render(<Connexion />);
-    const emailInput = screen.getByLabelText(/Adresse email/i);
-    const passwordInput = screen.getByLabelText(/Mot de passe/i);
-    const submitButton = screen.getByRole("button", {
-      name: /Se connecter/i,
-    });
+    const { user, emailInput, passwordInput, submitButton } = setUpConnexion();
     const mockedPostRequest = jest.mocked(postRequest);
     const fakeUser = {
       id: 123,
@@ -186,13 +174,7 @@ describe("connexion", () => {
 
   // ✅ le token est placé en cookies avec les bons paramètres
   it("set cookies", async () => {
-    const user = userEvent.setup();
-    render(<Connexion />);
-    const emailInput = screen.getByLabelText(/Adresse email/i);
-    const passwordInput = screen.getByLabelText(/Mot de passe/i);
-    const submitButton = screen.getByRole("button", {
-      name: /Se connecter/i,
-    });
+    const { user, emailInput, passwordInput, submitButton } = setUpConnexion();
     const mockedPostRequest = jest.mocked(postRequest);
     const fakeUser = {
       id: 123,
@@ -220,26 +202,23 @@ describe("connexion", () => {
     await user.type(passwordInput, "P@swworD123");
     await user.click(submitButton);
 
-    expect(mockedSetCookies).toHaveBeenCalledWith("token", mockedValue.data.token, fakeTokenParameters);
+    expect(mockedSetCookies).toHaveBeenCalledWith(
+      "token",
+      mockedValue.data.token,
+      fakeTokenParameters,
+    );
   });
 
   // ✅ API favoris appelée et avec les bonnes données
   it("fetch l'API pour récupérer les favoris", async () => {
-    const user = userEvent.setup();
-    render(<Connexion />);
-    const emailInput = screen.getByLabelText(/Adresse email/i);
-    const passwordInput = screen.getByLabelText(/Mot de passe/i);
-    const submitButton = screen.getByRole("button", {
-      name: /Se connecter/i,
-    });
-    const mockedPostRequest = jest.mocked(postRequest)
-    const mockedGetRequest = jest.mocked(getRequest)
+    const { user, emailInput, passwordInput, submitButton } = setUpConnexion();
+    const mockedPostRequest = jest.mocked(postRequest);
+    const mockedGetRequest = jest.mocked(getRequest);
     const fakeUser = {
       id: 123,
       name: "John Doe",
       picture: "fake-src",
     };
-    
     const mockedValue = {
       data: {
         token: "fake-token",
@@ -249,7 +228,7 @@ describe("connexion", () => {
       message: "authentification réussie",
     };
     mockedPostRequest.mockResolvedValue(mockedValue);
-    mockedGetRequest.mockResolvedValue([])
+    mockedGetRequest.mockResolvedValue([]);
 
     await user.type(emailInput, "john.doe@gmail.com");
     await user.type(passwordInput, "P@swworD123");
@@ -257,27 +236,22 @@ describe("connexion", () => {
 
     expect(mockedGetRequest).toHaveBeenCalledWith(
       expect.objectContaining({
-      url: expect.stringContaining(`/api/users/${fakeUser.id}/favorites`),
-      token: mockedValue.data.token}))
+        url: expect.stringContaining(`/api/users/${fakeUser.id}/favorites`),
+        token: mockedValue.data.token,
+      }),
+    );
   });
 
   // ✅ localStorage reçoit les bonnes données de favoris
   it("place en localStorage les favoris récupérés", async () => {
-    const user = userEvent.setup();
-    render(<Connexion />);
-    const emailInput = screen.getByLabelText(/Adresse email/i);
-    const passwordInput = screen.getByLabelText(/Mot de passe/i);
-    const submitButton = screen.getByRole("button", {
-      name: /Se connecter/i,
-    });
-    const mockedPostRequest = jest.mocked(postRequest)
-    const mockedGetRequest = jest.mocked(getRequest)
+    const { user, emailInput, passwordInput, submitButton } = setUpConnexion();
+    const mockedPostRequest = jest.mocked(postRequest);
+    const mockedGetRequest = jest.mocked(getRequest);
     const fakeUser = {
       id: 123,
       name: "John Doe",
       picture: "fake-src",
     };
-    
     const mockedValue = {
       data: {
         token: "fake-token",
@@ -288,7 +262,7 @@ describe("connexion", () => {
     };
     const fakeProperties = [
       {
-        cover : "/picture/cover1.png",
+        cover: "/picture/cover1.png",
         description: "descripption1",
         host: fakeUser,
         id: "1234",
@@ -298,12 +272,16 @@ describe("connexion", () => {
         ratings_counts: 2,
         slug: "maison-un",
         title: "Maison un",
-        pictures: ["/picture/picture11.png","/picture/picture12.png","/picture/picture13.png" ],
+        pictures: [
+          "/picture/picture11.png",
+          "/picture/picture12.png",
+          "/picture/picture13.png",
+        ],
         equipments: ["wifi", "lavabo"],
-        tags: ["Paris", "boulevard"]
+        tags: ["Paris", "boulevard"],
       },
       {
-        cover : "/picture/cover2.png",
+        cover: "/picture/cover2.png",
         description: "descripption2",
         host: fakeUser,
         id: "2345",
@@ -313,20 +291,130 @@ describe("connexion", () => {
         ratings_counts: 3,
         slug: "maison-deux",
         title: "Maison deux",
-        pictures: ["/picture/picture21.png","/picture/picture22.png","/picture/picture23.png" ],
+        pictures: [
+          "/picture/picture21.png",
+          "/picture/picture22.png",
+          "/picture/picture23.png",
+        ],
         equipments: ["wifi", "lavabo"],
-        tags: ["Paris", "Etoile"]
-      }
-      
-    ]
+        tags: ["Paris", "Etoile"],
+      },
+    ];
     mockedPostRequest.mockResolvedValue(mockedValue);
-    mockedGetRequest.mockResolvedValue(fakeProperties)
+    mockedGetRequest.mockResolvedValue(fakeProperties);
 
     await user.type(emailInput, "john.doe@gmail.com");
     await user.type(passwordInput, "P@swworD123");
     await user.click(submitButton);
 
-    expect(localStorage.getItem("favorites")).toBe(JSON.stringify(fakeProperties) );
+    expect(localStorage.getItem("favorites")).toBe(
+      JSON.stringify(fakeProperties),
+    );
   });
-    
+
+  // ✅ Echec API avec 401
+  it("reçoit une réponse 401 comme réponse API", async () => {
+    const { user, emailInput, passwordInput, submitButton } = setUpConnexion();
+    const mockedPostRequest = jest.mocked(postRequest);
+    const rejectedValue = {
+      status: 401,
+      message: "Identifiants invalides",
+    };
+    mockedPostRequest.mockRejectedValue(rejectedValue);
+
+    await user.type(emailInput, "john.doe@gmail.com");
+    await user.type(passwordInput, "P@swworD123");
+    await user.click(submitButton);
+
+    expect(
+      await screen.findByText("Identifiants invalides"),
+    ).toBeInTheDocument();
+  });
+
+  // ✅ Echec API avec 500
+  it("reçoit une réponse 500 comme réponse API", async () => {
+    const { user, emailInput, passwordInput, submitButton } = setUpConnexion();
+    const mockedPostRequest = jest.mocked(postRequest);
+    const rejectedValue = {
+      status: 500,
+      message: "Erreur interne du serveur",
+    };
+    mockedPostRequest.mockRejectedValue(rejectedValue);
+
+    await user.type(emailInput, "john.doe@gmail.com");
+    await user.type(passwordInput, "P@swworD123");
+    await user.click(submitButton);
+
+    expect(
+      await screen.findByText("Erreur interne du serveur"),
+    ).toBeInTheDocument();
+  });
+
+  // ✅ localStorage reçoit les bonnes données de favoris
+  it("redirige vers la page d'accueil après une connexion réussie", async () => {
+    const { user, emailInput, passwordInput, submitButton } = setUpConnexion();
+    const mockedPostRequest = jest.mocked(postRequest);
+    const fakeUser = {
+      id: 123,
+      name: "John Doe",
+      picture: "fake-src",
+    };
+
+    const mockedValue = {
+      data: {
+        token: "fake-token",
+        user: fakeUser,
+      },
+      success: true,
+      message: "authentification réussie",
+    };
+    const mockedGetRequest = jest.mocked(getRequest);
+    const fakeProperties = [
+      {
+        cover: "/picture/cover1.png",
+        description: "descripption1",
+        host: fakeUser,
+        id: "1234",
+        location: "location1",
+        price_per_night: 1234,
+        rating_avg: 1,
+        ratings_counts: 2,
+        slug: "maison-un",
+        title: "Maison un",
+        pictures: [
+          "/picture/picture11.png",
+          "/picture/picture12.png",
+          "/picture/picture13.png",
+        ],
+        equipments: ["wifi", "lavabo"],
+        tags: ["Paris", "boulevard"],
+      },
+      {
+        cover: "/picture/cover2.png",
+        description: "descripption2",
+        host: fakeUser,
+        id: "2345",
+        location: "location2",
+        price_per_night: 1234,
+        rating_avg: 2,
+        ratings_counts: 3,
+        slug: "maison-deux",
+        title: "Maison deux",
+        pictures: [
+          "/picture/picture21.png",
+          "/picture/picture22.png",
+          "/picture/picture23.png",
+        ],
+        equipments: ["wifi", "lavabo"],
+        tags: ["Paris", "Etoile"],
+      },
+    ];
+    mockedPostRequest.mockResolvedValue(mockedValue);
+    mockedGetRequest.mockResolvedValue(fakeProperties);
+    await user.type(emailInput, "john.doe@gmail.com");
+    await user.type(passwordInput, "P@swworD123");
+    await user.click(submitButton);
+
+    expect(mockPush).toHaveBeenCalledWith("/");
+  });
 });
