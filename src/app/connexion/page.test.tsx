@@ -119,20 +119,7 @@ describe("connexion", () => {
   it("fetch l'API pour vérifier les données de connexion", async () => {
     const { user, emailInput, passwordInput, submitButton } = setUpConnexion();
     const mockedPostRequest = jest.mocked(postRequest);
-    const mockedValue = {
-      data: {
-        token: "fake-token",
-        user: {
-          id: 123,
-          name: "john Doe",
-          picture: "fake-src",
-        },
-      },
-      success: true,
-      message: "authentification réussie",
-    };
-    mockedPostRequest.mockResolvedValue(mockedValue);
-
+    
     await user.type(emailInput, "john.doe@gmail.com");
     await user.type(passwordInput, "P@swworD123");
     await user.click(submitButton);
@@ -350,7 +337,7 @@ describe("connexion", () => {
     ).toBeInTheDocument();
   });
 
-  // ✅ localStorage reçoit les bonnes données de favoris
+  // ✅ redirection vers la page d'acceuil après connexion réussie
   it("redirige vers la page d'accueil après une connexion réussie", async () => {
     const { user, emailInput, passwordInput, submitButton } = setUpConnexion();
     const mockedPostRequest = jest.mocked(postRequest);

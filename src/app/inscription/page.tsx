@@ -111,7 +111,7 @@ export default function Inscription() {
           {apiError}
         </p>
       </div>
-      <form onSubmit={handleRegister} className={styles.form}>
+      <form onSubmit={handleRegister} className={styles.form} noValidate>
         <div className={styles.formGroup}>
           <label htmlFor="name">Nom</label>
           <input
