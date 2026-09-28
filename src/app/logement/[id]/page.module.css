@@ -1,7 +1,8 @@
 .top {
   width: 100%;
   max-width: 971px;
-  margin: auto;
+  margin: 10px auto 0 auto;
+  padding: 0 16px;
 }
 
 .top .backToProperties {
@@ -34,6 +35,7 @@
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: 420px 110px;
   gap: 10px;
+  padding: 0 16px;
 }
 
 .property .item {
@@ -154,19 +156,7 @@
   margin-bottom: 8px;
 }
 
-@media screen and (min-width: 767px) {
-  .property .grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(2, 174px);
-    gap: 10px;
-  }
-  .property .item:first-child {
-    grid-row: span 2;
-    grid-column: span 2;
-    width: 302px;
-  }
-}
+
 
 .modalOverlay {
   position: fixed;
@@ -226,6 +216,25 @@
     text-align: center;
     margin-top: 10px;
     font-size: 12px;
+}
+
+@media screen and (min-width: 767px) {
+  .property .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 174px);
+    gap: 10px;
+    padding: 0;
+  }
+  .property .item:first-child {
+    grid-row: span 2;
+    grid-column: span 2;
+    width: 302px;
+  }
+
+  .top {
+    margin: 86px auto 0 auto;
+  }
 }
 
 @media screen and (min-width: 1021px) {

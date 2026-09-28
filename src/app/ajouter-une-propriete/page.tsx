@@ -6,7 +6,11 @@ import { useState, useEffect, useRef } from "react";
 import getRequest from "../utils/getRequest";
 import Tag from "../components/Tag/Tag";
 import { ChangeEvent } from "react";
-import type { CreatePropertyPayload, PropertyFormData, ApiError } from "../types/types";
+import type {
+  CreatePropertyPayload,
+  PropertyFormData,
+  ApiError,
+} from "../types/types";
 import z from "zod";
 import { newPropertySchema } from "../types/schemas/newPropertySchema";
 import { useAuth } from "../context/AuthContext";
@@ -25,7 +29,7 @@ export default function Addproperty() {
   const [images, setImages] = useState<(File | null)[]>([null]);
   const [profile, setProfile] = useState<File | null>(null);
   const [tags, setTags] = useState<string[]>([]);
-  const [equipements, setEquipments] = useState<string[]>([])
+  const [equipements, setEquipments] = useState<string[]>([]);
   const [newTag, setNewTag] = useState<string>("");
   const profileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
@@ -34,7 +38,7 @@ export default function Addproperty() {
   const [profileFileName, setProfileFileName] = useState("");
   const { user, updateUser } = useAuth();
   const [apiError, setApiError] = useState("");
-  const [pictureQuantity, setPictureQuantity] = useState(1)
+  const [pictureQuantity, setPictureQuantity] = useState(1);
   const initFormData: PropertyFormData = {
     title: "",
     description: "",
@@ -53,10 +57,16 @@ export default function Addproperty() {
   useEffect(() => {
     if (!user) return;
 
-    setFormData((prev) => ({
-      ...prev,
-      name: user.name,
-    }));
+    setFormData((prev) => {
+      if (prev.name === user.name) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        name: user.name,
+      };
+    });
   }, [user]);
 
   // Captation des données d'enregistrement dans FormData
@@ -87,6 +97,24 @@ export default function Addproperty() {
       return;
     }
 
+    if (target.name === "postalCode") {
+      const postalCode = target.value.replace(/[^0-9]/g, "").slice(0, 5);
+      setFormData((prev) => ({
+        ...prev,
+        postalCode,
+      }));
+
+      return;
+    }
+    if (target.name === "price_per_night") {
+      const price_per_night = target.value.replace(/[^0-9]/g, "");
+      setFormData((prev) => ({
+        ...prev,
+        price_per_night,
+      }));
+
+      return;
+    }
     setFormData((prev) => ({
       ...prev,
       [target.name]: target.value,
@@ -159,11 +187,10 @@ export default function Addproperty() {
   };
 
   function addImage() {
-    if(pictureQuantity <= 3) {
-      setPictureQuantity(prev => prev+1)
+    if (pictureQuantity <= 3) {
+      setPictureQuantity((prev) => prev + 1);
       setImages((prev) => [...prev, null]);
     }
-    
   }
 
   // Récupération de l'erreur correspondant à un champ
@@ -247,82 +274,86 @@ export default function Addproperty() {
     });
 
     const token = Cookies.get("token");
-
-    const pictureUrls = await getPictureUrls(pictures, token);
-
-    let coverPicture = "";
-    let profilePicture = user.picture ?? "";
-    const propertyPictures: string[] = [];
-
-    pictureUrls.forEach((picture) => {
-      switch (picture.purpose) {
-        case "property-cover":
-          coverPicture = picture.url;
-          break;
-
-        case "user-picture":
-          profilePicture = picture.url;
-          break;
-
-        case "property-picture":
-          propertyPictures.push(picture.url);
-          break;
-      }
-    });
-
-    // Si une nouvelle photo de profil a été fournie,
-    // on met à jour le profil
-    if (profilePicture !== (user.picture ?? "")) {
-      const updatedUser = await updateProfilePicture(profilePicture);
-
-      if (updatedUser?.picture) {
-        profilePicture = updatedUser.picture;
-      }
-    }
-
-    const payload: CreatePropertyPayload = {
-      title: data.title.charAt(0) + data.title.slice(1).trim(),
-      description:
-        data.description.charAt(0) + data.description.slice(1).trim(),
-      cover: coverPicture,
-      location: data.location.charAt(0) + data.location.slice(1).trim(),
-      price_per_night: Number(data.price_per_night),
-      host_id: user.id,
-      host: {
-        name: user.name,
-        picture: profilePicture,
-      },
-      pictures: propertyPictures,
-      equipments: data.equipments,
-      tags: data.categories,
-    };
-
     try {
-      const result = await postRequest<Property, CreatePropertyPayload>({
-        url: apiUrl(`/api/properties`),
-        payload,
-        token,
+      const pictureUrls = await getPictureUrls(pictures, token);
+
+      let coverPicture = "";
+      let profilePicture = user.picture ?? "";
+      const propertyPictures: string[] = [];
+
+      pictureUrls.forEach((picture) => {
+        switch (picture.purpose) {
+          case "property-cover":
+            coverPicture = picture.url;
+            break;
+
+          case "user-picture":
+            profilePicture = picture.url;
+            break;
+
+          case "property-picture":
+            propertyPictures.push(picture.url);
+            break;
+        }
       });
 
-      localStorage.setItem(
-        "flash",
-        JSON.stringify({
-          type: "success",
-          message: "Votre logement a bien été enregistré",
-        }),
-      );
-      setErrors([]);
-      setFormData(initFormData);
-      router.push("/");
+      // Si une nouvelle photo de profil a été fournie,
+      // on met à jour le profil
+      if (profilePicture !== (user.picture ?? "")) {
+        const updatedUser = await updateProfilePicture(profilePicture);
+
+        if (updatedUser?.picture) {
+          profilePicture = updatedUser.picture;
+        }
+      }
+
+      const payload: CreatePropertyPayload = {
+        title: data.title.charAt(0) + data.title.slice(1).trim(),
+        description:
+          data.description.charAt(0) + data.description.slice(1).trim(),
+        cover: coverPicture,
+        location: data.location.charAt(0) + data.location.slice(1).trim(),
+        price_per_night: Number(data.price_per_night),
+        host_id: user.id,
+        host: {
+          name: user.name,
+          picture: profilePicture,
+        },
+        pictures: propertyPictures,
+        equipments: data.equipments,
+        tags: data.categories,
+      };
+
+      try {
+        const result = await postRequest<Property, CreatePropertyPayload>({
+          url: apiUrl(`/api/properties`),
+          payload,
+          token,
+        });
+
+        localStorage.setItem(
+          "flash",
+          JSON.stringify({
+            type: "success",
+            message: "Votre logement a bien été enregistré",
+          }),
+        );
+        setErrors([]);
+        setFormData(initFormData);
+        router.push("/");
+      } catch (error) {
+        const apiError = error as ApiError;
+        if (apiError.status === 403) {
+          setApiError(
+            "Vous n'aves pas les droits nécessaires pour créer un logement",
+          );
+        } else {
+          setApiError(apiError.message);
+        }
+      }
     } catch (error) {
       const apiError = error as ApiError;
-      if (apiError.status === 403) {
-        setApiError(
-          "Vous n'aves pas les droits nécessaires pour créer un logement",
-        );
-      } else {
-        setApiError(apiError.message);
-      }
+      setApiError(apiError.message);
     }
   }
 
@@ -365,7 +396,7 @@ export default function Addproperty() {
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const tags = await getRequest<string[]>({ url: apiUrl("/api/tags" )});
+        const tags = await getRequest<string[]>({ url: apiUrl("/api/tags") });
         setTags(tags);
       } catch (error) {
         console.error(error);
@@ -375,11 +406,13 @@ export default function Addproperty() {
     loadTags();
   }, []);
 
-   // Chargement des équipementss
+  // Chargement des équipementss
   useEffect(() => {
     const loadEquipements = async () => {
       try {
-        const equipements = await getRequest<string[]>({ url: apiUrl("/api/equipments" )});
+        const equipements = await getRequest<string[]>({
+          url: apiUrl("/api/equipments"),
+        });
         setEquipments(equipements);
       } catch (error) {
         console.error(error);
@@ -411,7 +444,11 @@ export default function Addproperty() {
         }}
         noValidate
       >
-        <button type="submit" className={styles.submitBtn}>
+        <button
+          type="submit"
+          className={styles.submitBtn}
+          aria-label="Ajouter la propriété"
+        >
           Ajouter
         </button>
         <article className={styles.mainData}>
@@ -472,6 +509,7 @@ export default function Addproperty() {
               inputMode="numeric"
               id="postalCode"
               name="postalCode"
+              value={formData.postalCode}
               onChange={handleInputValue}
               required
               aria-describedby={
@@ -511,11 +549,13 @@ export default function Addproperty() {
             )}
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="location">Prix par nuitée (€)</label>
+            <label htmlFor="price_per_night">Prix par nuitée (€)</label>
             <input
               type="text"
               id="price_per_night"
               name="price_per_night"
+              inputMode="numeric"
+              value={formData.price_per_night}
               onChange={handleInputValue}
               required
               aria-describedby={
@@ -588,7 +628,9 @@ export default function Addproperty() {
             </div>
             <div className={styles.formGroup}>
               {/* Images du logement */}
-              <label htmlFor="propertyPictures">Images du logement {pictureQuantity}</label>
+              <label htmlFor="propertyPictures">
+                Images du logement
+              </label>
 
               {images?.map((image, index) => {
                 const inputId = `propertyPicture-${index}`;
@@ -627,16 +669,15 @@ export default function Addproperty() {
                   </div>
                 );
               })}
-              {pictureQuantity <=3 && (
+              {pictureQuantity <= 3 && (
                 <button
-                type="button"
-                className={styles.addImage}
-                onClick={addImage}
-              >
-                +Ajouter une image
-              </button>
+                  type="button"
+                  className={styles.addImage}
+                  onClick={addImage}
+                >
+                  +Ajouter une image
+                </button>
               )}
-              
             </div>
           </div>
           <div className={styles.chooseProfile}>

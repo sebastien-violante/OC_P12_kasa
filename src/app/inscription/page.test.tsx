@@ -5,7 +5,6 @@ import postRequest from "../utils/postRequest";
 
 // MOCK DES IMPORTS ///////////////////////////////////
 const mockPush = jest.fn();
-
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
     push: mockPush,

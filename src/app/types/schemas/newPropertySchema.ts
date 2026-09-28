@@ -5,7 +5,7 @@ export const newPropertySchema = z.object({
 
   description: z
     .string()
-    .min(3, "La description doit comprendre au moins 10 caractères"),
+    .min(10, "La description doit comprendre au moins 10 caractères"),
 
   postalCode: z.string().regex(/^\d{5}$/, "Code postal invalide"),
 

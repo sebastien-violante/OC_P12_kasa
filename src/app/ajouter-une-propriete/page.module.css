@@ -41,8 +41,8 @@
     border-radius: 10px;
     cursor: pointer;
     position: absolute;
-    top: -80px;
-    right: 0;
+    top: -75px;
+    right: 16px;
   }
 
   .mainData {
@@ -55,6 +55,7 @@
   .pictures {
     width: 48%;
     display: flex;
+    justify-content: space-between;
     flex-direction: column;
     gap: 16px;
 
@@ -83,6 +84,7 @@
       border: 1px solid var(--grisLight);
       border-radius: 4px;
       padding-left: 10px;
+      font-size: 12px;
     }
 
     input:disabled {
@@ -137,7 +139,7 @@
       border: none;
       background: none;
       color: var(--mainRed);
-      font-size: 16px;
+      font-size: 14px;
       cursor: pointer;
       padding: 0;
     }
@@ -156,7 +158,7 @@
     position: relative;
 
     h2 {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .fieldError {
@@ -200,6 +202,7 @@
 
     .sectionLabel {
       margin-bottom: 10px;
+      font-size: 14px;
     }
   }
 
@@ -227,7 +230,7 @@
   .header {
     padding: 0 10px;
 
-    .top h1 {
+    h1 {
       font-size: 18px;
     }
   }
