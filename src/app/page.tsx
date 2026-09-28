@@ -55,7 +55,7 @@ export default async function Home() {
             alt=""
             fill
             priority
-            sizes="1115px"
+            sizes="(max-width: 1115px) 100vw, 1115px"
           />
         </div>
       </section>

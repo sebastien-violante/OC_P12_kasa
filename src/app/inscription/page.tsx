@@ -87,7 +87,6 @@ export default function Inscription() {
       }
     } catch (error) {
       const apiError = error as ApiError;
-      console.log(apiError.status);
       if (apiError.status === 409) {
         setApiError("Cet email est déjà utilisé !");
       } else {
