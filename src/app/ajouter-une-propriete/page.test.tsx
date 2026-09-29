@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Addproperty from "./page";
 import getRequest from "../utils/getRequest";
@@ -52,6 +52,11 @@ jest.mock("../context/AuthContext", () => {
     }),
   };
 });
+
+jest.mock("js-cookie", () => ({
+  get: jest.fn(() => "fake-token"),
+  set: jest.fn(),
+}));
 
 // FONCTION DE FACTORISATION ////////////////////////////
 function setUpRegisterProperty() {
@@ -279,8 +284,21 @@ describe("ajouter une propriété", () => {
 
   // ✅ récupère les urls des images chargées
   it("récupère les urls des images chargées", async () => {
-    const { user, coverInput, submitInput, getPictureInput } = setUpRegisterProperty();
+    const {
+      user,
+      titleInput,
+      descriptionInput,
+      postalCodeInput,
+      locationInput,
+      priceInput,
+      coverInput,
+      submitInput,
+      getPictureInput,
+    } = setUpRegisterProperty();
 
+    const wifiCheckbox = await screen.findByRole("checkbox", { name: /wifi/i });
+    
+    // simule la création des champs supplémentaires image
     async function addPictures(
       user: ReturnType<typeof userEvent.setup>,
       quantity: number,
@@ -294,31 +312,80 @@ describe("ajouter une propriété", () => {
       }
     }
 
-    await addPictures(user, 3);
+    // Faker d'images
+    const cover = new File(["cover"], "cover.jpeg", { type: "image/jpeg" });
+    const picture0 = new File(["picture0"], "picture0.webp", { type: "image/webp" });
+    const picture1 = new File(["picture1"], "picture1.jpeg", { type: "image/jpeg" });
+    const profile = new File(["profile"], "profile.png", { type: "image/png" });
 
-const picture1 = new File(["picture1"], "picture1.jpg", {
-  type: "image/jpeg",
-});
-const picture2 = new File(["picture2"], "picture2.jpg", {
-  type: "image/jpeg",
-});
-const picture3 = new File(["picture3"], "picture3.jpg", {
-  type: "image/jpeg",
-});
+    // champs File reçevant les images
+    const coverUpload = document.getElementById(
+      "coverImage",
+    ) as HTMLInputElement;
+    const profileUpload = document.getElementById(
+      "profile",
+    ) as HTMLInputElement;
 
-await user.upload(getPictureInput(0), picture1);
-await user.upload(getPictureInput(1), picture2);
-await user.upload(getPictureInput(2), picture3);
+    await user.type(titleInput, "ma propriété");
+    await user.type(descriptionInput, "description de ma propriété");
+    await user.type(postalCodeInput, "75001");
+    await user.type(locationInput, "Paris");
+    await user.type(priceInput, "120");
+    await user.click(wifiCheckbox);
+    
+    // ajout des champs images nécessaires à l'upload
+    await addPictures(user, 2);
+    const picture0Upload = document.getElementById(
+      "propertyPicture-0",
+    ) as HTMLInputElement;
+    const picture1Upload = document.getElementById(
+      "propertyPicture-1",
+    ) as HTMLInputElement;
+    // upload des images
+    await user.upload(coverUpload, cover);
+    await user.upload(picture0Upload, picture0);
+    await user.upload(picture1Upload, picture1);
+    await user.upload(profileUpload, profile)
 
-expect(mockedGetPictureUrls).toHaveBeenCalledWith(
-  expect.arrayContaining([
-    { file: picture1, purpose: "property-picture" },
-    { file: picture2, purpose: "property-picture" },
-    { file: picture3, purpose: "property-picture" },
-  ]),
-  expect.anything(),
-);
+  
+    // recopie des noms de fichiers dans le document
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("cover.jpeg")).toBeInTheDocument();
+    })
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("picture0.webp")).toBeInTheDocument();
+    })
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("picture1.jpeg")).toBeInTheDocument();
+    })
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("profile.png")).toBeInTheDocument()
+    })
+    mockedGetPictureUrls.mockResolvedValue([]);
+    await user.click(submitInput);
+
+    await waitFor(() => {
+      expect(mockedGetPictureUrls).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({
+            file: cover,
+            purpose: "property-cover",
+          }),
+          expect.objectContaining({
+            file: picture0,
+            purpose: "property-picture",
+          }),
+          expect.objectContaining({
+            file: picture1,
+            purpose: "property-picture",
+          }),
+          expect.objectContaining({
+            file: profile,
+            purpose: "user-picture",
+          }),
+        ]),
+        "fake-token",
+      );
+    });
   });
-
-
 });
