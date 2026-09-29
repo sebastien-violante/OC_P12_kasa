@@ -310,7 +310,8 @@ export default function Addproperty() {
       const payload: CreatePropertyPayload = {
         title: data.title.charAt(0).toUpperCase() + data.title.slice(1).trim(),
         description:
-          data.description.charAt(0).toUpperCase() + data.description.slice(1).trim(),
+          data.description.charAt(0).toUpperCase() +
+          data.description.slice(1).trim(),
         cover: coverPicture,
         location: data.location.charAt(0) + data.location.slice(1).trim(),
         price_per_night: Number(data.price_per_night),
@@ -427,7 +428,8 @@ export default function Addproperty() {
       <section className={styles.header}>
         <Link href="/" className={styles.backToProperties}>
           <img src="/pictures/back-arrow.svg" alt="" />
-          <span>Retour</span>
+          <span className="md:hidden">Retour aux annonces</span>
+          <span className="hidden md:inline">Retour</span>
         </Link>
         <h1>Ajouter une propriété</h1>
         {apiError && (
@@ -628,9 +630,7 @@ export default function Addproperty() {
             </div>
             <div className={styles.formGroup}>
               {/* Images du logement */}
-              <label htmlFor="propertyPictures">
-                Images du logement
-              </label>
+              <label htmlFor="propertyPictures">Images du logement</label>
 
               {images?.map((image, index) => {
                 const inputId = `propertyPicture-${index}`;
