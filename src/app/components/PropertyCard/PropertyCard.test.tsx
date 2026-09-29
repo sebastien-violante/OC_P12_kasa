@@ -8,14 +8,14 @@ import { useFavorites } from "@/app/context/FavoritesContext";
 import type { Property } from "@/app/types/types";
 import { apiUrl } from "@/app/utils/api";
 
+// MOCK DES IMPORTS ///////////////////////////////////
+
 jest.mock("@/app/utils/postRequest");
 jest.mock("@/app/utils/deleteRequest");
 jest.mock("js-cookie");
-
 jest.mock("@/app/context/FavoritesContext", () => ({
   useFavorites: jest.fn(),
 }));
-
 jest.mock("next/image", () => {
   return function Image({
     fill: _fill,
@@ -26,7 +26,6 @@ jest.mock("next/image", () => {
     return <img {...props} />;
   };
 });
-
 jest.mock("next/link", () => {
   return function Link({
     href,
@@ -42,25 +41,20 @@ jest.mock("next/link", () => {
     );
   };
 });
-
 jest.mock("@/app/utils/formatUrl", () => ({
   __esModule: true,
   default: jest.fn((url: string) => url),
 }));
-
 jest.mock("../FlashMessage/FlashMessage", () => {
-  return function FlashMessage({
-    message,
-  }: {
-    message: string;
-  }) {
+  return function FlashMessage({ message }: { message: string }) {
     return <div>{message}</div>;
   };
 });
-
 const mockedPostRequest = jest.mocked(postRequest);
 const mockedDeleteRequest = jest.mocked(deleteRequest);
 const mockedUseFavorites = jest.mocked(useFavorites);
+
+// FAKER DE PROPRIETE //////////////////////////////////////////////////////
 
 const property: Property = {
   id: "1",
@@ -77,6 +71,7 @@ const property: Property = {
 };
 
 describe("PropertyCard - affichage", () => {
+  // clean des mocks
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -89,7 +84,8 @@ describe("PropertyCard - affichage", () => {
     } as any);
   });
 
-  it("affiche le titre du logement", () => {
+  // ✅ Affichage du composant
+  it("affiche correctement tous les éléments du composant", () => {
     render(<PropertyCard property={property} />);
 
     expect(
@@ -97,26 +93,11 @@ describe("PropertyCard - affichage", () => {
         name: property.title,
       }),
     ).toBeInTheDocument();
-  });
-
-  it("affiche la position", () => {
-    render(<PropertyCard property={property} />);
-
+    expect(screen.getByText(property.location)).toBeInTheDocument();
     expect(
-      screen.getByText(property.location),
+      screen.getByText(`${property.price_per_night} €`),
     ).toBeInTheDocument();
-  });
-
-  it("affiche le prix par nuit", () => {
-    render(<PropertyCard property={property} />);
-
-    expect(screen.getByText(`${property.price_per_night} €`)).toBeInTheDocument();
     expect(screen.getByText("par nuit")).toBeInTheDocument();
-  });
-
-  it("affiche correctement l'image", () => {
-    render(<PropertyCard property={property} />);
-
     expect(
       screen.getByRole("img", {
         name: `Photo du logement : ${property.title}`,
@@ -137,7 +118,7 @@ describe("PropertyCard - favoris", () => {
       removeFavorite: jest.fn(),
     } as any);
   });
-
+  // ✅ Ajout de la propriété aux favoris
   it("ajoute la propriété aux favoris", async () => {
     const user = userEvent.setup();
 
@@ -173,6 +154,7 @@ describe("PropertyCard - favoris", () => {
     });
   });
 
+  // ✅ Message flash si l'utilisateur n'est pas connecté
   it("affiche un message si l'utilisateur n'est pas connecté", async () => {
     const user = userEvent.setup();
 
@@ -187,14 +169,13 @@ describe("PropertyCard - favoris", () => {
     await user.click(button);
 
     expect(
-      screen.getByText(
-        "Vous devez être connecté.e pour ajouter un favori",
-      ),
+      screen.getByText("Vous devez être connecté.e pour ajouter un favori"),
     ).toBeInTheDocument();
 
     expect(mockedPostRequest).not.toHaveBeenCalled();
   });
 
+  // ✅ Enlève la propriété des favoris
   it("retire la propriété des favoris", async () => {
     const user = userEvent.setup();
 
