@@ -9,7 +9,6 @@ import Image from "next/image";
 
 export default async function Home() {
   let properties: Property[] = [];
-
   const homeSchema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -75,6 +74,7 @@ export default async function Home() {
           <Tile
             title="Recherchez"
             description="Entrez votre destination, vos dates et laissez Kasa faire le reste"
+            
           />
 
           <Tile

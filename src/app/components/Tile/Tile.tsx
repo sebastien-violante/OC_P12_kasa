@@ -7,7 +7,7 @@ type TileProps = {
 
 export default function Tile({title, description}: TileProps) {
     return (
-        <div className={styles.tile}>
+        <div className={styles.tile} tabIndex={0}>
             <h3>{title}</h3>
             <p>{description}</p>
         </div>

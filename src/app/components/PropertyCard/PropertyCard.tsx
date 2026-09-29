@@ -76,6 +76,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
       <Link
         href={`/logement/${propertyId}`}
         className={styles.propertyLink}
+        data-focusable="property-link"
       >
         <div className={styles.pictureContainer}>
           <Image
