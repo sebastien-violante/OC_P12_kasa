@@ -1,9 +1,9 @@
 ```text
  ___   ____  ________    ______   ________
 |   | /   / |   __   |  |   ___| |   __   |
-|   |/   /  |  |__|  |  |  |___  |  |__|  |
-|   /   /   |   __   |  |___   | |   __   |
-|   \   \   |  |  |  |      |  | |  |  |  |
+|   |/   /  |  |  |  |  |  |___  |  |  |  |
+|   /   /   |  |__|  |  |___   | |  |__|  |
+|   \   \   |   __   |      |  | |   __   |
 |   |\   \  |  |  |  |   ___|  | |  |  |  |
 |___| \___\ |__|  |__|  |______| |__|  |__|  BY SEB !
    
@@ -127,9 +127,7 @@ src/
     ├── deleteRequest.ts
     ├── patchRequest.ts
     ├── portFileRequest.ts
-
-
-    
+  
 ```
 
 ### `app/`
@@ -197,6 +195,20 @@ deleteRequest.ts
 ```
 
 Cela permet d'éviter de dupliquer la logique de communication avec le backend dans les différents composants mais aussi de garder de la lisibilité sur le rôle de la requête.
+
+## 🚦 tests
+
+Afin de sécuriser le comportement de l'application et d'assurer sa non régression en cas de modification, plusieurs tests sont mis en oeuvre dans des fichiers dédiés. Ils permettent de vérifier :
+- la connexion
+- l'enregistrement d'un nouvel utilisateur
+- l'ajout d'une propriété
+- l'ajout/suppression d'une propriété dans les favoris
+
+Les tests peuvent être lancés en console avec la commande : 
+
+```bash
+npm run test
+```
 
 ## 🧩 Conventions
 
