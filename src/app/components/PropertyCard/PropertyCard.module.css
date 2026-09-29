@@ -1,74 +1,79 @@
 .card {
-    margin: 0 16px;
-    height: 552px;
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    background: white;
-    cursor: pointer;
+  margin: 0 16px;
+  height: 552px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  cursor: pointer;
 }
 
 .card:hover {
-    box-shadow: var(--box-shadow);
+  box-shadow: var(--box-shadow);
 }
 
+.card:has(.propertyLink:focus-visible) {
+  outline: 2px solid var(--darkOrange);
+  outline-offset: 2px;
+}
+
+
 .cardData {
-    height: 176px;
-    padding: 16px 24px 24px 24px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+  height: 176px;
+  padding: 16px 24px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .cardDescription {
-    font-size: 14px;
-    color: var(--grisDark);
+  font-size: 14px;
+  color: var(--grisDark);
 }
 
 .cardHeader {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .cardTitle {
-    font-size: 18px;
-    font-weight: var(--weight-medium);
+  font-size: 18px;
+  font-weight: var(--weight-medium);
 }
 
 .favorite {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    z-index: 20;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 20;
 }
 
 .favorite:hover {
-    transform: scale(1.1);
-    cursor: pointer;   
+  transform: scale(1.1);
+  cursor: pointer;
 }
 
 .label {
-    color: var(--grisDark);
+  color: var(--grisDark);
 }
 
 .pictureContainer {
-    height: 376px;
-    width: 355px;
-    position: relative;
+  height: 376px;
+  width: 355px;
+  position: relative;
 }
 
 .pictureContainer img {
-    object-fit: cover;
+  object-fit: cover;
 }
 
 .price {
-    font-size: 14px;
-    font-weight: var(--weight-medium);
+  font-size: 14px;
+  font-weight: var(--weight-medium);
 }
-
 
 @media (min-width: 767px) {
   .card {
