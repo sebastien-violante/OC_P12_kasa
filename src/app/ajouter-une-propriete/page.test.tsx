@@ -297,7 +297,7 @@ describe("ajouter une propriété", () => {
     } = setUpRegisterProperty();
 
     const wifiCheckbox = await screen.findByRole("checkbox", { name: /wifi/i });
-    
+
     // simule la création des champs supplémentaires image
     async function addPictures(
       user: ReturnType<typeof userEvent.setup>,
@@ -314,8 +314,12 @@ describe("ajouter une propriété", () => {
 
     // Faker d'images
     const cover = new File(["cover"], "cover.jpeg", { type: "image/jpeg" });
-    const picture0 = new File(["picture0"], "picture0.webp", { type: "image/webp" });
-    const picture1 = new File(["picture1"], "picture1.jpeg", { type: "image/jpeg" });
+    const picture0 = new File(["picture0"], "picture0.webp", {
+      type: "image/webp",
+    });
+    const picture1 = new File(["picture1"], "picture1.jpeg", {
+      type: "image/jpeg",
+    });
     const profile = new File(["profile"], "profile.png", { type: "image/png" });
 
     // champs File reçevant les images
@@ -332,7 +336,7 @@ describe("ajouter une propriété", () => {
     await user.type(locationInput, "Paris");
     await user.type(priceInput, "120");
     await user.click(wifiCheckbox);
-    
+
     // ajout des champs images nécessaires à l'upload
     await addPictures(user, 2);
     const picture0Upload = document.getElementById(
@@ -345,22 +349,21 @@ describe("ajouter une propriété", () => {
     await user.upload(coverUpload, cover);
     await user.upload(picture0Upload, picture0);
     await user.upload(picture1Upload, picture1);
-    await user.upload(profileUpload, profile)
+    await user.upload(profileUpload, profile);
 
-  
     // recopie des noms de fichiers dans le document
     await waitFor(() => {
       expect(screen.getByDisplayValue("cover.jpeg")).toBeInTheDocument();
-    })
+    });
     await waitFor(() => {
       expect(screen.getByDisplayValue("picture0.webp")).toBeInTheDocument();
-    })
+    });
     await waitFor(() => {
       expect(screen.getByDisplayValue("picture1.jpeg")).toBeInTheDocument();
-    })
+    });
     await waitFor(() => {
-      expect(screen.getByDisplayValue("profile.png")).toBeInTheDocument()
-    })
+      expect(screen.getByDisplayValue("profile.png")).toBeInTheDocument();
+    });
     mockedGetPictureUrls.mockResolvedValue([]);
     await user.click(submitInput);
 
@@ -387,5 +390,162 @@ describe("ajouter une propriété", () => {
         "fake-token",
       );
     });
+  });
+
+  // ✅ envoie la bonne payload pour l'enregistrement de la propriété
+  it("appelle postRequest avec les URLs des images récupérées", async () => {
+    const {
+      user,
+      titleInput,
+      descriptionInput,
+      postalCodeInput,
+      locationInput,
+      priceInput,
+      submitInput,
+    } = setUpRegisterProperty();
+
+    // Attendre que les équipements soient chargés
+    const wifiCheckbox = await screen.findByRole("checkbox", {
+      name: /wifi/i,
+    });
+
+    // Remplissage du formulaire
+    await user.type(titleInput, "ma propriété");
+    await user.type(descriptionInput, "description de ma propriété");
+    await user.type(postalCodeInput, "75001");
+    await user.type(locationInput, "Paris");
+    await user.type(priceInput, "120");
+    await user.click(wifiCheckbox);
+
+    // Ajout de la cover
+    const cover = new File(["cover"], "cover.jpeg", {
+      type: "image/jpeg",
+    });
+
+    const coverInput = document.getElementById(
+      "coverImage",
+    ) as HTMLInputElement;
+
+    await user.upload(coverInput, cover);
+
+    // Ajout d'une image du logement
+    const addImageButton = screen.getByRole("button", {
+      name: "+Ajouter une image",
+    });
+
+    await user.click(addImageButton);
+
+    const propertyPicture = new File(["picture"], "picture.jpeg", {
+      type: "image/jpeg",
+    });
+
+    const pictureInput = document.getElementById(
+      "propertyPicture-0",
+    ) as HTMLInputElement;
+
+    await user.upload(pictureInput, propertyPicture);
+
+    mockedGetPictureUrls.mockResolvedValue([
+      {
+        url: "https://cdn.test/cover.jpeg",
+        purpose: "property-cover",
+      },
+      {
+        url: "https://cdn.test/picture.jpeg",
+        purpose: "property-picture",
+      },
+    ]);
+
+    (postRequest as jest.Mock).mockResolvedValue({
+      data: {},
+    });
+
+    await user.click(submitInput);
+
+    await waitFor(() => {
+      expect(postRequest).toHaveBeenCalledTimes(1);
+    });
+
+    const [request] = (postRequest as jest.Mock).mock.calls[0];
+
+    expect(request.url).toContain("/api/properties");
+    expect(request.token).toBe("fake-token");
+
+    expect(request.payload).toEqual({
+      title: "Ma propriété",
+      description: "Description de ma propriété",
+      cover: "https://cdn.test/cover.jpeg",
+      location: "Paris",
+      price_per_night: 120,
+      host_id: 1,
+      host: {
+        name: "John Doe",
+        picture: "/pictures/profile.png",
+      },
+      pictures: ["https://cdn.test/picture.jpeg"],
+      equipments: ["Wifi"],
+      tags: [],
+    });
+  });
+
+  // ✅ erreur lors de l'enregistrement de la propriété
+  it("affiche le message lorsque l'API retourne une erreur", async () => {
+    const {
+      user,
+      titleInput,
+      descriptionInput,
+      postalCodeInput,
+      locationInput,
+      priceInput,
+      submitInput,
+    } = setUpRegisterProperty();
+
+    const wifiCheckbox = await screen.findByRole("checkbox", {
+      name: /wifi/i,
+    });
+
+    const cover = new File(["cover"], "cover.jpeg", {
+      type: "image/jpeg",
+    });
+
+    const coverUpload = document.getElementById(
+      "coverImage",
+    ) as HTMLInputElement;
+
+    // Remplissage des champs obligatoires
+    await user.type(titleInput, "ma propriété");
+    await user.type(descriptionInput, "description de ma propriété");
+    await user.type(postalCodeInput, "75001");
+    await user.type(locationInput, "Paris");
+    await user.type(priceInput, "120");
+    await user.click(wifiCheckbox);
+
+    await user.upload(coverUpload, cover);
+
+    // L'upload des images réussit
+    mockedGetPictureUrls.mockResolvedValue([
+      {
+        url: "https://cdn.example.com/cover.jpeg",
+        purpose: "property-cover",
+      },
+    ]);
+
+    // Mais la création de la propriété échoue
+    (postRequest as jest.Mock).mockRejectedValue({
+      status: 500,
+      message: "Une erreur est survenue lors de la création du logement",
+    });
+
+    await user.click(submitInput);
+
+    const apiError = await screen.findByRole("alert");
+
+    expect(apiError).toHaveTextContent(
+      "Une erreur est survenue lors de la création du logement",
+    );
+
+    expect(postRequest).toHaveBeenCalledTimes(1);
+
+    expect(mockPush).not.toHaveBeenCalled();
   });
 });

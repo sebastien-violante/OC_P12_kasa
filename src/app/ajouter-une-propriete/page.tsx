@@ -308,9 +308,9 @@ export default function Addproperty() {
       }
 
       const payload: CreatePropertyPayload = {
-        title: data.title.charAt(0) + data.title.slice(1).trim(),
+        title: data.title.charAt(0).toUpperCase() + data.title.slice(1).trim(),
         description:
-          data.description.charAt(0) + data.description.slice(1).trim(),
+          data.description.charAt(0).toUpperCase() + data.description.slice(1).trim(),
         cover: coverPicture,
         location: data.location.charAt(0) + data.location.slice(1).trim(),
         price_per_night: Number(data.price_per_night),
