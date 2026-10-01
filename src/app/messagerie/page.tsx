@@ -22,6 +22,7 @@ export default function Messagerie() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [flash, setFlash] = useState<FlashMessageType | null>(null);
+  const [isMessagesDisplayed, setIsMessagesDisplayed] = useState(false);
   const {
     messages,
     selectedConversationId,
@@ -106,6 +107,7 @@ export default function Messagerie() {
     );
     if (conversationId) {
       setSelectedConversationId(Number(conversationId));
+      setIsMessagesDisplayed(true);
     }
   }, [setSelectedConversationId]);
   // Chargement des messages correspondant à la conversation sélectionnée
@@ -136,7 +138,11 @@ export default function Messagerie() {
     <div className={styles.mainWrapper}>
       {flash && <FlashMessage status={flash.status} message={flash.message} />}
 
-      <section className={styles.conversations}>
+      <section
+        className={`${styles.conversations} ${
+          isMessagesDisplayed ? styles.conversationsHidden : ""
+        }`}
+      >
         <div className={styles.back}>
           <Link href="/" className={styles.link}>
             <img alt="" src="/pictures/back-arrow.svg" />
@@ -145,6 +151,7 @@ export default function Messagerie() {
         </div>
 
         <h1>Messages</h1>
+
         <div className={styles.messageList}>
           {conversations.map((conversation) => (
             <ConversationTile
@@ -155,15 +162,25 @@ export default function Messagerie() {
               date={conversation.lastMessage?.createdAt}
               selectedConversationId={selectedConversationId}
               setSelectedConversationId={setSelectedConversationId}
+              setIsMessagesDisplayed={setIsMessagesDisplayed}
               unreadCount={conversation.unreadCount}
             />
           ))}
         </div>
       </section>
-      <section className={styles.messages}>
+
+      <section
+        className={`${styles.messages} ${
+          isMessagesDisplayed ? styles.messagesDisplayed : ""
+        }`}
+      >
         <div className={styles.backToList}>
-          <button>Retour à la liste</button>
+          <button type="button" onClick={() => setIsMessagesDisplayed(false)}>
+            <img alt="" src="/pictures/back-arrow.svg" />
+            Retour
+          </button>
         </div>
+
         <div className={styles.details}>
           {loading && (
             <div
@@ -175,6 +192,7 @@ export default function Messagerie() {
               <span className="sr-only">Chargement des messages</span>
             </div>
           )}
+
           {messages?.map((message, index) => {
             const previousMessage = messages[index - 1];
 
@@ -201,10 +219,12 @@ export default function Messagerie() {
             );
           })}
         </div>
+
         <form className={styles.messageForm} onSubmit={handleSendMessage}>
           <label htmlFor="message" className="sr-only">
             Envoyer un message
           </label>
+
           <textarea
             id="message"
             name="message"
