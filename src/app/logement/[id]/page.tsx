@@ -43,26 +43,25 @@ export async function generateMetadata({
   return {
     title: `${property.title} | Kasa`,
     description: property.description,
-     openGraph: {
-    title: `${property.title} | Kasa`,
-    description: property.description,
-    url: `/logements/${property.id}`,
-    siteName: "Kasa",
-    images: [
-      {
-        url: property.cover,
-        alt: property.title,
-      },
-    ],
-    locale: "fr_FR",
-    type: "website",
-  },
+    alternates: { canonical: `/logements/${property.id}`, },
+    openGraph: {
+      title: `${property.title} | Kasa`,
+      description: property.description,
+      url: `/logements/${property.id}`,
+      siteName: "Kasa",
+      images: [
+        {
+          url: property.cover,
+          alt: property.title,
+        },
+      ],
+      locale: "fr_FR",
+      type: "website",
+    },
   };
 }
 
-export default async function PropertyPage({
-  params,
-}: PropertyPageProps) {
+export default async function PropertyPage({ params }: PropertyPageProps) {
   const { id } = await params;
 
   const property = await getProperty(id);
@@ -76,10 +75,7 @@ export default async function PropertyPage({
     "@type": "VacationRental",
     name: property.title,
     description: property.description,
-    image: [
-      property.cover,
-      ...(property.pictures ?? []),
-    ],
+    image: [property.cover, ...(property.pictures ?? [])],
     address: {
       "@type": "PostalAddress",
       addressLocality: property.location,
@@ -105,8 +101,6 @@ export default async function PropertyPage({
       },
     });
   }
-
-  
 
   return (
     <>
