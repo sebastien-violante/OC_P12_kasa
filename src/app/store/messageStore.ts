@@ -50,7 +50,6 @@ export const useMessageStore = create<MessageStore>((set) => ({
 
     set({
       messages: messages ?? [],
-      selectedConversationId: conversationId,
     });
   },
 }));

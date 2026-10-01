@@ -51,3 +51,10 @@
   cursor: pointer;
   background: var(--lightOrange);
 }
+
+.conversationTile.selected {
+  border: 3px solid var(--darkOrange);
+  background: var(--lightOrange);
+  border-radius: 5px;
+
+}

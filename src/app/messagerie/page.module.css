@@ -2,7 +2,7 @@
   display: flex;
   max-width: 1113px;
   min-height: 65vh;
-  margin: auto;
+  margin: 40px auto;
 
   .conversations {
     width: 376px;
@@ -15,7 +15,7 @@
       display: flex;
       align-items: center;
 
-      button {
+      .link {
         width: 93px;
         height: 36px;
         background: var(--grisLight);
@@ -75,6 +75,7 @@
             width: 100%;
             height: 100%;
             padding: 10px;
+            font-size: 12px;
         }
         .sendButton {
             position: absolute;

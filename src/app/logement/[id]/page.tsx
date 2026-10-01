@@ -92,6 +92,8 @@ export default async function PropertyPage({
     });
   }
 
+  
+
   return (
     <>
       <JsonLd data={propertySchema} />

@@ -7,14 +7,16 @@ import type {
   CreateConversationPayload,
   CreatedConversation,
   FlashMessageType,
+  PreviousConversationResponse
 } from "@/app/types/types";
 import Link from "next/link";
 import Image from "next/image";
 import Tag from "@/app/components/Tag/Tag";
 import formatUrl from "@/app/utils/formatUrl";
 import { useAuth } from "@/app/context/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import postRequest from "@/app/utils/postRequest";
+import getRequest from "@/app/utils/getRequest";
 import Cookies from "js-cookie";
 import FlashMessage from "@/app/components/FlashMessage/FlashMessage";
 import { apiUrl } from "@/app/utils/api";
@@ -32,10 +34,16 @@ export default function PropertyContent({ property }: PropertyContentProps) {
   const [sendingMessage, setSendingMessage] = useState(false);
   const [apiError, setApiError] = useState("");
   const [flash, setFlash] = useState<FlashMessageType | null>(null);
+  const [previousConversationExists, setPreviousConversationExists] =
+    useState(false);
+  const [previousConversationId, setPreviousConversationId] = useState< number | null>(null);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    if (!token) {
+      setApiError("Vous devez être connecté.e pour envoyer un message");
+      return;
+    }
     if (!message) {
       setApiError("Vous devez saisir un message avant d'envoyer");
       return;
@@ -77,13 +85,33 @@ export default function PropertyContent({ property }: PropertyContentProps) {
         });
       } catch (error) {
         console.error(error);
-        
+
         setApiError("Impossible d'envoyer le message. Réessayez plus tard.");
       } finally {
         setSendingMessage(false);
       }
     }
   };
+
+  useEffect(() => {
+    async function getIfAlreadyConversation() {
+      if (!token) return;
+      try {
+        const result = await getRequest<PreviousConversationResponse>({
+          url: apiUrl(`/api/properties/${property.id}/conversation`),
+          token: token,
+        });
+
+        if (result) {
+          setPreviousConversationExists(result.exists);
+          setPreviousConversationId(result.conversationId);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    getIfAlreadyConversation();
+  }, [property.id, token]);
 
   return (
     <>
@@ -93,7 +121,9 @@ export default function PropertyContent({ property }: PropertyContentProps) {
         <Link href="/">
           <div className={styles.backToProperties}>
             <img src="/pictures/back-arrow.svg" alt="" />
-            <span>Retour aux annonces</span>
+            <span className="block lg:hidden">Retour aux annonces</span>
+            <span className="hidden lg:block">Retour</span>
+
           </div>
         </Link>
       </section>
@@ -211,17 +241,23 @@ export default function PropertyContent({ property }: PropertyContentProps) {
 
           {property.host.id !== user?.id && (
             <>
-              <Link href="#" className={styles.link}>
-                Contacter l&apos;hôte
-              </Link>
-
-              <button
-                type="button"
-                onClick={() => setIsMessageModalOpen(true)}
-                className={styles.link}
-              >
-                Envoyer un message
-              </button>
+              {!previousConversationExists && (
+                <button
+                  type="button"
+                  onClick={() => setIsMessageModalOpen(true)}
+                  className={styles.link}
+                >
+                  Contacter l&apos;hôte
+                </button>
+              )}
+              {previousConversationExists && (
+                <Link
+                  href={`/messagerie?conversationId=${previousConversationId}`}
+                  className={styles.link}
+                >
+                  Envoyer un message
+                </Link>
+              )}
             </>
           )}
         </section>

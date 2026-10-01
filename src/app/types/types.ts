@@ -188,3 +188,8 @@ export type CreatedConversation = {
 export type StoreMessage = Message & {
   temporary?: boolean;
 };
+
+export type PreviousConversationResponse = {
+  exists: boolean;
+  conversationId: number | null;
+};

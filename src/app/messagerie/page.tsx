@@ -14,6 +14,7 @@ import patchRequest from "../utils/patchRequest";
 import FlashMessage from "../components/FlashMessage/FlashMessage";
 import { useMessageStore } from "../store/messageStore";
 import { apiUrl } from "../utils/api";
+import Link from "next/link";
 
 export default function Messagerie() {
   const token = Cookies.get("token");
@@ -32,7 +33,6 @@ export default function Messagerie() {
 
   // Envoi d'un message
   async function handleSendMessage(event: React.FormEvent<HTMLFormElement>) {
-    
     event.preventDefault();
     // Empêche l'envoi d'un message sans sélection d'une conversation
     if (selectedConversationId === null) {
@@ -63,7 +63,7 @@ export default function Messagerie() {
         },
       });
       // Ajout dans le store
-      if(messageResponse.data) {
+      if (messageResponse.data) {
         addMessage(messageResponse.data);
       }
 
@@ -99,6 +99,15 @@ export default function Messagerie() {
     loadConversations();
   }, []);
 
+  // Récupération de l'id de la conversation en cas de provenance de la carte du logement
+  useEffect(() => {
+    const conversationId = new URLSearchParams(window.location.search).get(
+      "conversationId",
+    );
+    if (conversationId) {
+      setSelectedConversationId(Number(conversationId));
+    }
+  }, [setSelectedConversationId]);
   // Chargement des messages correspondant à la conversation sélectionnée
   useEffect(() => {
     if (selectedConversationId === null) {
@@ -129,9 +138,10 @@ export default function Messagerie() {
 
       <section className={styles.conversations}>
         <div className={styles.back}>
-          <button>
-            <img alt="" src="/pictures/back-arrow.svg"/>
-            Retour</button>
+          <Link href="/" className={styles.link}>
+            <img alt="" src="/pictures/back-arrow.svg" />
+            Retour
+          </Link>
         </div>
 
         <h1>Messages</h1>
@@ -143,6 +153,7 @@ export default function Messagerie() {
               user={conversation.otherUser.name}
               message={conversation.lastMessage?.content}
               date={conversation.lastMessage?.createdAt}
+              selectedConversationId={selectedConversationId}
               setSelectedConversationId={setSelectedConversationId}
               unreadCount={conversation.unreadCount}
             />
@@ -191,7 +202,12 @@ export default function Messagerie() {
           })}
         </div>
         <form className={styles.messageForm} onSubmit={handleSendMessage}>
+          <label htmlFor="message" className="sr-only">
+            Envoyer un message
+          </label>
           <textarea
+            id="message"
+            name="message"
             className={styles.messageInput}
             placeholder="Envoyer un message..."
             rows={1}

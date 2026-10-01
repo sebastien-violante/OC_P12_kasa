@@ -6,10 +6,11 @@ import Image from "next/image";
 import Link from "next/link";
 import postRequest from "@/app/utils/postRequest";
 import deleteRequest from "@/app/utils/deleteRequest";
+import getRequest from "@/app/utils/getRequest";
 import Cookies from "js-cookie";
 import { useFavorites } from "@/app/context/FavoritesContext";
 import FlashMessage from "../FlashMessage/FlashMessage";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import formatUrl from "@/app/utils/formatUrl";
 import { apiUrl } from "@/app/utils/api";
 
@@ -23,11 +24,10 @@ export default function PropertyCard({ property }: PropertyCardProps) {
     null,
   );
   const { favoriteIds, addFavorite, removeFavorite } = useFavorites();
-
+    
   if (!property.id) {
     return null;
   }
-
   const propertyId = property.id;
   const isFavorite = favoriteIds.includes(propertyId);
 
@@ -94,9 +94,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           </div>
 
           <p>
-            <span className={styles.price}>
-              {property.price_per_night} €
-            </span>
+            <span className={styles.price}>{property.price_per_night} €</span>
 
             <span className={styles.label}> par nuit</span>
           </p>
@@ -115,11 +113,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         aria-pressed={isFavorite}
       >
         <Image
-          src={
-            isFavorite
-              ? "/pictures/heart-red.svg"
-              : "/pictures/heart.svg"
-          }
+          src={isFavorite ? "/pictures/heart-red.svg" : "/pictures/heart.svg"}
           alt=""
           width={24}
           height={24}
