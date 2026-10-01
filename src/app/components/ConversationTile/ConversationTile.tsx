@@ -9,6 +9,7 @@ type ConversationTileProps = {
   selectedConversationId: number | null;
   setSelectedConversationId: (id: number | null) => void;
   unreadCount: number;
+  setIsMessagesDisplayed: (value: boolean) => void;
 };
 
 export default function ConversationTile({
@@ -19,11 +20,15 @@ export default function ConversationTile({
   selectedConversationId,
   id,
   unreadCount,
+  setIsMessagesDisplayed
 }: ConversationTileProps) {
   return (
     <article
       className={`${styles.conversationTile} ${Number(selectedConversationId) === id ? styles.selected : ""}`}
-      onClick={() => setSelectedConversationId(id)}
+      onClick={() => {
+        setSelectedConversationId(id)
+        setIsMessagesDisplayed(true)
+      }}
     >
       <div className={styles.square}></div>
       <div className={styles.data}>
