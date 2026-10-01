@@ -176,7 +176,7 @@ export default function Header() {
               {user ? (
                 <>
                   <li>
-                    <Link href="/messages">Messagerie</Link>
+                    <Link href="/messagerie">Messagerie</Link>
                   </li>
 
                   <li>

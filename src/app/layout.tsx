@@ -5,7 +5,7 @@ import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
 import { AuthProvider } from "./context/AuthContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -13,12 +13,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://oc-p12-kasa.vercel.app"),
   title: "Kasa",
   description:
     "La nouvelle version du site de location d'appartements et de maisons entre particuliers",
   verification: {
-    google:"tKbFWZ9h6ulXC1uZ8u4Pm_vaeIfnbXLM9-LlCDpn9j8"
-  }
+    google: "tKbFWZ9h6ulXC1uZ8u4Pm_vaeIfnbXLM9-LlCDpn9j8",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

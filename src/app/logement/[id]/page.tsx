@@ -43,6 +43,20 @@ export async function generateMetadata({
   return {
     title: `${property.title} | Kasa`,
     description: property.description,
+     openGraph: {
+    title: `${property.title} | Kasa`,
+    description: property.description,
+    url: `/logements/${property.id}`,
+    siteName: "Kasa",
+    images: [
+      {
+        url: property.cover,
+        alt: property.title,
+      },
+    ],
+    locale: "fr_FR",
+    type: "website",
+  },
   };
 }
 
