@@ -27,7 +27,7 @@ export default function Inscription() {
   const [formData, setFormData] = useState<RegistrationFormData>(initFormData);
   const [errors, setErrors] = useState<z.core.$ZodIssue[]>([]);
   const [apiError, setApiError] = useState("");
-
+  const [isSubmiting, setIsSubmiting] = useState(false)
   // Captation des données d'enregistrement dans FormData
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = event.target;
@@ -44,6 +44,7 @@ export default function Inscription() {
 
   const handleRegister = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsSubmiting(true)
     // validation des données par Zod
     const zodValidation = registerSchema.safeParse(formData);
     if (!zodValidation.success) {
@@ -94,6 +95,8 @@ export default function Inscription() {
       }
       setFormData(initFormData);
       setErrors([]);
+    } finally {
+      setIsSubmiting(false)
     }
   };
 
@@ -215,8 +218,12 @@ export default function Inscription() {
             {getFieldError("acceptCgu")?.message}
           </p>
         )}
-        <button className={styles.submitBtn} type="submit">
-          S&apos;inscrire
+        <button 
+          className={styles.submitBtn} 
+          type="submit"
+          disabled={isSubmiting}
+          aria-busy={isSubmiting}>
+          {isSubmiting ? "Inscription en cours…" : "S'inscrire"}
         </button>
       </form>
       <p className={styles.connect}>

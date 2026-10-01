@@ -30,7 +30,7 @@ export default function FlashMessage({
   return (
     <div
       className={`flashMessage z-[500] fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg ${
-        status ? "bg-emerald-600" : "bg-red-800"
+        status ? "bg-emerald-700" : "bg-red-800"
       } px-6 py-4 text-white shadow-lg`}
       role={status ? "status" : "alert"}
       aria-live={status ? "polite" : "assertive"}

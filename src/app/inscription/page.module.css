@@ -78,6 +78,10 @@
     margin: auto;
 }
 
+.submitBtn:hover {
+    transform: scale(1.05);
+}
+
 .connect {
     color: var(--mainRed);
     font-size: 14px;

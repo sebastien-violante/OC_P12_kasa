@@ -48,6 +48,7 @@ export default function Connexion() {
 
   async function handleLogin(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    setIsSubmitting(true)
     // validation des données par Zod
     const zodValidation = authSchema.safeParse(formData);
     if (!zodValidation.success) {
@@ -71,7 +72,6 @@ export default function Connexion() {
       if (result.data) {
         const token = result.data.token;
         const user = result.data.user;
-
         // enregistrement du token en cookie
         Cookies.set("token", token, {
           expires: 1 / 24,
@@ -106,9 +106,10 @@ export default function Connexion() {
       } else {
         setApiError(apiError.message);
       }
-
       setFormData(initFormData);
       setErrors([]);
+    } finally {
+      setIsSubmitting(false)
     }
   }
 

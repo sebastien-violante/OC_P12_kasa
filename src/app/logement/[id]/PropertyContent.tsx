@@ -7,7 +7,7 @@ import type {
   CreateConversationPayload,
   CreatedConversation,
   FlashMessageType,
-  PreviousConversationResponse
+  PreviousConversationResponse,
 } from "@/app/types/types";
 import Link from "next/link";
 import Image from "next/image";
@@ -36,7 +36,9 @@ export default function PropertyContent({ property }: PropertyContentProps) {
   const [flash, setFlash] = useState<FlashMessageType | null>(null);
   const [previousConversationExists, setPreviousConversationExists] =
     useState(false);
-  const [previousConversationId, setPreviousConversationId] = useState< number | null>(null);
+  const [previousConversationId, setPreviousConversationId] = useState<
+    number | null
+  >(null);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,7 +125,6 @@ export default function PropertyContent({ property }: PropertyContentProps) {
             <img src="/pictures/back-arrow.svg" alt="" />
             <span className="block lg:hidden">Retour aux annonces</span>
             <span className="hidden lg:block">Retour</span>
-
           </div>
         </Link>
       </section>
@@ -252,7 +253,9 @@ export default function PropertyContent({ property }: PropertyContentProps) {
               )}
               {previousConversationExists && (
                 <Link
-                  href={`/messagerie?conversationId=${previousConversationId}`}
+                  href={`/messagerie?conversationId=${previousConversationId}&returnTo=${encodeURIComponent(
+                    `/logement/${property.id}`,
+                  )}`}
                   className={styles.link}
                 >
                   Envoyer un message
@@ -302,7 +305,7 @@ export default function PropertyContent({ property }: PropertyContentProps) {
               <div className={styles.modalActions}>
                 <button
                   type="button"
-                  className="rounded-lg bg-red-600 px-6 py-2 text-white shadow-lg"
+                  className="rounded-lg bg-red-800 px-6 py-2 text-white shadow-lg"
                   onClick={() => {
                     setIsMessageModalOpen(false);
                     setApiError("");
@@ -314,7 +317,7 @@ export default function PropertyContent({ property }: PropertyContentProps) {
 
                 <button
                   type="submit"
-                  className="rounded-lg bg-emerald-600 px-6 py-2 text-white shadow-lg"
+                  className="rounded-lg bg-emerald-700 px-6 py-2 text-white shadow-lg"
                   disabled={sendingMessage}
                 >
                   {sendingMessage ? "Envoi..." : "Envoyer"}
