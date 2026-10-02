@@ -8,16 +8,16 @@ Le projet permet notamment de consulter des logements, de gérer des favoris, de
 
 ## 🚀 Technologies
 
-* [Next.js](https://nextjs.org/) 16
-* [React](https://react.dev/) 19
-* TypeScript
-* CSS Modules
-* Tailwind CSS
-* Zod
-* Zustand
-* Jest
-* React Testing Library
-* ESLint
+![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![CSS Modules](https://img.shields.io/badge/CSS%20Modules-000000?logo=cssmodules&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
+![Zod](https://img.shields.io/badge/Zod-3C3C3B?logo=zod&logoColor=white)
+![Zustand](https://img.shields.io/badge/Zustand-602C3C?logo=react&logoColor=white)
+![Jest](https://img.shields.io/badge/Jest-C21325?logo=jest&logoColor=white)
+![React Testing Library](https://img.shields.io/badge/Testing%20Library-E33332?logo=testinglibrary&logoColor=white)
+![ESLint](https://img.shields.io/badge/ESLint-4B32C3?logo=eslint&logoColor=white)
 
 ---
 
