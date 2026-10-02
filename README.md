@@ -167,12 +167,6 @@ src/
     │   ├── AuthContext.tsx
     │   └── FavoritesContext.tsx
     │
-    ├── data/
-    │   └── equipments.ts
-    │
-    ├── mock/
-    │   └── favorites-mock.json
-    │
     ├── store/
     │   └── messageStore.ts
     │
@@ -221,14 +215,6 @@ Contient les Context Providers React utilisés pour partager certains états dan
 * `AuthContext` : gestion de l'utilisateur connecté et de l'authentification.
 * `FavoritesContext` : gestion des logements ajoutés aux favoris.
 
-### `data/`
-
-Contient les données statiques utilisées par l'application, notamment la liste des équipements disponibles.
-
-### `mock/`
-
-Contient les données mock utilisées par l'application.
-
 ### `store/`
 
 Contient les stores Zustand utilisés pour gérer certains états applicatifs, notamment la messagerie.
@@ -264,7 +250,7 @@ Principales routes de l'application :
 
 L'authentification repose sur un token stocké dans un cookie et géré côté frontend par `AuthContext`.
 
-Le contexte permet notamment de :
+Le contexte permet de :
 
 * récupérer les informations de l'utilisateur connecté ;
 * gérer la connexion ;
@@ -283,7 +269,7 @@ Certaines fonctionnalités sont réservées aux utilisateurs connectés, notamme
 
 Les logements favoris sont gérés via `FavoritesContext`.
 
-Le contexte permet notamment :
+Le contexte permet :
 
 * de récupérer les logements favoris de l'utilisateur ;
 * d'ajouter un logement aux favoris ;
@@ -298,7 +284,7 @@ Les cartes de logements permettent de modifier directement l'état d'un favori.
 
 L'application propose une messagerie permettant aux utilisateurs d'échanger autour des logements.
 
-Elle permet notamment :
+Elle permet :
 
 * d'afficher les conversations ;
 * d'afficher les messages d'une conversation ;
@@ -306,7 +292,7 @@ Elle permet notamment :
 * d'identifier les messages lus et non lus ;
 * d'associer une conversation à un logement.
 
-La gestion d'une partie de l'état de la messagerie est réalisée avec **Zustand**.
+La gestion d'une partie de l'état de la messagerie est réalisée avec **Zustand** qui permet de mettre à jour instantanément l'affichage des messages
 
 ---
 
@@ -314,15 +300,15 @@ La gestion d'une partie de l'état de la messagerie est réalisée avec **Zustan
 
 Les utilisateurs peuvent consulter les logements et, lorsqu'ils disposent des droits nécessaires, en créer de nouveaux.
 
-Un logement peut notamment contenir :
+Un logement peut notamment contenir (* obligatoire):
 
-* un titre ;
-* une description ;
-* une localisation ;
-* un prix par nuit ;
-* une photo de couverture ;
+* un titre* ;
+* une description* ;
+* une localisation* ;
+* un prix par nuit* ;
+* une photo de couverture*;
 * plusieurs photos ;
-* des équipements ;
+* un ou plusieurs équipements*;
 * des tags ;
 * les informations de son propriétaire.
 
@@ -407,7 +393,7 @@ Le projet intègre plusieurs fonctionnalités dédiées au référencement :
 * génération du sitemap via `sitemap.ts` ;
 * génération du fichier `robots.txt` via `robots.ts` ;
 * génération de métadonnées avec les fonctionnalités de Next.js ;
-* données structurées JSON-LD pour certaines pages.
+* données structurées JSON-LD pour certaines pages (homepage et page de détail d'un logement)
 
 ---
 
@@ -444,7 +430,7 @@ Ils couvrent notamment :
 * l'ajout d'un logement ;
 * la gestion des favoris.
 
-Les tests sont répartis directement dans les dossiers des fonctionnalités concernées.
+Les tests sont répartis directement dans les dossiers des fonctionnalités concernées au sein des fichiers **.test.tsx**.
 
 ### Commandes disponibles
 

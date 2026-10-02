@@ -9,10 +9,7 @@ export default function notFound() {
         Nous sommes désolés mais cette propriété n&apos;est pas disponible !
       </p>
       <Link className={styles.link} href="/">
-        Accueil
-      </Link>
-      <Link className={styles.link} href="/">
-        Logements
+        Retourner à l&apos;accueil
       </Link>
     </section>
   );
