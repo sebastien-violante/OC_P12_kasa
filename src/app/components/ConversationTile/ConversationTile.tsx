@@ -30,7 +30,7 @@ export default function ConversationTile({
   setIsMessagesDisplayed,
 }: ConversationTileProps) {
   return (
-    <article
+    <button
       className={`${styles.conversationTile} ${
         Number(selectedConversationId) === id ? styles.selected : ""
       }`}
@@ -38,6 +38,7 @@ export default function ConversationTile({
         setSelectedConversationId(id);
         setIsMessagesDisplayed(true);
       }}
+      tabIndex={0}
     >
       <div className={styles.square}></div>
 
@@ -51,6 +52,6 @@ export default function ConversationTile({
 
         {unreadCount > 0 && <div className={styles.redBubble}></div>}
       </div>
-    </article>
+    </button>
   );
 }
