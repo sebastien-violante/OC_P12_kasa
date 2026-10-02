@@ -67,6 +67,10 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         }
       } catch (error) {
         console.error(error);
+        setFlashMessage({
+          status: false,
+          message: "Erreur serveur lors de l'ajout du logement en favori",
+        });
       }
 
       return;
@@ -83,6 +87,10 @@ export default function PropertyCard({ property }: PropertyCardProps) {
       }
     } catch (error) {
       console.error(error);
+      setFlashMessage({
+          status: false,
+          message: "Erreur serveur lors de la suppression du logement des favoris",
+        });
     }
   }
 

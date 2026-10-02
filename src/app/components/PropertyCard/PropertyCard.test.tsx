@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import PropertyCard from "./PropertyCard";
 import postRequest from "@/app/utils/postRequest";
@@ -13,9 +13,11 @@ import { apiUrl } from "@/app/utils/api";
 jest.mock("@/app/utils/postRequest");
 jest.mock("@/app/utils/deleteRequest");
 jest.mock("js-cookie");
+
 jest.mock("@/app/context/FavoritesContext", () => ({
   useFavorites: jest.fn(),
 }));
+
 jest.mock("next/image", () => {
   return function Image({
     fill: _fill,
@@ -26,6 +28,7 @@ jest.mock("next/image", () => {
     return <img {...props} />;
   };
 });
+
 jest.mock("next/link", () => {
   return function Link({
     href,
@@ -41,20 +44,23 @@ jest.mock("next/link", () => {
     );
   };
 });
+
 jest.mock("@/app/utils/formatUrl", () => ({
   __esModule: true,
   default: jest.fn((url: string) => url),
 }));
+
 jest.mock("../FlashMessage/FlashMessage", () => {
   return function FlashMessage({ message }: { message: string }) {
     return <div>{message}</div>;
   };
 });
+
 const mockedPostRequest = jest.mocked(postRequest);
 const mockedDeleteRequest = jest.mocked(deleteRequest);
 const mockedUseFavorites = jest.mocked(useFavorites);
 
-// FAKER DE PROPRIETE //////////////////////////////////////////////////////
+// FAKE PROPERTY //////////////////////////////////////
 
 const property: Property = {
   id: "1",
@@ -70,34 +76,64 @@ const property: Property = {
   },
 };
 
+// SETUP //////////////////////////////////////////////
+
+type SetUpDisplayCardOptions = {
+  favoriteIds?: string[];
+  addFavorite?: jest.Mock;
+  removeFavorite?: jest.Mock;
+  token?: string | null;
+};
+
+function setUpDisplayCard({
+  favoriteIds = [],
+  addFavorite = jest.fn(),
+  removeFavorite = jest.fn(),
+  token = "fake-token",
+}: SetUpDisplayCardOptions = {}) {
+  const user = userEvent.setup();
+
+  (Cookies.get as jest.Mock).mockReturnValue(token);
+
+  mockedUseFavorites.mockReturnValue({
+    favoriteIds,
+    addFavorite,
+    removeFavorite,
+  } as any);
+
+  render(<PropertyCard property={property} />);
+
+  return {
+    user,
+    addFavorite,
+    removeFavorite,
+  };
+}
+
+// TESTS //////////////////////////////////////////////
+
 describe("PropertyCard - affichage", () => {
-  // clean des mocks
   beforeEach(() => {
     jest.clearAllMocks();
-
-    (Cookies.get as jest.Mock).mockReturnValue("fake-token");
-
-    mockedUseFavorites.mockReturnValue({
-      favoriteIds: [],
-      addFavorite: jest.fn(),
-      removeFavorite: jest.fn(),
-    } as any);
   });
-
-  // ✅ Affichage du composant
+  // ✅ Affichage du formulaire
   it("affiche correctement tous les éléments du composant", () => {
-    render(<PropertyCard property={property} />);
+    setUpDisplayCard();
 
     expect(
       screen.getByRole("heading", {
         name: property.title,
       }),
     ).toBeInTheDocument();
+
     expect(screen.getByText(property.location)).toBeInTheDocument();
+
     expect(
       screen.getByText(`${property.price_per_night} €`),
     ).toBeInTheDocument();
+
     expect(screen.getByText("par nuit")).toBeInTheDocument();
+
     expect(
       screen.getByRole("img", {
         name: `Photo du logement : ${property.title}`,
@@ -109,32 +145,19 @@ describe("PropertyCard - affichage", () => {
 describe("PropertyCard - favoris", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-
-    (Cookies.get as jest.Mock).mockReturnValue("fake-token");
-
-    mockedUseFavorites.mockReturnValue({
-      favoriteIds: [],
-      addFavorite: jest.fn(),
-      removeFavorite: jest.fn(),
-    } as any);
   });
-  // ✅ Ajout de la propriété aux favoris
-  it("ajoute la propriété aux favoris", async () => {
-    const user = userEvent.setup();
 
+  // ✅ Ajout de la propriété dans les favoris
+  it("ajoute la propriété aux favoris", async () => {
     const addFavorite = jest.fn();
 
-    mockedUseFavorites.mockReturnValue({
-      favoriteIds: [],
+    const { user } = setUpDisplayCard({
       addFavorite,
-      removeFavorite: jest.fn(),
-    } as any);
+    });
 
     mockedPostRequest.mockResolvedValue({
       data: true,
     } as any);
-
-    render(<PropertyCard property={property} />);
 
     const button = screen.getByRole("button", {
       name: `Ajouter ${property.title} aux favoris`,
@@ -142,25 +165,19 @@ describe("PropertyCard - favoris", () => {
 
     await user.click(button);
 
-    await waitFor(() => {
-      expect(mockedPostRequest).toHaveBeenCalledWith({
-        url: apiUrl(`/api/properties/${property.id}/favorite`),
-        token: "fake-token",
-      });
+    expect(mockedPostRequest).toHaveBeenCalledWith({
+      url: apiUrl(`/api/properties/${property.id}/favorite`),
+      token: "fake-token",
     });
 
-    await waitFor(() => {
-      expect(addFavorite).toHaveBeenCalledWith(property.id);
-    });
+    expect(addFavorite).toHaveBeenCalledWith(property.id);
   });
 
-  // ✅ Message flash si l'utilisateur n'est pas connecté
+  // ✅ Message d'erreur si tentative d'ajout favoris + non connecté
   it("affiche un message si l'utilisateur n'est pas connecté", async () => {
-    const user = userEvent.setup();
-
-    (Cookies.get as jest.Mock).mockReturnValue(undefined);
-
-    render(<PropertyCard property={property} />);
+    const { user } = setUpDisplayCard({
+      token: null,
+    });
 
     const button = screen.getByRole("button", {
       name: `Ajouter ${property.title} aux favoris`,
@@ -169,29 +186,56 @@ describe("PropertyCard - favoris", () => {
     await user.click(button);
 
     expect(
-      screen.getByText("Vous devez être connecté.e pour ajouter un favori"),
+      screen.getByText(
+        "Vous devez être connecté.e pour ajouter un favori",
+      ),
     ).toBeInTheDocument();
 
     expect(mockedPostRequest).not.toHaveBeenCalled();
   });
 
-  // ✅ Enlève la propriété des favoris
-  it("retire la propriété des favoris", async () => {
-    const user = userEvent.setup();
+  // ✅ Message d'erreur si échec ajout favoris
+  it("affiche un message si l'ajout aux favoris échoue", async () => {
+    const addFavorite = jest.fn();
 
+    const { user } = setUpDisplayCard({
+      addFavorite,
+    });
+
+    mockedPostRequest.mockRejectedValue(new Error("Erreur API"));
+
+    const button = screen.getByRole("button", {
+      name: `Ajouter ${property.title} aux favoris`,
+    });
+
+    await user.click(button);
+
+    expect(mockedPostRequest).toHaveBeenCalledWith({
+      url: apiUrl(`/api/properties/${property.id}/favorite`),
+      token: "fake-token",
+    });
+
+    expect(
+      await screen.findByText(
+        "Erreur serveur lors de l'ajout du logement en favori",
+      ),
+    ).toBeInTheDocument();
+
+    expect(addFavorite).not.toHaveBeenCalled();
+  });
+
+  // ✅ Suppression de la propriété des favoris
+  it("retire la propriété des favoris", async () => {
     const removeFavorite = jest.fn();
 
-    mockedUseFavorites.mockReturnValue({
-      favoriteIds: [property.id],
-      addFavorite: jest.fn(),
+    const { user } = setUpDisplayCard({
+      favoriteIds: [property.id!],
       removeFavorite,
-    } as any);
+    });
 
     mockedDeleteRequest.mockResolvedValue({
       data: true,
     } as any);
-
-    render(<PropertyCard property={property} />);
 
     const button = screen.getByRole("button", {
       name: `Retirer ${property.title} des favoris`,
@@ -199,15 +243,42 @@ describe("PropertyCard - favoris", () => {
 
     await user.click(button);
 
-    await waitFor(() => {
-      expect(mockedDeleteRequest).toHaveBeenCalledWith({
-        url: apiUrl(`/api/properties/${property.id}/favorite`),
-        token: "fake-token",
-      });
+    expect(mockedDeleteRequest).toHaveBeenCalledWith({
+      url: apiUrl(`/api/properties/${property.id}/favorite`),
+      token: "fake-token",
     });
 
-    await waitFor(() => {
-      expect(removeFavorite).toHaveBeenCalledWith(property.id);
+    expect(removeFavorite).toHaveBeenCalledWith(property.id);
+  });
+
+  // ✅ Message d'erreur si échec de la supression de la propriété des favoris
+  it("affiche un message si la suppression des favoris échoue", async () => {
+    const removeFavorite = jest.fn();
+
+    const { user } = setUpDisplayCard({
+      favoriteIds: [property.id!],
+      removeFavorite,
     });
+
+    mockedDeleteRequest.mockRejectedValue(new Error("Erreur API"));
+
+    const button = screen.getByRole("button", {
+      name: `Retirer ${property.title} des favoris`,
+    });
+
+    await user.click(button);
+
+    expect(mockedDeleteRequest).toHaveBeenCalledWith({
+      url: apiUrl(`/api/properties/${property.id}/favorite`),
+      token: "fake-token",
+    });
+
+    expect(
+      await screen.findByText(
+        "Erreur serveur lors de la suppression du logement des favoris",
+      ),
+    ).toBeInTheDocument();
+
+    expect(removeFavorite).not.toHaveBeenCalled();
   });
 });

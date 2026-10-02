@@ -46,8 +46,8 @@ export default function HomeContent({
     setVisibleCards((prev) => prev + 6);
   };
 
+  // Récupération du message flash éventuellement transmis par une autre page.
   useEffect(() => {
-    // Récupération du message flash éventuellement transmis par une autre page.
     const flashBag = localStorage.getItem("flash");
 
     if (flashBag) {
@@ -63,6 +63,7 @@ export default function HomeContent({
     }
   }, []);
 
+  // Repositionnement sur la première nouvelle carte du focus en cas de chargement d'un nouveau lot de cartes
   useEffect(() => {
     if (newCardsStartIndex === null) return;
 
