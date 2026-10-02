@@ -76,7 +76,8 @@ export default async function Home() {
             src="/pictures/hero.png"
             alt=""
             fill
-            priority
+            preload
+            fetchPriority="high"
             sizes="(max-width: 1115px) 100vw, 1115px"
           />
         </div>
