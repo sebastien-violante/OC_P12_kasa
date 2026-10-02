@@ -1,6 +1,6 @@
 # Frontend — Kasa
 
-![Page d'accueil de Kasa](https://raw.githubusercontent.com/sebastien-violante/OC_P12/kasa/main/public/screens/capture-github.png)
+![Page d'accueil de Kasa](https://raw.githubusercontent.com/sebastien-violante/OC_P12_kasa/main/public/screens/capture-github.png)
 
 Application frontend de location de logements développée avec **Next.js**, **React** et **TypeScript**.
 
