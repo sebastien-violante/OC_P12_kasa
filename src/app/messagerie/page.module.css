@@ -83,6 +83,15 @@
         position: absolute;
         bottom: 29px;
         right: 44px;
+
+        .spans {
+          display: flex;
+          gap: 0.8;
+
+          span {
+            background: var(--darkOrange);
+          }
+        }
       }
     }
   }

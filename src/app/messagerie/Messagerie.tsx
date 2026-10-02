@@ -4,11 +4,7 @@ import styles from "./page.module.css";
 import ConversationTile from "../components/ConversationTile/ConversationTile";
 import { useEffect, useState, Fragment } from "react";
 import getRequest from "../utils/getRequest";
-import type {
-  Conversation,
-  Message,
-  FlashMessageType,
-} from "../types/types";
+import type { Conversation, Message, FlashMessageType } from "../types/types";
 import Cookies from "js-cookie";
 import Loader from "../components/Loader/Loader";
 import MessageTile from "../components/MessageTile/MessageTile";
@@ -54,13 +50,11 @@ export default function Messagerie({
   } = useMessageStore();
 
   const loadMessages = useMessageStore((state) => state.loadMessages);
-
+  const [isSending, setIsSending] = useState(false);
   /**
    * Envoie le message dans la conversation sélectionnée.
-  */
-  async function handleSendMessage(
-    event: React.FormEvent<HTMLFormElement>,
-  ) {
+   */
+  async function handleSendMessage(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (selectedConversationId === null) {
@@ -79,6 +73,8 @@ export default function Messagerie({
       });
       return;
     }
+
+    setIsSending(true);
 
     try {
       const messageResponse = await postRequest<{ content: string }, Message>({
@@ -105,19 +101,21 @@ export default function Messagerie({
         status: false,
         message: "Une erreur est survenue lors de l'envoi du message",
       });
+    } finally {
+      setIsSending(false);
     }
   }
 
   /**
    * Vérifie si deux messages ont été envoyés le même jour (pour la gestion des séparateurs dans l'affichage)
-  */
-  function isSameDay (date1: string, date2: string): boolean {
+   */
+  function isSameDay(date1: string, date2: string): boolean {
     return new Date(date1).toDateString() === new Date(date2).toDateString();
-  };
+  }
 
   /**
    * Charge toutes les conversations de l'utilisateur connecté.
-  */
+   */
   useEffect(() => {
     const loadConversations = async () => {
       setLoading(true);
@@ -146,11 +144,11 @@ export default function Messagerie({
 
   /**
    * Sélectionne automatiquement la conversation transmise dans l'URL lorsque l'utilisateur arrive de la page détail logement.
-  */
+   */
   useEffect(() => {
-    const urlConversationId = new URLSearchParams(
-      window.location.search,
-    ).get("conversationId");
+    const urlConversationId = new URLSearchParams(window.location.search).get(
+      "conversationId",
+    );
 
     if (urlConversationId) {
       setSelectedConversationId(Number(urlConversationId));
@@ -188,9 +186,7 @@ export default function Messagerie({
 
   return (
     <div className={styles.mainWrapper}>
-      {flash && (
-        <FlashMessage status={flash.status} message={flash.message} />
-      )}
+      {flash && <FlashMessage status={flash.status} message={flash.message} />}
 
       <section
         className={`${styles.conversations} ${
@@ -259,14 +255,11 @@ export default function Messagerie({
                 {showDate && (
                   <div className={styles.messageDate}>
                     <span>
-                      {new Date(message.createdAt).toLocaleDateString(
-                        "fr-FR",
-                        {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        },
-                      )}
+                      {new Date(message.createdAt).toLocaleDateString("fr-FR", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
                     </span>
                   </div>
                 )}
@@ -297,7 +290,16 @@ export default function Messagerie({
             className={styles.sendButton}
             aria-label="Envoyer le message"
           >
+            {isSending ? (
+              <span className={styles.spans}>
+                <span className="h-2 w-2 animate-bounce rounded-full [animation-delay:-0.3s]"></span>
+                <span className="h-2 w-2 animate-bounce rounded-full [animation-delay:-0.15s]"></span>
+                <span className="h-2 w-2 animate-bounce rounded-full "></span>
+              </span>
+            ) 
+            : 
             <img src="/pictures/send-message.svg" alt="" />
+          }
           </button>
         </form>
       </section>
