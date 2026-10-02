@@ -34,9 +34,7 @@ export default async function getRequest<TResponse = unknown>({
   const response = await fetch(url, {
     method: "GET",
     headers,
-    next: {
-      revalidate: 60,
-    },
+    cache: "no-store"
   });
 
   let result: unknown;

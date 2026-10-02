@@ -186,9 +186,7 @@ describe("PropertyCard - favoris", () => {
     await user.click(button);
 
     expect(
-      screen.getByText(
-        "Vous devez être connecté.e pour ajouter un favori",
-      ),
+      screen.getByText("Vous devez être connecté.e pour ajouter un favori"),
     ).toBeInTheDocument();
 
     expect(mockedPostRequest).not.toHaveBeenCalled();
