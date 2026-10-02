@@ -1,47 +1,118 @@
+// ============================================================
+// LOGEMENTS
+// ============================================================
+
 export type Property = {
-    cover : string;
-    description: string;
-    host: Host;
-    id?: string;
-    location: string;
-    price_per_night: number;
-    rating_avg?: number;
-    ratings_counts?: number;
-    slug?: string;
-    title: string;
-    pictures?: string[];
-    equipments?: string[];
-    tags?: string[];
+  cover: string;
+  description: string;
+  host: Host;
+  id?: string;
+  location: string;
+  price_per_night: number;
+  rating_avg?: number;
+  ratings_counts?: number;
+  slug?: string;
+  title: string;
+  pictures?: string[];
+  equipments?: string[];
+  tags?: string[];
 };
 
 export type Host = {
-    id?: number;
-    name: string;
-    picture: string;
-}
+  id?: number;
+  name: string;
+  picture: string;
+};
+
+export type GetPropertyData = {
+  property: Property;
+};
+
+export type CreatePropertyPayload = {
+  title: string;
+  description: string;
+  cover: string;
+  location: string;
+  price_per_night: number;
+  host_id: number;
+  host: Host;
+  pictures: string[];
+  equipments: string[];
+  tags: string[];
+};
+
+
+// ============================================================
+// FORMULAIRES
+// ============================================================
 
 export type RegistrationFormData = {
-    name: string;
-    firstname: string;
-    email: string;
-    password: string;
-    acceptCgu: boolean;
-}
+  name: string;
+  firstname: string;
+  email: string;
+  password: string;
+  acceptCgu: boolean;
+};
 
 export type LoginFormData = {
-    email: string;
-    password: string;
-}
+  email: string;
+  password: string;
+};
+
+export type PropertyFormData = {
+  title: string;
+  description: string;
+  postalCode: string;
+  location: string;
+  cover: File | null;
+  pictures: (File | null)[];
+  name: string;
+  profile: File | null;
+  equipments: string[];
+  categories: string[];
+  price_per_night: string;
+};
+
+
+// ============================================================
+// UTILISATEURS & AUTHENTIFICATION
+// ============================================================
+
+export type Role = "owner" | "client" | "admin";
 
 export type User = {
-    id: number;
-    name: string;
-    email: string;
-    picture: string | null;
-    role: Role ;
-}
+  id: number;
+  name: string;
+  email: string;
+  picture: string | null;
+  role: Role;
+};
 
-export type Role = "owner" | "client" | "admin"
+export type RegistrationPayload = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+export type RegistrationResponse = {
+  token: string;
+  user: User;
+};
+
+export type AuthenticationPayload = {
+  email: string;
+  password: string;
+};
+
+export type AuthenticationResponse = {
+  token: string;
+  user: User;
+};
+
+
+// ============================================================
+// API
+// ============================================================
 
 export type ApiResponse<T = unknown> = {
   success: boolean;
@@ -63,74 +134,14 @@ export type ApiErrorDetail = {
   message: string;
 };
 
-// Types d'envoi et de réponse pour l'enregistrement
-export type RegistrationPayload = {
-  name: string;
-  email: string;
-  password: string;
-};
 
-export type RegistrationResponse = {
-    token: string;
-    user: User;
-}
+// ============================================================
+// MESSAGERIE
+// ============================================================
 
-// Types d'envoi et de réponse pour l'authentification
-export type AuthenticationPayload = {
-  email: string;
-  password: string;
-};
-
-export type AuthenticationResponse = {
-    token: string;
-    user: User;
-}
-
-
-// Types d'envoi formulaire propriété 
-export type PropertyFormData = {
-  title: string;
-  description: string;
-  postalCode: string;
-  location: string;
-  cover: File | null;
-  pictures: (File | null)[];
-  name: string;
-  profile: File | null;
-  equipments: string[];
-  categories: string[];
-  price_per_night: string;
-};
-
-
-export type GetPropertyData = {
-  property: Property;
-}
-
-export type FlashMessageType = {
-  status: boolean;
-  message: string;
-};
-
-export type FlashType = "success" | "error" | "info";
-
-export type CreatePropertyPayload = {
-  title: string;
-  description: string;
-  cover: string;
-  location: string;
-  price_per_night: number;
-  host_id: number;
-  host: Host;
-  pictures: string[];
-  equipments: string[];
-  tags: string[];
-};
-
-// TYPES POUR LA MESSAGERIE
 export type SendMessagePayload = {
   content: string;
-}
+};
 
 export type Message = {
   id: number;
@@ -143,7 +154,7 @@ export type Message = {
   content: string;
   createdAt: string;
   readAt: string | null;
-}
+};
 
 export type Conversation = {
   id: number;
@@ -193,3 +204,15 @@ export type PreviousConversationResponse = {
   exists: boolean;
   conversationId: number | null;
 };
+
+
+// ============================================================
+// INTERFACE
+// ============================================================
+
+export type FlashMessageType = {
+  status: boolean;
+  message: string;
+};
+
+export type FlashType = "success" | "error" | "info";

@@ -8,6 +8,22 @@ type PostFileRequestProps = {
   property_id?: string;
 };
 
+/**
+ * Envoie un fichier à l'API via une requête multipart/form-data.
+ *
+ * Ajoute le token d'authentification lorsqu'il est fourni ainsi que les
+ * informations complémentaires permettant d'identifier l'usage du fichier.
+ *
+ * @template TResponse - Type attendu pour les données retournées par l'API.
+ * @param url - URL de la ressource à laquelle envoyer le fichier.
+ * @param token - Token d'authentification optionnel.
+ * @param file - Fichier à envoyer.
+ * @param purpose - Usage associé au fichier.
+ * @param property_id - Identifiant optionnel du logement associé au fichier.
+ * @returns La réponse de l'API contenant les données du fichier envoyé.
+ * @throws Une erreur lorsque la réponse du serveur est invalide ou que
+ * la requête échoue.
+ */
 export default async function postFileRequest<TResponse = unknown>({
   url,
   token,

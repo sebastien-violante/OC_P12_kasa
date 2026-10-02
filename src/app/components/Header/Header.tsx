@@ -9,6 +9,12 @@ import { useRouter } from "next/navigation";
 import getRequest from "@/app/utils/getRequest";
 import type { Conversation } from "@/app/types/types";
 
+/**
+ * Affiche l'en-tête principal de l'application.
+ *
+ * Adapte la navigation selon l'état d'authentification de l'utilisateur
+ * et fournit un menu spécifique aux écrans mobiles.
+ */
 export default function Header() {
   const [menuExpanded, setMenuExpanded] = useState(false);
   const [token, setToken] = useState<string | null>(null);
@@ -18,21 +24,33 @@ export default function Header() {
   const menuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
+  /**
+   * Ouvre ou ferme le menu de navigation mobile.
+   */
   const expandMenu = () => {
     setMenuExpanded((prev) => !prev);
   };
 
+  /**
+   * Déconnecte l'utilisateur, ferme le menu et retourne à l'accueil.
+   */
   function handleLogout() {
     logout();
     setMenuExpanded(false);
     router.push("/");
   }
 
+  /**
+   * Récupère le token d'authentification présent dans les cookies.
+   */
   useEffect(() => {
     const storedToken = Cookies.get("token");
     setToken(storedToken ?? null);
   }, []);
 
+  /**
+   * Ferme le menu mobile lorsqu'un clic est effectué en dehors de celui-ci.
+   */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -47,6 +65,10 @@ export default function Header() {
     };
   }, []);
 
+  /**
+   * Ferme le menu mobile avec la touche Échap et restitue le focus
+   * au bouton d'ouverture du menu.
+   */
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape" && menuExpanded) {
@@ -61,7 +83,6 @@ export default function Header() {
       document.removeEventListener("keydown", handleEscape);
     };
   }, [menuExpanded]);
-
 
   return (
     <header className={styles.header}>

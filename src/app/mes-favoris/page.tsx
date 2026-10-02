@@ -10,6 +10,13 @@ import PropertyCard from "../components/PropertyCard/PropertyCard";
 import getRequest from "../utils/getRequest";
 import { apiUrl } from "../utils/api";
 
+/**
+ * Affiche la liste des logements enregistrés dans les favoris de l'utilisateur.
+ *
+ * Vérifie l'authentification, récupère les favoris depuis l'API et les affiche
+ * sous forme de cartes. Un utilisateur non connecté est redirigé vers la page
+ * de connexion.
+ */
 export default function Favorites() {
   const router = useRouter();
 
@@ -18,7 +25,9 @@ export default function Favorites() {
   const [favorites, setFavorites] = useState<Property[]>([]);
   const [favoriteIds, setFavoriteIds] = useState<string[] | []>([]);
 
-  // Redirection en l'absence de token
+  /**
+   * Vérifie l'authentification de l'utilisateur et récupère ses favoris.
+   */
   useEffect(() => {
     async function loadFavorites() {
       const token = Cookies.get("token");
@@ -31,6 +40,7 @@ export default function Favorites() {
 
       if (userCookie) {
         const user = JSON.parse(userCookie);
+
         try {
           const result = await getRequest<Property[]>({
             url: apiUrl(`/api/users/${user.id}/favorites`),
@@ -38,12 +48,14 @@ export default function Favorites() {
           });
 
           setFavorites(result);
+
           const ids = result
             .map((favorite) => favorite.id)
             .filter((id): id is string => id !== undefined);
 
           setFavoriteIds(ids);
-          // mise à jour du local storage
+
+          // Synchronise les favoris récupérés avec le stockage local.
           localStorage.setItem("favorites", JSON.stringify(favorites));
         } catch (error) {
           console.error(error);
@@ -52,6 +64,7 @@ export default function Favorites() {
         }
       }
     }
+
     loadFavorites();
   }, [token]);
 
@@ -68,6 +81,7 @@ export default function Favorites() {
     <>
       <div className={styles.banner}>
         <h1>Vos favoris</h1>
+
         <p>
           Retrouvez ici tous les logements que vous avez aimés.
           <br />

@@ -1,3 +1,8 @@
+/**
+ * Formate l'heure d'une date au format 12 heures.
+ * @param date - Date contenant une heure au format `HH:mm:ss`.
+ * @returns L'heure au format `hh:mm am/pm`.
+ */
 export default function formatHour(date: string): string {
   const [hours, minutes] = date.split(" ")[1].split(":");
 

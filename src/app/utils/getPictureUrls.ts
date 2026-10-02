@@ -21,9 +21,19 @@ type UploadResponse = {
   instructions?: string;
 };
 
+/**
+ * Envoie plusieurs images à l'API et récupère leurs URL.
+ *
+ * Les fichiers sont envoyés séquentiellement afin de conserver l'ordre
+ * fourni et chaque erreur d'upload est traitée indépendamment.
+ *
+ * @param pictures - Liste des fichiers à envoyer avec leur usage.
+ * @param token - Token d'authentification optionnel.
+ * @returns Les URL et usages des images correctement envoyées.
+ */
 export default async function getPictureUrls(
   pictures: PictureInput[],
-  token?: string
+  token?: string,
 ): Promise<PictureResult[]> {
   const results: PictureResult[] = [];
 

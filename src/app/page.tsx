@@ -7,8 +7,29 @@ import styles from "./page.module.css";
 import JsonLd from "./components/JsonLd/JsonLd";
 import Image from "next/image";
 
+/**
+ * Page d'accueil de l'application Kasa.
+ *
+ * Cette page est rendue côté serveur et récupère la liste des logements
+ * avant de transmettre les données au composant `HomeContent`.
+ *
+ * Elle contient également :
+ * - les données structurées JSON-LD pour les moteurs de recherche ;
+ * - la section principale de présentation ;
+ * - la liste des logements ;
+ * - la présentation du fonctionnement de la plateforme.
+ *
+ * En cas d'échec de récupération des logements, la page reste accessible
+ * avec une liste vide.
+ *
+ * @returns {Promise<JSX.Element>} La page d'accueil.
+ */
 export default async function Home() {
   let properties: Property[] = [];
+
+  /**
+   * Données structurées décrivant l'organisation et le site.
+   */
   const homeSchema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -29,6 +50,7 @@ export default async function Home() {
   };
 
   try {
+    // Récupération des logements côté serveur avant le rendu de la page.
     properties = await getRequest<Property[]>({
       url: apiUrl("/api/properties"),
     });
@@ -39,6 +61,7 @@ export default async function Home() {
   return (
     <div className={styles.homeWrapper}>
       <JsonLd data={homeSchema} />
+
       <section className={styles.hero}>
         <h1>Chez vous, partout et ailleurs</h1>
 
@@ -74,7 +97,6 @@ export default async function Home() {
           <Tile
             title="Recherchez"
             description="Entrez votre destination, vos dates et laissez Kasa faire le reste"
-            
           />
 
           <Tile

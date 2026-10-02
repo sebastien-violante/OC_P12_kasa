@@ -11,6 +11,12 @@ type PropertyPageProps = {
   }>;
 };
 
+/**
+ * Récupère les données d'un logement à partir de son identifiant.
+ *
+ * Retourne `null` lorsque le logement n'existe pas afin de permettre
+ * à la page de gérer le cas 404 avec `notFound()`.
+ */
 async function getProperty(id: string): Promise<Property | null> {
   const response = await fetch(apiUrl(`/api/properties/${id}`), {
     cache: "no-store",
@@ -27,6 +33,13 @@ async function getProperty(id: string): Promise<Property | null> {
   return response.json();
 }
 
+/**
+ * Génère les métadonnées SEO de la page à partir des informations
+ * du logement demandé.
+ *
+ * Une version spécifique est également générée lorsque le logement
+ * n'existe pas afin d'éviter d'afficher des métadonnées incohérentes.
+ */
 export async function generateMetadata({
   params,
 }: PropertyPageProps): Promise<Metadata> {
@@ -43,7 +56,9 @@ export async function generateMetadata({
   return {
     title: `${property.title} | Kasa`,
     description: property.description,
-    alternates: { canonical: `/logements/${property.id}`, },
+    alternates: {
+      canonical: `/logements/${property.id}`,
+    },
     openGraph: {
       title: `${property.title} | Kasa`,
       description: property.description,
@@ -61,7 +76,16 @@ export async function generateMetadata({
   };
 }
 
-export default async function PropertyPage({ params }: PropertyPageProps) {
+/**
+ * Affiche la page détail d'un logement.
+ *
+ * Prépare également les données structurées Schema.org afin de permettre
+ * aux moteurs de recherche d'identifier le logement et ses informations
+ * principales.
+ */
+export default async function PropertyPage({
+  params,
+}: PropertyPageProps) {
   const { id } = await params;
 
   const property = await getProperty(id);
@@ -88,6 +112,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
     },
   };
 
+  // Ajout de la note moyenne uniquement lorsqu'au moins une évaluation existe.
   if (
     property.rating_avg !== undefined &&
     property.ratings_counts !== undefined &&

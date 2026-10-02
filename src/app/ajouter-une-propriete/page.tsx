@@ -22,23 +22,35 @@ import type { Property, User } from "../types/types";
 import { useRouter } from "next/navigation";
 import { apiUrl } from "../utils/api";
 
-export default function Addproperty() {
+/**
+ * Page de création d'un nouveau logement.
+ *
+ * Gère la saisie du formulaire, la sélection des images, la validation
+ * des données, la mise à jour éventuelle du profil de l'hôte et la création
+ * du logement auprès de l'API.
+ */
+export default function AddProperty() {
   const token = Cookies.get("token");
   const router = useRouter();
+
   const [cover, setCover] = useState<File | null>(null);
   const [images, setImages] = useState<(File | null)[]>([null]);
   const [profile, setProfile] = useState<File | null>(null);
   const [tags, setTags] = useState<string[]>([]);
   const [equipements, setEquipments] = useState<string[]>([]);
   const [newTag, setNewTag] = useState<string>("");
+
   const profileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
-  const [errors, setErrors] = useState<z.core.$ZodIssue[]>([]);
   const pictureInputRef = useRef<(HTMLInputElement | null)[]>([]);
+
+  const [errors, setErrors] = useState<z.core.$ZodIssue[]>([]);
   const [profileFileName, setProfileFileName] = useState("");
   const { user, updateUser } = useAuth();
   const [apiError, setApiError] = useState("");
   const [pictureQuantity, setPictureQuantity] = useState(1);
+  const [isSubmiting, setIsSubmiting] = useState(false);
+
   const initFormData: PropertyFormData = {
     title: "",
     description: "",
@@ -54,6 +66,7 @@ export default function Addproperty() {
   };
 
   const [formData, setFormData] = useState<PropertyFormData>(initFormData);
+
   useEffect(() => {
     if (!user) return;
 
@@ -69,12 +82,14 @@ export default function Addproperty() {
     });
   }, [user]);
 
-  // Captation des données d'enregistrement dans FormData
-  const handleInputValue = (
+  /**
+   * Met à jour les données du formulaire en fonction du champ modifié.
+  */
+  function handleInputValue (
     event: ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >,
-  ) => {
+  ) {
     const target = event.target;
 
     if (target instanceof HTMLInputElement && target.type === "checkbox") {
@@ -96,9 +111,10 @@ export default function Addproperty() {
 
       return;
     }
-
+    // nettoyage préalable du champ pour n'autoriser que les chiffres
     if (target.name === "postalCode") {
       const postalCode = target.value.replace(/[^0-9]/g, "").slice(0, 5);
+
       setFormData((prev) => ({
         ...prev,
         postalCode,
@@ -106,8 +122,10 @@ export default function Addproperty() {
 
       return;
     }
+    // nettoyage préalable du champ pour n'autoriser que les chiffres
     if (target.name === "price_per_night") {
       const price_per_night = target.value.replace(/[^0-9]/g, "");
+
       setFormData((prev) => ({
         ...prev,
         price_per_night,
@@ -115,27 +133,39 @@ export default function Addproperty() {
 
       return;
     }
+
     setFormData((prev) => ({
       ...prev,
       [target.name]: target.value,
     }));
   };
 
+  /**
+   * Enregistre l'image de couverture sélectionnée.
+   */
   function handleCoverChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
+
     if (!file) return;
 
     setCover(file);
   }
 
+  /**
+   * Enregistre la photo de profil sélectionnée.
+   */
   function handleProfileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
+
     if (!file) return;
 
     setProfile(file);
     setProfileFileName(file.name);
   }
 
+  /**
+   * Enregistre une image du logement à l'emplacement correspondant.
+   */
   function handleImageChange(
     index: number,
     event: ChangeEvent<HTMLInputElement>,
@@ -147,15 +177,22 @@ export default function Addproperty() {
     setImages((prev) => {
       const newImages = [...prev];
       newImages[index] = file;
+
       return newImages;
     });
   }
 
+  /**
+   * Met à jour la valeur de la nouvelle catégorie saisie.
+   */
   function handleNewTagChange(value: string) {
     setNewTag(value);
   }
 
-  const handleAddTag = () => {
+  /**
+   * Ajoute une catégorie personnalisée au formulaire et à la liste disponible.
+   */
+  function handleAddTag () {
     const formatedTag = newTag.charAt(0).toUpperCase() + newTag.slice(1).trim();
 
     if (!formatedTag) return;
@@ -170,7 +207,10 @@ export default function Addproperty() {
     setNewTag("");
   };
 
-  const handleTagToggle = (tag: string) => {
+  /**
+   * Active ou désactive une catégorie existante.
+   */
+  function handleTagToggle (tag: string) {
     setFormData((prev) => {
       if (prev.categories.includes(tag)) {
         return {
@@ -186,6 +226,9 @@ export default function Addproperty() {
     });
   };
 
+  /**
+   * Ajoute un nouvel emplacement pour une image du logement.
+   */
   function addImage() {
     if (pictureQuantity <= 3) {
       setPictureQuantity((prev) => prev + 1);
@@ -193,11 +236,17 @@ export default function Addproperty() {
     }
   }
 
-  // Récupération de l'erreur correspondant à un champ
-  const getFieldError = (fieldName: string) => {
+  /**
+   * Retourne l'erreur de validation associée à un champ.
+   */
+  function getFieldError(fieldName: string) {
     return errors.find((error) => error.path.includes(fieldName));
   };
 
+  /**
+   * Met à jour la photo de profil de l'utilisateur et synchronise
+   * les données du contexte d'authentification.
+   */
   async function updateProfilePicture(profilePicture: string) {
     if (!user) {
       return null;
@@ -226,11 +275,19 @@ export default function Addproperty() {
       return null;
     }
   }
-  async function addPorperty() {
+
+  /**
+   * Valide et enregistre le nouveau logement.
+   *
+   * Prépare les fichiers à envoyer, récupère leurs URL, met à jour
+   * la photo de profil si nécessaire puis crée le logement via l'API.
+   */
+  async function addProperty() {
     if (!user) {
       console.error("Utilisateur non connecté");
       return;
     }
+
     const data = {
       ...formData,
       cover,
@@ -244,6 +301,8 @@ export default function Addproperty() {
       setErrors(zodValidation.error.issues);
       return;
     }
+
+    setIsSubmiting(true);
 
     const pictures: {
       file: File;
@@ -274,7 +333,9 @@ export default function Addproperty() {
     });
 
     const token = Cookies.get("token");
+
     try {
+      // Récupération d'url publiques pour chaque image chargée et en fonction du type fourni (cover, picture, profile)
       const pictureUrls = await getPictureUrls(pictures, token);
 
       let coverPicture = "";
@@ -297,8 +358,7 @@ export default function Addproperty() {
         }
       });
 
-      // Si une nouvelle photo de profil a été fournie,
-      // on met à jour le profil
+      // Met à jour le profil uniquement lorsqu'une nouvelle photo a été fournie.
       if (profilePicture !== (user.picture ?? "")) {
         const updatedUser = await updateProfilePicture(profilePicture);
 
@@ -339,11 +399,13 @@ export default function Addproperty() {
             message: "Votre logement a bien été enregistré",
           }),
         );
+
         setErrors([]);
         setFormData(initFormData);
         router.push("/");
       } catch (error) {
         const apiError = error as ApiError;
+
         if (apiError.status === 403) {
           setApiError(
             "Vous n'aves pas les droits nécessaires pour créer un logement",
@@ -355,16 +417,19 @@ export default function Addproperty() {
     } catch (error) {
       const apiError = error as ApiError;
       setApiError(apiError.message);
+    } finally {
+      setIsSubmiting(false);
     }
   }
 
-  // Update rôle utilisateur client->owner si ce n'est pas déjà fait et placement en cookies du nouveau token
+  // Passage du rôle client à owner et actualisation du token d'authentification.
   useEffect(() => {
     if (user?.role === "client") {
       const changeRole = async () => {
         const payload: { role: "owner" } = {
           role: "owner",
         };
+
         try {
           const result = await patchRequest<
             { role: "owner" },
@@ -374,6 +439,7 @@ export default function Addproperty() {
             token,
             payload,
           });
+
           if (result.data) {
             const newToken = result.data.token;
             Cookies.set("token", newToken);
@@ -387,17 +453,24 @@ export default function Addproperty() {
     }
   }, [user]);
 
-  // Chargement de nom de l'utilisateur dans le formulaire
+  // Synchronisation du nom de l'utilisateur avec le formulaire.
   useEffect(() => {
     if (!user) return;
-    setFormData((prev) => ({ ...prev, name: user.name }));
+
+    setFormData((prev) => ({
+      ...prev,
+      name: user.name,
+    }));
   }, [user]);
 
-  // Chargement des tags
+  // Chargement des catégories disponibles depuis la base de données
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const tags = await getRequest<string[]>({ url: apiUrl("/api/tags") });
+        const tags = await getRequest<string[]>({
+          url: apiUrl("/api/tags"),
+        });
+
         setTags(tags);
       } catch (error) {
         console.error(error);
@@ -407,13 +480,14 @@ export default function Addproperty() {
     loadTags();
   }, []);
 
-  // Chargement des équipementss
+  // Chargement des équipements disponibles depuis la base de données
   useEffect(() => {
     const loadEquipements = async () => {
       try {
         const equipements = await getRequest<string[]>({
           url: apiUrl("/api/equipments"),
         });
+
         setEquipments(equipements);
       } catch (error) {
         console.error(error);
@@ -431,18 +505,21 @@ export default function Addproperty() {
           <span className="md:hidden">Retour aux annonces</span>
           <span className="hidden md:inline">Retour</span>
         </Link>
+
         <h1>Ajouter une propriété</h1>
+
         {apiError && (
           <p id="api-error" role="alert" className={styles.apiError}>
             {apiError}
           </p>
         )}
       </section>
+
       <form
         className={styles.form}
         onSubmit={(event) => {
           event.preventDefault();
-          addPorperty();
+          addProperty();
         }}
         noValidate
       >
@@ -450,9 +527,12 @@ export default function Addproperty() {
           type="submit"
           className={styles.submitBtn}
           aria-label="Ajouter la propriété"
+          disabled={isSubmiting}
+          aria-busy={isSubmiting}
         >
-          Ajouter
+          {isSubmiting ? "Ajout en cours…" : "Ajouter"}
         </button>
+
         <article className={styles.mainData}>
           <div className={styles.formGroup}>
             <label htmlFor="title">Titre de la propriété</label>
@@ -469,12 +549,14 @@ export default function Addproperty() {
               aria-invalid={getFieldError("title") ? "true" : "false"}
               className={getFieldError("title") ? styles.inputOnError : ""}
             />
+
             {getFieldError("title") && (
               <p id="title-error" className={styles.fieldError} role="alert">
                 {getFieldError("title")?.message}
               </p>
             )}
           </div>
+
           <div className={styles.formGroup}>
             <label htmlFor="description">Description</label>
             <textarea
@@ -492,6 +574,7 @@ export default function Addproperty() {
                 getFieldError("description") ? styles.inputOnError : ""
               }
             />
+
             {getFieldError("description") && (
               <p
                 id="description-error"
@@ -502,6 +585,7 @@ export default function Addproperty() {
               </p>
             )}
           </div>
+
           <div className={styles.formGroup}>
             <label htmlFor="postalCode">Code postal</label>
             <input
@@ -520,6 +604,7 @@ export default function Addproperty() {
               aria-invalid={getFieldError("postalCode") ? "true" : "false"}
               className={getFieldError("postalCode") ? styles.inputOnError : ""}
             />
+
             {getFieldError("postalCode") && (
               <p
                 id="postalCode-error"
@@ -530,6 +615,7 @@ export default function Addproperty() {
               </p>
             )}
           </div>
+
           <div className={styles.formGroup}>
             <label htmlFor="location">Localisation</label>
             <input
@@ -544,12 +630,14 @@ export default function Addproperty() {
               aria-invalid={getFieldError("location") ? "true" : "false"}
               className={getFieldError("location") ? styles.inputOnError : ""}
             />
+
             {getFieldError("location") && (
               <p id="location-error" className={styles.fieldError} role="alert">
                 {getFieldError("location")?.message}
               </p>
             )}
           </div>
+
           <div className={styles.formGroup}>
             <label htmlFor="price_per_night">Prix par nuitée (€)</label>
             <input
@@ -570,6 +658,7 @@ export default function Addproperty() {
                 getFieldError("price_per_night") ? styles.inputOnError : ""
               }
             />
+
             {getFieldError("price_per_night") && (
               <p
                 id="price_per_night-error"
@@ -581,11 +670,13 @@ export default function Addproperty() {
             )}
           </div>
         </article>
+
         <article className={styles.pictures}>
           <div className={styles.choosePictures}>
             <div className={styles.formGroup}>
               {/* Image de couverture */}
               <label htmlFor="coverFileName">Image de couverture</label>
+
               <div className={styles.inputWrapper}>
                 <input
                   id="coverFileName"
@@ -600,6 +691,7 @@ export default function Addproperty() {
                   aria-invalid={getFieldError("cover") ? "true" : "false"}
                   className={getFieldError("cover") ? styles.inputOnError : ""}
                 />
+
                 {getFieldError("cover") && (
                   <p
                     id="cover-error"
@@ -609,6 +701,7 @@ export default function Addproperty() {
                     {getFieldError("cover")?.message}
                   </p>
                 )}
+
                 <button
                   type="button"
                   className={styles.addButton}
@@ -617,6 +710,7 @@ export default function Addproperty() {
                 >
                   <span aria-hidden="true">+</span>
                 </button>
+
                 <input
                   ref={coverInputRef}
                   id="coverImage"
@@ -628,12 +722,14 @@ export default function Addproperty() {
                 />
               </div>
             </div>
+
             <div className={styles.formGroup}>
               {/* Images du logement */}
               <label htmlFor="propertyPictures">Images du logement</label>
 
               {images?.map((image, index) => {
                 const inputId = `propertyPicture-${index}`;
+
                 return (
                   <div className={styles.formGroup} key={index}>
                     {" "}
@@ -669,6 +765,7 @@ export default function Addproperty() {
                   </div>
                 );
               })}
+
               {pictureQuantity <= 3 && (
                 <button
                   type="button"
@@ -680,10 +777,12 @@ export default function Addproperty() {
               )}
             </div>
           </div>
+
           <div className={styles.chooseProfile}>
             <div className={styles.formGroup}>
               <div className={styles.formGroup}>
                 <label htmlFor="name">Nom de l&apos;hôte</label>
+
                 <input
                   type="text"
                   id="name"
@@ -697,14 +796,17 @@ export default function Addproperty() {
                   aria-invalid={getFieldError("name") ? "true" : "false"}
                   className={getFieldError("name") ? styles.inputOnError : ""}
                 />
+
                 {getFieldError("name") && (
                   <p id="name-error" className={styles.fieldError} role="alert">
                     {getFieldError("name")?.message}
                   </p>
                 )}
               </div>
+
               <div className={styles.formGroup}>
                 <label htmlFor="profileFileName">Photo de profil</label>
+
                 <div className={styles.inputWrapper}>
                   <input
                     id="profileFileName"
@@ -714,6 +816,7 @@ export default function Addproperty() {
                     readOnly
                     aria-label="Photo de profil sélectionnée"
                   />
+
                   {getFieldError("profile") && (
                     <p
                       id="profile-error"
@@ -746,15 +849,20 @@ export default function Addproperty() {
             </div>
           </div>
         </article>
+
         <section
-          className={`${styles.equipments} ${getFieldError("equipments") ? styles.inputOnError : ""}`}
+          className={`${styles.equipments} ${
+            getFieldError("equipments") ? styles.inputOnError : ""
+          }`}
         >
           <h2 className={styles.sectionLabel}>Équipements</h2>
+
           {getFieldError("equipments") && (
             <p id="equipments-error" className={styles.fieldError} role="alert">
               {getFieldError("equipments")?.message}
             </p>
           )}
+
           <div className={styles.checkboxes}>
             {equipements.map((equipment) => (
               <div className={styles.checkbox} key={equipment}>
@@ -770,8 +878,10 @@ export default function Addproperty() {
             ))}
           </div>
         </section>
+
         <section className={styles.categories}>
           <h2 className={styles.sectionLabel}>Catégories</h2>
+
           <div className={styles.categoryList}>
             {tags.map((tag) => (
               <Tag

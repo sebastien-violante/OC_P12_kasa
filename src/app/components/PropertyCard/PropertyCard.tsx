@@ -6,11 +6,10 @@ import Image from "next/image";
 import Link from "next/link";
 import postRequest from "@/app/utils/postRequest";
 import deleteRequest from "@/app/utils/deleteRequest";
-import getRequest from "@/app/utils/getRequest";
 import Cookies from "js-cookie";
 import { useFavorites } from "@/app/context/FavoritesContext";
 import FlashMessage from "../FlashMessage/FlashMessage";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import formatUrl from "@/app/utils/formatUrl";
 import { apiUrl } from "@/app/utils/api";
 
@@ -18,19 +17,35 @@ type PropertyCardProps = {
   property: Property;
 };
 
+/**
+ * Affiche une carte de logement avec ses principales informations.
+ *
+ * Permet également d'ajouter ou de retirer le logement des favoris.
+ * Une notification est affichée lorsque l'utilisateur tente d'ajouter
+ * un favori sans être connecté.
+ *
+ * @param property - Logement dont les informations sont affichées.
+ */
 export default function PropertyCard({ property }: PropertyCardProps) {
   const token = Cookies.get("token");
   const [flashMessage, setFlashMessage] = useState<FlashMessageType | null>(
     null,
   );
   const { favoriteIds, addFavorite, removeFavorite } = useFavorites();
-    
+
   if (!property.id) {
     return null;
   }
+
   const propertyId = property.id;
   const isFavorite = favoriteIds.includes(propertyId);
 
+  /**
+   * Ajoute ou retire le logement des favoris selon son état actuel.
+   *
+   * Si l'utilisateur n'est pas connecté, une notification lui demande
+   * de se connecter avant de poursuivre.
+   */
   async function toggleFavorite() {
     if (!token) {
       setFlashMessage({

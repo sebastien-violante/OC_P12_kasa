@@ -12,6 +12,13 @@ type ConversationTileProps = {
   setIsMessagesDisplayed: (value: boolean) => void;
 };
 
+/**
+ * Affiche un aperçu d'une conversation dans la liste des messages.
+ *
+ * Permet de sélectionner la conversation et d'afficher la zone contenant
+ * ses messages. Un indicateur visuel signale également la présence de
+ * messages non lus.
+ */
 export default function ConversationTile({
   user,
   message,
@@ -20,23 +27,28 @@ export default function ConversationTile({
   selectedConversationId,
   id,
   unreadCount,
-  setIsMessagesDisplayed
+  setIsMessagesDisplayed,
 }: ConversationTileProps) {
   return (
     <article
-      className={`${styles.conversationTile} ${Number(selectedConversationId) === id ? styles.selected : ""}`}
+      className={`${styles.conversationTile} ${
+        Number(selectedConversationId) === id ? styles.selected : ""
+      }`}
       onClick={() => {
-        setSelectedConversationId(id)
-        setIsMessagesDisplayed(true)
+        setSelectedConversationId(id);
+        setIsMessagesDisplayed(true);
       }}
     >
       <div className={styles.square}></div>
+
       <div className={styles.data}>
         <p className={styles.user}>{user}</p>
         <p className={styles.message}>{message}</p>
       </div>
+
       <div className={styles.date}>
         <p className={styles.hour}>{date ? formatHour(date) : ""}</p>
+
         {unreadCount > 0 && <div className={styles.redBubble}></div>}
       </div>
     </article>

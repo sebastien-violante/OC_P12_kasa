@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Addproperty from "./page";
+import AddProperty from "./page";
 import getRequest from "../utils/getRequest";
 import postRequest from "../utils/postRequest";
 import patchRequest from "../utils/patchRequest";
@@ -61,7 +61,7 @@ jest.mock("js-cookie", () => ({
 // FONCTION DE FACTORISATION ////////////////////////////
 function setUpRegisterProperty() {
   const user = userEvent.setup();
-  render(<Addproperty />);
+  render(<AddProperty />);
   const titleInput = screen.getByLabelText(/Titre de la propriété/);
   const descriptionInput = screen.getByLabelText(/Description/);
   const postalCodeInput = screen.getByLabelText(/Code postal/);

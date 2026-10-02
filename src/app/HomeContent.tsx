@@ -11,16 +11,43 @@ type HomeContentProps = {
   properties: Property[];
 };
 
-export default function HomeContent({ properties }: HomeContentProps) {
+/**
+ * Affiche la liste des logements disponibles sur la page d'accueil.
+ *
+ * Le composant gère :
+ * - l'affichage progressif des logements ;
+ * - la récupération et l'affichage d'un message flash ;
+ * - le déplacement du focus clavier vers la première carte d'un nouveau lot.
+ *
+ * @param {HomeContentProps} props Propriétés nécessaires au rendu du composant.
+ * @param {Property[]} props.properties Liste des logements à afficher.
+ *
+ * @returns {JSX.Element} La section contenant les cartes de logements.
+ */
+export default function HomeContent({
+  properties,
+}: HomeContentProps) {
   const [visibleCards, setVisibleCards] = useState(6);
   const [flash, setFlash] = useState<FlashMessageType | null>(null);
+
+  // Mémorise l'index de la première carte ajoutée lors du prochain affichage.
+  const [newCardsStartIndex, setNewCardsStartIndex] = useState<number | null>(
+    null,
+  );
+
+  /**
+   * Affiche six logements supplémentaires.
+   *
+   * L'index de la première nouvelle carte est mémorisé afin de pouvoir
+   * déplacer le focus dessus une fois que le DOM a été mis à jour.
+   */
   const loadMoreProperties = () => {
+    setNewCardsStartIndex(visibleCards);
     setVisibleCards((prev) => prev + 6);
   };
-  const [focusables, setFocusables] = useState<NodeListOf<HTMLAnchorElement>>();
-  const [hasFocus, setHasFocus] = useState<HTMLAnchorElement | null>(null);
 
   useEffect(() => {
+    // Récupération du message flash éventuellement transmis par une autre page.
     const flashBag = localStorage.getItem("flash");
 
     if (flashBag) {
@@ -31,47 +58,33 @@ export default function HomeContent({ properties }: HomeContentProps) {
         message: parsedFlashBag.message,
       });
 
+      // Le message ne doit être affiché qu'une seule fois.
       localStorage.removeItem("flash");
     }
   }, []);
 
   useEffect(() => {
-    const focusablesCards = getFocusableElements();
-    setFocusables(focusablesCards);
-  }, [visibleCards]);
+    if (newCardsStartIndex === null) return;
 
-  useEffect(() => {
-    const handleFocus = (event: FocusEvent) => {
-      const target = event.target;
+    const focusableCards = getFocusableElements();
+    const firstNewCard = focusableCards[newCardsStartIndex];
 
-      if (!(target instanceof HTMLAnchorElement)) return;
-
-      const isFocusable = Array.from(focusables ?? []).some(
-        (element) => element === target,
-      );
-
-      if (isFocusable) {
-        setHasFocus(target);
-      }
-    };
-    document.addEventListener("focusin", handleFocus);
-
-    return () => {
-      document.removeEventListener("focusin", handleFocus);
-    };
-  }, [focusables]);
-
-  useEffect(() => {
-    if (!hasFocus) return
-    const focusableStillExists = document.contains(hasFocus);
-    if (focusableStillExists) {
-      hasFocus.focus();
+    if (firstNewCard) {
+      firstNewCard.focus();
     }
-  }, [focusables]);
+
+    // Le déplacement du focus ne doit avoir lieu qu'après un ajout de cartes.
+    setNewCardsStartIndex(null);
+  }, [visibleCards, newCardsStartIndex]);
 
   return (
     <>
-      {flash && <FlashMessage status={flash.status} message={flash.message} />}
+      {flash && (
+        <FlashMessage
+          status={flash.status}
+          message={flash.message}
+        />
+      )}
 
       <section
         className={styles.cardWrapper}
@@ -81,9 +94,14 @@ export default function HomeContent({ properties }: HomeContentProps) {
           Nos logements
         </h2>
 
-        {properties.slice(0, visibleCards).map((property) => (
-          <PropertyCard property={property} key={property.slug} />
-        ))}
+        {properties
+          .slice(0, visibleCards)
+          .map((property) => (
+            <PropertyCard
+              property={property}
+              key={property.slug}
+            />
+          ))}
 
         {visibleCards < properties.length && (
           <button

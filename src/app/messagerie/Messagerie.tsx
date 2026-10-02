@@ -2,13 +2,16 @@
 
 import styles from "./page.module.css";
 import ConversationTile from "../components/ConversationTile/ConversationTile";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Fragment } from "react";
 import getRequest from "../utils/getRequest";
-import type { Conversation, Message, FlashMessageType } from "../types/types";
+import type {
+  Conversation,
+  Message,
+  FlashMessageType,
+} from "../types/types";
 import Cookies from "js-cookie";
 import Loader from "../components/Loader/Loader";
 import MessageTile from "../components/MessageTile/MessageTile";
-import { Fragment } from "react";
 import postRequest from "../utils/postRequest";
 import patchRequest from "../utils/patchRequest";
 import FlashMessage from "../components/FlashMessage/FlashMessage";
@@ -22,17 +25,26 @@ type MessagerieProps = {
   returnTo?: string;
 };
 
+/**
+ * Affiche l'interface de messagerie de l'utilisateur.
+ *
+ * Gère le chargement des conversations, l'affichage des messages de la
+ * conversation sélectionnée, l'envoi de nouveaux messages et la mise à jour
+ * de leur statut de lecture.
+ */
 export default function Messagerie({
   conversationId,
   returnTo = "/",
 }: MessagerieProps) {
   const token = Cookies.get("token");
   const router = useRouter();
+
   const [conversations, setConversations] = useState<Conversation[] | []>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [flash, setFlash] = useState<FlashMessageType | null>(null);
   const [isMessagesDisplayed, setIsMessagesDisplayed] = useState(false);
+
   const {
     messages,
     selectedConversationId,
@@ -40,14 +52,17 @@ export default function Messagerie({
     setMessages,
     addMessage,
   } = useMessageStore();
+
   const loadMessages = useMessageStore((state) => state.loadMessages);
-  //const searchParams = useSearchParams();
-  //const returnTo = searchParams.get("returnTo") || "/";
-  
-  // Envoi d'un message
-  async function handleSendMessage(event: React.FormEvent<HTMLFormElement>) {
+
+  /**
+   * Envoie le message dans la conversation sélectionnée.
+  */
+  async function handleSendMessage(
+    event: React.FormEvent<HTMLFormElement>,
+  ) {
     event.preventDefault();
-    // Empêche l'envoi d'un message sans sélection d'une conversation
+
     if (selectedConversationId === null) {
       setFlash({
         status: false,
@@ -57,7 +72,6 @@ export default function Messagerie({
       return;
     }
 
-    // Empêche l'envoi d'un message vide
     if (!message.trim()) {
       setFlash({
         status: false,
@@ -66,7 +80,6 @@ export default function Messagerie({
       return;
     }
 
-    // Envoi du message
     try {
       const messageResponse = await postRequest<{ content: string }, Message>({
         url: apiUrl(`/api/conversations/${selectedConversationId}/messages`),
@@ -75,12 +88,11 @@ export default function Messagerie({
           content: message.trim(),
         },
       });
-      // Ajout dans le store
+
       if (messageResponse.data) {
         addMessage(messageResponse.data);
       }
 
-      // Vidage du champ message et affichage du Flash
       setMessage("");
       setFlash({
         status: true,
@@ -96,23 +108,31 @@ export default function Messagerie({
     }
   }
 
-  const isSameDay = (date1: string, date2: string): boolean => {
+  /**
+   * Vérifie si deux messages ont été envoyés le même jour (pour la gestion des séparateurs dans l'affichage)
+  */
+  function isSameDay (date1: string, date2: string): boolean {
     return new Date(date1).toDateString() === new Date(date2).toDateString();
   };
 
-  // Chargement de toutes les conversations de l'utilisateur
+  /**
+   * Charge toutes les conversations de l'utilisateur connecté.
+  */
   useEffect(() => {
     const loadConversations = async () => {
       setLoading(true);
+
       if (!token) {
         router.push("/connexion");
         return;
       }
+
       try {
         const data = await getRequest<Conversation[]>({
           url: apiUrl("/api/conversations"),
           token,
         });
+
         setConversations(data);
       } catch (error) {
         console.error(error);
@@ -120,31 +140,38 @@ export default function Messagerie({
         setLoading(false);
       }
     };
+
     loadConversations();
   }, [token]);
 
-  // Récupération de l'id de la conversation en cas de provenance de la carte du logement
+  /**
+   * Sélectionne automatiquement la conversation transmise dans l'URL lorsque l'utilisateur arrive de la page détail logement.
+  */
   useEffect(() => {
-    const conversationId = new URLSearchParams(window.location.search).get(
-      "conversationId",
-    );
-    if (conversationId) {
-      setSelectedConversationId(Number(conversationId));
+    const urlConversationId = new URLSearchParams(
+      window.location.search,
+    ).get("conversationId");
+
+    if (urlConversationId) {
+      setSelectedConversationId(Number(urlConversationId));
       setIsMessagesDisplayed(true);
     }
   }, [setSelectedConversationId]);
 
-  // Chargement des messages correspondant à la conversation sélectionnée
+  /**
+   * Charge les messages de la conversation sélectionnée et les marque comme lus auprès de l'API.
+   */
   useEffect(() => {
     if (selectedConversationId === null) {
       return;
     }
+
     const load = async () => {
       setLoading(true);
+
       try {
-        // Récupération des messages depuis le store
         await loadMessages(selectedConversationId, token);
-        // Lors de l'affichage des messages, tous les messages sont considérés lus
+
         await patchRequest({
           url: apiUrl(`/api/conversations/${selectedConversationId}/read`),
           token,
@@ -155,12 +182,15 @@ export default function Messagerie({
         setLoading(false);
       }
     };
+
     load();
   }, [selectedConversationId, setMessages, token]);
 
   return (
     <div className={styles.mainWrapper}>
-      {flash && <FlashMessage status={flash.status} message={flash.message} />}
+      {flash && (
+        <FlashMessage status={flash.status} message={flash.message} />
+      )}
 
       <section
         className={`${styles.conversations} ${
@@ -229,11 +259,14 @@ export default function Messagerie({
                 {showDate && (
                   <div className={styles.messageDate}>
                     <span>
-                      {new Date(message.createdAt).toLocaleDateString("fr-FR", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
+                      {new Date(message.createdAt).toLocaleDateString(
+                        "fr-FR",
+                        {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        },
+                      )}
                     </span>
                   </div>
                 )}

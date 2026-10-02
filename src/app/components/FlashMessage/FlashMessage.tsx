@@ -7,6 +7,13 @@ type FlashMessageProps = {
   message: string;
 };
 
+/**
+ * Affiche temporairement un message de succès ou d'erreur.
+ *
+ * Le message est automatiquement masqué après deux secondes et son rôle
+ * ARIA est adapté selon son statut afin de faciliter son annonce par les
+ * technologies d'assistance.
+ */
 export default function FlashMessage({
   status,
   message,

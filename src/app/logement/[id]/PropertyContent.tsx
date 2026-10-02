@@ -25,7 +25,16 @@ type PropertyContentProps = {
   property: Property;
 };
 
-export default function PropertyContent({ property }: PropertyContentProps) {
+/**
+ * Affiche le contenu détaillé d'un logement.
+ *
+ * Présente les informations du logement, ses équipements, ses catégories
+ * et les informations de l'hôte. Permet également à un utilisateur connecté
+ * de contacter l'hôte ou de poursuivre une conversation existante.
+ */
+export default function PropertyContent({
+  property,
+}: PropertyContentProps) {
   const { user } = useAuth();
   const token = Cookies.get("token");
 
@@ -40,12 +49,20 @@ export default function PropertyContent({ property }: PropertyContentProps) {
     number | null
   >(null);
 
-  const handleSendMessage = async (e: React.FormEvent) => {
+  /**
+   * Envoie un message à l'hôte.
+   *
+   * Crée une conversation pour le logement si nécessaire, puis ajoute
+   * le message à cette conversation avant de fermer la modale.
+   */
+  async function handleSendMessage(e: React.FormEvent) {
     e.preventDefault();
+
     if (!token) {
       setApiError("Vous devez être connecté.e pour envoyer un message");
       return;
     }
+
     if (!message) {
       setApiError("Vous devez saisir un message avant d'envoyer");
       return;
@@ -53,6 +70,7 @@ export default function PropertyContent({ property }: PropertyContentProps) {
 
     setSendingMessage(true);
     setApiError("");
+
     if (property.id) {
       try {
         const conversationResponse = await postRequest<
@@ -95,9 +113,14 @@ export default function PropertyContent({ property }: PropertyContentProps) {
     }
   };
 
+  /**
+   * Vérifie si l'utilisateur possède déjà une conversation avec l'hôte
+   * pour ce logement afin d'adapter l'action proposée dans l'interface.
+   */
   useEffect(() => {
     async function getIfAlreadyConversation() {
       if (!token) return;
+
       try {
         const result = await getRequest<PreviousConversationResponse>({
           url: apiUrl(`/api/properties/${property.id}/conversation`),
@@ -112,12 +135,15 @@ export default function PropertyContent({ property }: PropertyContentProps) {
         console.error(error);
       }
     }
+
     getIfAlreadyConversation();
   }, [property.id, token]);
 
   return (
     <>
-      {flash && <FlashMessage status={flash.status} message={flash.message} />}
+      {flash && (
+        <FlashMessage status={flash.status} message={flash.message} />
+      )}
 
       <section className={styles.top}>
         <Link href="/">
@@ -188,7 +214,6 @@ export default function PropertyContent({ property }: PropertyContentProps) {
                     itemType="https://schema.org/LocationFeatureSpecification"
                   >
                     <meta itemProp="name" content={equipment} />
-
                     <meta itemProp="value" content="true" />
 
                     <Tag item={equipment} select={false} />
@@ -213,7 +238,11 @@ export default function PropertyContent({ property }: PropertyContentProps) {
           <h2>Votre hôte</h2>
 
           <div className={styles.data}>
-            <div itemProp="host" itemScope itemType="https://schema.org/Person">
+            <div
+              itemProp="host"
+              itemScope
+              itemType="https://schema.org/Person"
+            >
               {property.host.picture ? (
                 <Image
                   src={formatUrl(property.host.picture)}
@@ -251,6 +280,7 @@ export default function PropertyContent({ property }: PropertyContentProps) {
                   Contacter l&apos;hôte
                 </button>
               )}
+
               {previousConversationExists && (
                 <Link
                   href={`/messagerie?conversationId=${previousConversationId}&returnTo=${encodeURIComponent(
