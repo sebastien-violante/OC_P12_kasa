@@ -88,9 +88,10 @@ export default function PropertyCard({ property }: PropertyCardProps) {
     } catch (error) {
       console.error(error);
       setFlashMessage({
-          status: false,
-          message: "Erreur serveur lors de la suppression du logement des favoris",
-        });
+        status: false,
+        message:
+          "Erreur serveur lors de la suppression du logement des favoris",
+      });
     }
   }
 
@@ -106,6 +107,8 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             src={formatUrl(property.cover)}
             alt={`Photo du logement : ${property.title}`}
             fill
+            sizes="(max-width: 768px) 100vw, 564px"
+            quality={70}
           />
         </div>
 
