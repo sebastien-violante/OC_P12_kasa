@@ -3,13 +3,11 @@ import userEvent from "@testing-library/user-event";
 import AddProperty from "./page";
 import getRequest from "../utils/getRequest";
 import postRequest from "../utils/postRequest";
-import patchRequest from "../utils/patchRequest";
 import getPictureUrls from "../utils/getPictureUrls";
 
 // MOCK DES IMPORTS ///////////////////////////////////
 
 const mockPush = jest.fn();
-const mockUpdateUser = jest.fn();
 const mockedGetPictureUrls = jest.mocked(getPictureUrls);
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -99,7 +97,6 @@ beforeEach(() => {
 
 // TESTS //////////////////////////////////////////////
 describe("ajouter une propriété", () => {
-  // ✅ Affiche le formulaire
   it("affiche le formulaire d'enregistrement", async () => {
     const {
       titleInput,
@@ -127,7 +124,6 @@ describe("ajouter une propriété", () => {
     expect(await screen.findByText("Vue mer")).toBeInTheDocument();
   });
 
-  // ✅ champs remplissables - hors cover
   it("permet à l'utilisateur de remplir les champs obligatoires du formulaire", async () => {
     const {
       user,
@@ -167,7 +163,6 @@ describe("ajouter une propriété", () => {
     expect(wifiCheckbox).toBeChecked();
   });
 
-  // ✅ champ remplissable - cover
   it("permet à l'utilisateur de remplir les champs obligatoires du formulaire", async () => {
     const { user } = setUpRegisterProperty();
     const fileInput = document.getElementById("coverImage") as HTMLInputElement;
@@ -183,7 +178,6 @@ describe("ajouter une propriété", () => {
     expect(fileInput.files?.[0]).toBe(file);
   });
 
-  // ✅ validation champs vides
   it("soulève des erreurs si les champs sont vides et place les inputs en aria-invalid", async () => {
     const {
       user,
@@ -233,7 +227,6 @@ describe("ajouter une propriété", () => {
     ).toBeInTheDocument();
   });
 
-  // ✅ validation longueur champs titre
   it("soulève une erreur si le champ titre est trop court", async () => {
     const { user, titleInput, submitInput } = setUpRegisterProperty();
 
@@ -248,7 +241,6 @@ describe("ajouter une propriété", () => {
     ).toBeInTheDocument();
   });
 
-  // ✅ validation longueur champ description
   it("soulève une erreur si le champ description est trop court", async () => {
     const { user, descriptionInput, submitInput } = setUpRegisterProperty();
 
@@ -263,7 +255,6 @@ describe("ajouter une propriété", () => {
     ).toBeInTheDocument();
   });
 
-  // ✅ validation contenu champ code postal
   it("n'accepte que les caractères numériques dans le champ code postal", async () => {
     const { user, postalCodeInput, submitInput } = setUpRegisterProperty();
 
@@ -273,16 +264,14 @@ describe("ajouter une propriété", () => {
     expect(postalCodeInput).toHaveValue("17569");
   });
 
-  // ✅ validation de la valeur du champ prix par nuit
   it("n'accepte que les caractères numériques dans le champ price_per_night", async () => {
-    const { user, priceInput, submitInput } = setUpRegisterProperty();
+    const { user, priceInput } = setUpRegisterProperty();
 
     await user.type(priceInput, "17oolp5");
 
     expect(priceInput).toHaveValue("175");
   });
 
-  // ✅ récupère les urls des images chargées
   it("récupère les urls des images chargées", async () => {
     const {
       user,
@@ -291,9 +280,7 @@ describe("ajouter une propriété", () => {
       postalCodeInput,
       locationInput,
       priceInput,
-      coverInput,
-      submitInput,
-      getPictureInput,
+      submitInput
     } = setUpRegisterProperty();
 
     const wifiCheckbox = await screen.findByRole("checkbox", { name: /wifi/i });
@@ -392,7 +379,6 @@ describe("ajouter une propriété", () => {
     });
   });
 
-  // ✅ envoie la bonne payload pour l'enregistrement de la propriété
   it("appelle postRequest avec les URLs des images récupérées", async () => {
     const {
       user,
@@ -488,7 +474,6 @@ describe("ajouter une propriété", () => {
     });
   });
 
-  // ✅ erreur lors de l'enregistrement de la propriété
   it("affiche le message lorsque l'API retourne une erreur", async () => {
     const {
       user,

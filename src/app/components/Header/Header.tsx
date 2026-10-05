@@ -3,11 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import styles from "./Header.module.css";
 import Link from "next/link";
-import Cookies from "js-cookie";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
-import getRequest from "@/app/utils/getRequest";
-import type { Conversation } from "@/app/types/types";
 
 /**
  * Affiche l'en-tête principal de l'application.
@@ -17,7 +14,6 @@ import type { Conversation } from "@/app/types/types";
  */
 export default function Header() {
   const [menuExpanded, setMenuExpanded] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
   const { logout, user } = useAuth();
   const router = useRouter();
 
@@ -40,14 +36,7 @@ export default function Header() {
     router.push("/");
   }
 
-  /**
-   * Récupère le token d'authentification présent dans les cookies.
-   */
-  useEffect(() => {
-    const storedToken = Cookies.get("token");
-    setToken(storedToken ?? null);
-  }, []);
-
+  
   /**
    * Ferme le menu mobile lorsqu'un clic est effectué en dehors de celui-ci.
    */

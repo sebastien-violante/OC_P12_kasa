@@ -116,7 +116,6 @@ describe("PropertyCard - affichage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  // ✅ Affichage du formulaire
   it("affiche correctement tous les éléments du composant", () => {
     setUpDisplayCard();
 
@@ -147,7 +146,6 @@ describe("PropertyCard - favoris", () => {
     jest.clearAllMocks();
   });
 
-  // ✅ Ajout de la propriété dans les favoris
   it("ajoute la propriété aux favoris", async () => {
     const addFavorite = jest.fn();
 
@@ -173,7 +171,6 @@ describe("PropertyCard - favoris", () => {
     expect(addFavorite).toHaveBeenCalledWith(property.id);
   });
 
-  // ✅ Message d'erreur si tentative d'ajout favoris + non connecté
   it("affiche un message si l'utilisateur n'est pas connecté", async () => {
     const { user } = setUpDisplayCard({
       token: null,
@@ -192,7 +189,6 @@ describe("PropertyCard - favoris", () => {
     expect(mockedPostRequest).not.toHaveBeenCalled();
   });
 
-  // ✅ Message d'erreur si échec ajout favoris
   it("affiche un message si l'ajout aux favoris échoue", async () => {
     const addFavorite = jest.fn();
 
@@ -222,7 +218,6 @@ describe("PropertyCard - favoris", () => {
     expect(addFavorite).not.toHaveBeenCalled();
   });
 
-  // ✅ Suppression de la propriété des favoris
   it("retire la propriété des favoris", async () => {
     const removeFavorite = jest.fn();
 
@@ -249,7 +244,6 @@ describe("PropertyCard - favoris", () => {
     expect(removeFavorite).toHaveBeenCalledWith(property.id);
   });
 
-  // ✅ Message d'erreur si échec de la supression de la propriété des favoris
   it("affiche un message si la suppression des favoris échoue", async () => {
     const removeFavorite = jest.fn();
 

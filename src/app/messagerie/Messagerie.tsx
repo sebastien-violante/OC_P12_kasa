@@ -140,7 +140,7 @@ export default function Messagerie({
     };
 
     loadConversations();
-  }, [token]);
+  }, [token, router]);
 
   /**
    * Sélectionne automatiquement la conversation transmise dans l'URL lorsque l'utilisateur arrive de la page détail logement.
@@ -154,7 +154,7 @@ export default function Messagerie({
       setSelectedConversationId(Number(urlConversationId));
       setIsMessagesDisplayed(true);
     }
-  }, [setSelectedConversationId]);
+  }, [setSelectedConversationId, loadMessages]);
 
   /**
    * Charge les messages de la conversation sélectionnée et les marque comme lus auprès de l'API.

@@ -166,6 +166,7 @@ src/
     ├── context/
     │   ├── AuthContext.tsx
     │   └── FavoritesContext.tsx
+    │   └── FavoritesContext.test.tsx
     │
     ├── store/
     │   └── messageStore.ts

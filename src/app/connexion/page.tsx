@@ -13,14 +13,12 @@ import type {
   AuthenticationPayload,
   AuthenticationResponse,
   ApiError,
-  Property,
 } from "../types/types";
 import FlashMessage from "../components/FlashMessage/FlashMessage";
 import Link from "next/link";
 import z from "zod";
 import { authSchema } from "../types/schemas/authSchema";
 import postRequest from "../utils/postRequest";
-import getRequest from "../utils/getRequest";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
@@ -121,21 +119,6 @@ export default function Connexion() {
 
         // Mise à jour du contexte d'authentification avec la valeur de l'utilisateur connecté.
         login(user);
-
-        // Chargement des favoris 
-        try {
-          const result = await getRequest<Property[]>({
-            url: apiUrl(`/api/users/${user.id}/favorites`),
-            token,
-          });
-
-          localStorage.setItem("favorites", JSON.stringify(result));
-        } catch (error) {
-          console.error(
-            "Erreur lors du chargement des favoris :",
-            error
-          );
-        }
 
         // Nettoyage de l'état du formulaire avant la redirection.
         setApiError("");

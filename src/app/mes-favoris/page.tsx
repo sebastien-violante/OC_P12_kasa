@@ -9,6 +9,7 @@ import type { Property } from "../types/types";
 import PropertyCard from "../components/PropertyCard/PropertyCard";
 import getRequest from "../utils/getRequest";
 import { apiUrl } from "../utils/api";
+import { useFavorites } from "@/app/context/FavoritesContext";
 
 /**
  * Affiche la liste des logements enregistrés dans les favoris de l'utilisateur.
@@ -19,11 +20,9 @@ import { apiUrl } from "../utils/api";
  */
 export default function Favorites() {
   const router = useRouter();
-
-  const [token] = useState<string | null>(null);
+  const { favoriteIds } = useFavorites();
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<Property[]>([]);
-  const [favoriteIds, setFavoriteIds] = useState<string[] | []>([]);
 
   /**
    * Vérifie l'authentification de l'utilisateur et récupère ses favoris.
@@ -48,15 +47,6 @@ export default function Favorites() {
           });
 
           setFavorites(result);
-
-          const ids = result
-            .map((favorite) => favorite.id)
-            .filter((id): id is string => id !== undefined);
-
-          setFavoriteIds(ids);
-
-          // Synchronise les favoris récupérés avec le stockage local.
-          localStorage.setItem("favorites", JSON.stringify(favorites));
         } catch (error) {
           console.error(error);
         } finally {
@@ -66,7 +56,11 @@ export default function Favorites() {
     }
 
     loadFavorites();
-  }, [token]);
+  }, [router]);
+
+  const displayedFavorites = favorites.filter(
+    (property) => property.id && favoriteIds.includes(property.id),
+  );
 
   if (loading) {
     return (
@@ -91,10 +85,10 @@ export default function Favorites() {
       </div>
 
       <section className={styles.favoritesWrapper}>
-        {favorites.length === 0 ? (
+        {displayedFavorites.length === 0 ? (
           <p>Vous n&apos;avez aucun favori enregistré.</p>
         ) : (
-          favorites.map((property) => (
+          displayedFavorites.map((property) => (
             <PropertyCard key={property.id} property={property} />
           ))
         )}

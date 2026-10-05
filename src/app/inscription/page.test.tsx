@@ -44,16 +44,13 @@ function setUpInscription() {
 // TESTS //////////////////////////////////////////////
 
 describe("inscription", () => {
-  // ✅ Affiche le formulaire
   it("affiche le formulaire de connexion", () => {
     const {
-      user,
       nameInput,
       firstnameInput,
       emailInput,
       passwordInput,
       cguInput,
-      submitButton,
     } = setUpInscription();
 
     expect(
@@ -66,7 +63,6 @@ describe("inscription", () => {
     expect(cguInput).toBeInTheDocument();
   });
 
-  // ✅ Permet de remplir tous les champs + la checkbox
   it("permet le remplissage du formulaire", async () => {
     const {
       user,
@@ -100,7 +96,6 @@ describe("inscription", () => {
     expect(cguInput).toBeChecked();
   });
 
-  // ✅ Validation : champs vides
   it("soulève des erreurs si les champs sont vides et place les inputs en aria-invalid", async () => {
     const {
       user,
@@ -153,7 +148,6 @@ describe("inscription", () => {
     ).toBeInTheDocument();
   });
 
-  // ✅ Validation nom : pas assez de caractères
   it("soulève une erreur si le nom n'est pas assez long", async () => {
     const { user, nameInput, submitButton } = setUpInscription();
 
@@ -168,7 +162,6 @@ describe("inscription", () => {
     ).toBeInTheDocument();
   });
 
-  // ✅ Validation nom : caractères non alphabétiques
   it("soulève une erreur si le nom ne comprend pas de caractères alphabétiques", async () => {
     const { user, nameInput, submitButton } = setUpInscription();
 
@@ -185,7 +178,6 @@ describe("inscription", () => {
     ).toBeInTheDocument();
   });
 
-  // ✅ Validation prénom : pas assez de caractères
   it("soulève une erreur si le prénom n'est pas assez long", async () => {
     const { user, firstnameInput, submitButton } = setUpInscription();
 
@@ -202,7 +194,6 @@ describe("inscription", () => {
     ).toBeInTheDocument();
   });
 
-  // ✅ Validation nom : caractères non alphabétiques
   it("soulève une erreur si le prénom ne comprend pas de caractères alphabétiques", async () => {
     const { user, firstnameInput, submitButton } = setUpInscription();
 
@@ -219,7 +210,6 @@ describe("inscription", () => {
     ).toBeInTheDocument();
   });
 
-  // ✅ Validation email : format invalide
   it("soulève une erreur si le format de l'email est invalide", async () => {
     const { user, emailInput, submitButton } = setUpInscription();
 
@@ -233,7 +223,6 @@ describe("inscription", () => {
     ).toBeInTheDocument();
   });
 
-  // ✅ Appelle postRequest avec le bon payload
   it("appelle postRequest avec la bonne payload", async () => {
     const {
       user,
@@ -265,7 +254,6 @@ describe("inscription", () => {
     );
   });
 
-  // ✅ Erreur 409 : « Cet email est déjà utilisé ! »
   it("reçoit une erreur 409 comme réponse API", async () => {
     const {
       user,
@@ -295,7 +283,6 @@ describe("inscription", () => {
     ).toBeInTheDocument();
   });
 
-  // ✅ Autre erreur API : affiche le message de l'API
   it("reçoit une erreur autre que 409 comme réponse API et affiche le message", async () => {
     const {
       user,
@@ -325,7 +312,6 @@ describe("inscription", () => {
     ).toBeInTheDocument();
   });
 
-  // ✅ Redirection vers la page connexion si enregistrement réussi
   it("redirige vers la page de connexion en cas de succès de l'enregistrement", async () => {
     const {
       user,

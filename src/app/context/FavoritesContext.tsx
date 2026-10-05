@@ -35,23 +35,51 @@ export function FavoritesProvider({
 
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
 
+  // Récupération des favoris depuis le localStorage
   useEffect(() => {
-    // Pas connecté → aucun favori
     if (!user) {
       setFavoriteIds([]);
       return;
     }
 
-    const userId = user.id
+    const storageKey = `favorites_${user.id}`;
+    const storedFavorites = localStorage.getItem(storageKey);
+
+    if (!storedFavorites) {
+      setFavoriteIds([]);
+      return;
+    }
+
+    try {
+      const parsedFavorites: unknown = JSON.parse(storedFavorites);
+
+      if (Array.isArray(parsedFavorites)) {
+        const ids = parsedFavorites.filter(
+          (id): id is string => typeof id === "string"
+        );
+
+        setFavoriteIds(ids);
+      }
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des favoris locaux :",
+        error
+      );
+
+      setFavoriteIds([]);
+    }
+  }, [user]);
+
+  // Synchronisation avec l'API
+  useEffect(() => {
+    if (!user) return;
+
+    const userId = user.id;
+    const token = Cookies.get("token");
+
+    if (!token) return;
 
     async function fetchFavorites() {
-      const token = Cookies.get("token");
-
-      if (!token) {
-        setFavoriteIds([]);
-        return;
-      }
-
       try {
         const result = await getRequest<Property[]>({
           url: apiUrl(`/api/users/${userId}/favorites`),
@@ -63,13 +91,16 @@ export function FavoritesProvider({
           .filter((id): id is string => id !== undefined);
 
         setFavoriteIds(ids);
+
+        localStorage.setItem(
+          `favorites_${userId}`,
+          JSON.stringify(ids)
+        );
       } catch (error) {
         console.error(
           "Erreur lors de la récupération des favoris :",
           error
         );
-
-        setFavoriteIds([]);
       }
     }
 
@@ -77,23 +108,46 @@ export function FavoritesProvider({
   }, [user]);
 
   function addFavorite(id: string) {
+    if (!user) return;
+
     setFavoriteIds((prev) => {
       if (prev.includes(id)) {
         return prev;
       }
 
-      return [...prev, id];
+      const updatedFavorites = [...prev, id];
+
+      localStorage.setItem(
+        `favorites_${user.id}`,
+        JSON.stringify(updatedFavorites)
+      );
+
+      return updatedFavorites;
     });
   }
 
   function removeFavorite(id: string) {
-    setFavoriteIds((prev) =>
-      prev.filter((favoriteId) => favoriteId !== id)
-    );
+    if (!user) return;
+
+    setFavoriteIds((prev) => {
+      const updatedFavorites = prev.filter(
+        (favoriteId) => favoriteId !== id
+      );
+
+      localStorage.setItem(
+        `favorites_${user.id}`,
+        JSON.stringify(updatedFavorites)
+      );
+
+      return updatedFavorites;
+    });
   }
 
   function clearFavorites() {
+    if (!user) return;
+
     setFavoriteIds([]);
+    localStorage.removeItem(`favorites_${user.id}`);
   }
 
   return (
