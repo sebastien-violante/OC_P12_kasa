@@ -82,10 +82,7 @@ export default function AddProperty() {
     });
   }, [user]);
 
-  /**
-   * Met à jour les données du formulaire en fonction du champ modifié.
-  */
-  function handleInputValue (
+  function handleInputValue(
     event: ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >,
@@ -111,7 +108,7 @@ export default function AddProperty() {
 
       return;
     }
-    // nettoyage préalable du champ pour n'autoriser que les chiffres
+
     if (target.name === "postalCode") {
       const postalCode = target.value.replace(/[^0-9]/g, "").slice(0, 5);
 
@@ -122,7 +119,7 @@ export default function AddProperty() {
 
       return;
     }
-    // nettoyage préalable du champ pour n'autoriser que les chiffres
+
     if (target.name === "price_per_night") {
       const price_per_night = target.value.replace(/[^0-9]/g, "");
 
@@ -138,11 +135,8 @@ export default function AddProperty() {
       ...prev,
       [target.name]: target.value,
     }));
-  };
+  }
 
-  /**
-   * Enregistre l'image de couverture sélectionnée.
-   */
   function handleCoverChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
 
@@ -151,9 +145,6 @@ export default function AddProperty() {
     setCover(file);
   }
 
-  /**
-   * Enregistre la photo de profil sélectionnée.
-   */
   function handleProfileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
 
@@ -163,9 +154,6 @@ export default function AddProperty() {
     setProfileFileName(file.name);
   }
 
-  /**
-   * Enregistre une image du logement à l'emplacement correspondant.
-   */
   function handleImageChange(
     index: number,
     event: ChangeEvent<HTMLInputElement>,
@@ -182,17 +170,11 @@ export default function AddProperty() {
     });
   }
 
-  /**
-   * Met à jour la valeur de la nouvelle catégorie saisie.
-   */
   function handleNewTagChange(value: string) {
     setNewTag(value);
   }
 
-  /**
-   * Ajoute une catégorie personnalisée au formulaire et à la liste disponible.
-   */
-  function handleAddTag () {
+  function handleAddTag() {
     const formatedTag = newTag.charAt(0).toUpperCase() + newTag.slice(1).trim();
 
     if (!formatedTag) return;
@@ -205,12 +187,9 @@ export default function AddProperty() {
     }));
 
     setNewTag("");
-  };
+  }
 
-  /**
-   * Active ou désactive une catégorie existante.
-   */
-  function handleTagToggle (tag: string) {
+  function handleTagToggle(tag: string) {
     setFormData((prev) => {
       if (prev.categories.includes(tag)) {
         return {
@@ -224,29 +203,19 @@ export default function AddProperty() {
         categories: [...prev.categories, tag],
       };
     });
-  };
+  }
 
-  /**
-   * Ajoute un nouvel emplacement pour une image du logement.
-   */
   function addImage() {
-    if (pictureQuantity <= 3) {
+    if (pictureQuantity < 4) {
       setPictureQuantity((prev) => prev + 1);
       setImages((prev) => [...prev, null]);
     }
   }
 
-  /**
-   * Retourne l'erreur de validation associée à un champ.
-   */
   function getFieldError(fieldName: string) {
     return errors.find((error) => error.path.includes(fieldName));
-  };
+  }
 
-  /**
-   * Met à jour la photo de profil de l'utilisateur et synchronise
-   * les données du contexte d'authentification.
-   */
   async function updateProfilePicture(profilePicture: string) {
     if (!user) {
       return null;
@@ -276,12 +245,6 @@ export default function AddProperty() {
     }
   }
 
-  /**
-   * Valide et enregistre le nouveau logement.
-   *
-   * Prépare les fichiers à envoyer, récupère leurs URL, met à jour
-   * la photo de profil si nécessaire puis crée le logement via l'API.
-   */
   async function addProperty() {
     if (!user) {
       console.error("Utilisateur non connecté");
@@ -335,7 +298,6 @@ export default function AddProperty() {
     const token = Cookies.get("token");
 
     try {
-      // Récupération d'url publiques pour chaque image chargée et en fonction du type fourni (cover, picture, profile)
       const pictureUrls = await getPictureUrls(pictures, token);
 
       let coverPicture = "";
@@ -358,7 +320,6 @@ export default function AddProperty() {
         }
       });
 
-      // Met à jour le profil uniquement lorsqu'une nouvelle photo a été fournie.
       if (profilePicture !== (user.picture ?? "")) {
         const updatedUser = await updateProfilePicture(profilePicture);
 
@@ -386,7 +347,7 @@ export default function AddProperty() {
       };
 
       try {
-        const result = await postRequest<Property, CreatePropertyPayload>({
+        await postRequest<Property, CreatePropertyPayload>({
           url: apiUrl(`/api/properties`),
           payload,
           token,
@@ -408,7 +369,7 @@ export default function AddProperty() {
 
         if (apiError.status === 403) {
           setApiError(
-            "Vous n'aves pas les droits nécessaires pour créer un logement",
+            "Vous n'avez pas les droits nécessaires pour créer un logement",
           );
         } else {
           setApiError(apiError.message);
@@ -422,7 +383,6 @@ export default function AddProperty() {
     }
   }
 
-  // Passage du rôle client à owner et actualisation du token d'authentification.
   useEffect(() => {
     if (user?.role === "client") {
       const changeRole = async () => {
@@ -453,17 +413,6 @@ export default function AddProperty() {
     }
   }, [user]);
 
-  // Synchronisation du nom de l'utilisateur avec le formulaire.
-  useEffect(() => {
-    if (!user) return;
-
-    setFormData((prev) => ({
-      ...prev,
-      name: user.name,
-    }));
-  }, [user]);
-
-  // Chargement des catégories disponibles depuis la base de données
   useEffect(() => {
     const loadTags = async () => {
       try {
@@ -480,7 +429,6 @@ export default function AddProperty() {
     loadTags();
   }, []);
 
-  // Chargement des équipements disponibles depuis la base de données
   useEffect(() => {
     const loadEquipements = async () => {
       try {
@@ -602,7 +550,9 @@ export default function AddProperty() {
                 getFieldError("postalCode") ? "postalCode-error" : undefined
               }
               aria-invalid={getFieldError("postalCode") ? "true" : "false"}
-              className={getFieldError("postalCode") ? styles.inputOnError : ""}
+              className={
+                getFieldError("postalCode") ? styles.inputOnError : ""
+              }
             />
 
             {getFieldError("postalCode") && (
@@ -674,23 +624,12 @@ export default function AddProperty() {
         <article className={styles.pictures}>
           <div className={styles.choosePictures}>
             <div className={styles.formGroup}>
-              {/* Image de couverture */}
-              <label htmlFor="coverFileName">Image de couverture</label>
+              <p className={styles.groupLabel}>Image de couverture</p>
 
               <div className={styles.inputWrapper}>
-                <input
-                  id="coverFileName"
-                  type="text"
-                  value={cover?.name || ""}
-                  onChange={handleInputValue}
-                  readOnly
-                  required
-                  aria-describedby={
-                    getFieldError("cover") ? "cover-error" : undefined
-                  }
-                  aria-invalid={getFieldError("cover") ? "true" : "false"}
-                  className={getFieldError("cover") ? styles.inputOnError : ""}
-                />
+                <span id="coverFileName" className={styles.fileName}>
+                  {cover?.name || ""}
+                </span>
 
                 {getFieldError("cover") && (
                   <p
@@ -702,71 +641,93 @@ export default function AddProperty() {
                   </p>
                 )}
 
-                <button
-                  type="button"
+                <label
+                  htmlFor="coverImage"
                   className={styles.addButton}
-                  onClick={() => coverInputRef.current?.click()}
-                  aria-label="Choisir une photo de couverture"
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      coverInputRef.current?.click();
+                    }
+                  }}
                 >
+                  <span className="sr-only">
+                    Choisir une image de couverture
+                  </span>
                   <span aria-hidden="true">+</span>
-                </button>
+                </label>
 
                 <input
                   ref={coverInputRef}
                   id="coverImage"
                   name="cover"
                   type="file"
+                  tabIndex={-1}
                   accept="image/jpeg,image/png,image/webp"
-                  hidden
+                  aria-describedby={
+                    getFieldError("cover") ? "cover-error" : undefined
+                  }
+                  aria-invalid={getFieldError("cover") ? "true" : "false"}
+                  className={styles.visuallyHidden}
                   onChange={handleCoverChange}
                 />
               </div>
             </div>
 
             <div className={styles.formGroup}>
-              {/* Images du logement */}
-              <label htmlFor="propertyPictures">Images du logement</label>
+              <p className={styles.groupLabel}>Images du logement</p>
 
               {images?.map((image, index) => {
                 const inputId = `propertyPicture-${index}`;
 
                 return (
                   <div className={styles.formGroup} key={index}>
-                    {" "}
                     <div className={styles.inputWrapper}>
-                      {" "}
-                      <input
+                      <span
                         id={`${inputId}-name`}
-                        type="text"
-                        value={image?.name || ""}
-                        readOnly
-                        aria-label={`Photo du logement ${index + 1}`}
-                      />{" "}
-                      <button
-                        type="button"
-                        className={styles.addButton}
-                        onClick={() => pictureInputRef.current[index]?.click()}
-                        aria-label={`Choisir la photo du logement ${index + 1}`}
+                        className={styles.fileName}
                       >
-                        {" "}
-                        <span aria-hidden="true">+</span>{" "}
-                      </button>{" "}
+                        {image?.name || ""}
+                      </span>
+
+                      <label
+                        htmlFor={inputId}
+                        className={styles.addButton}
+                        tabIndex={0}
+                        onKeyDown={(event) => {
+                          if (
+                            event.key === "Enter" ||
+                            event.key === " "
+                          ) {
+                            event.preventDefault();
+                            pictureInputRef.current[index]?.click();
+                          }
+                        }}
+                      >
+                        <span className="sr-only">
+                          Choisir la photo du logement {index + 1}
+                        </span>
+                        <span aria-hidden="true">+</span>
+                      </label>
+
                       <input
                         id={inputId}
                         type="file"
+                        tabIndex={-1}
                         accept="image/*"
-                        hidden
+                        className={styles.visuallyHidden}
                         onChange={(e) => handleImageChange(index, e)}
                         ref={(element) => {
                           pictureInputRef.current[index] = element;
                         }}
-                      />{" "}
-                    </div>{" "}
+                      />
+                    </div>
                   </div>
                 );
               })}
 
-              {pictureQuantity <= 3 && (
+              {pictureQuantity < 4 && (
                 <button
                   type="button"
                   className={styles.addImage}
@@ -787,6 +748,7 @@ export default function AddProperty() {
                   type="text"
                   id="name"
                   name="name"
+                  tabIndex={-1}
                   disabled
                   onChange={handleInputValue}
                   value={formData.name ?? ""}
@@ -805,17 +767,11 @@ export default function AddProperty() {
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="profileFileName">Photo de profil</label>
-
+              <p className={styles.groupLabel}>Photo de profil</p>
                 <div className={styles.inputWrapper}>
-                  <input
-                    id="profileFileName"
-                    type="text"
-                    name="profile"
-                    value={profileFileName}
-                    readOnly
-                    aria-label="Photo de profil sélectionnée"
-                  />
+                  <span id="profileFileName" className={styles.fileName}>
+                    {profileFileName || ""}
+                  </span>
 
                   {getFieldError("profile") && (
                     <p
@@ -827,21 +783,35 @@ export default function AddProperty() {
                     </p>
                   )}
 
-                  <button
-                    type="button"
+                  <label
+                    htmlFor="profile"
                     className={styles.addButton}
-                    onClick={() => profileInputRef.current?.click()}
-                    aria-label="Choisir une photo de profil"
+                    tabIndex={0}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        profileInputRef.current?.click();
+                      }
+                    }}
                   >
+                    <span className="sr-only">
+                      Choisir une photo de profil
+                    </span>
                     <span aria-hidden="true">+</span>
-                  </button>
+                  </label>
 
                   <input
                     ref={profileInputRef}
                     id="profile"
+                    tabIndex={-1}
                     type="file"
+                    name="profile"
                     accept="image/*"
-                    hidden
+                    aria-describedby={
+                      getFieldError("profile") ? "profile-error" : undefined
+                    }
+                    aria-invalid={getFieldError("profile") ? "true" : "false"}
+                    className={styles.visuallyHidden}
                     onChange={handleProfileChange}
                   />
                 </div>
@@ -894,7 +864,9 @@ export default function AddProperty() {
             ))}
           </div>
 
-          <label htmlFor="newTag">Ajouter une catégorie personnalisée</label>
+          <label htmlFor="newTag">
+            Ajouter une catégorie personnalisée
+          </label>
 
           <div className={styles.formGroup}>
             <div className={styles.inputWrapper}>

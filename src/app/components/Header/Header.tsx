@@ -36,7 +36,6 @@ export default function Header() {
     router.push("/");
   }
 
-  
   /**
    * Ferme le menu mobile lorsqu'un clic est effectué en dehors de celui-ci.
    */
@@ -92,13 +91,11 @@ export default function Header() {
             </li>
 
             <li>
-              <Link href="/" aria-label="Kasa, accueil">
-                <img
-                  src="/pictures/logo-kasa-full.svg"
-                  alt=""
-                  className={styles.logo}
-                />
-              </Link>
+              <img
+                src="/pictures/logo-kasa-full.svg"
+                alt=""
+                className={styles.logo}
+              />
             </li>
 
             {user ? (
@@ -145,13 +142,11 @@ export default function Header() {
         {/* Navigation mobile */}
         <div className={styles.mobileMenu} ref={menuRef}>
           <div className={styles.mobileHeader}>
-            <Link href="/" aria-label="Kasa, accueil">
-              <img
-                src="/pictures/logo-kasa-small.svg"
-                alt=""
-                className={styles.logoMobile}
-              />
-            </Link>
+            <img
+              src="/pictures/logo-kasa-small.svg"
+              alt=""
+              className={styles.logoMobile}
+            />
 
             <button
               ref={menuButtonRef}

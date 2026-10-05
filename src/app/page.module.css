@@ -98,4 +98,7 @@
   .homeWrapper {
     margin: auto;
   }
+  .hero {
+    padding: 0;
+  }
 }

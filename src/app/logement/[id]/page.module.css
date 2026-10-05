@@ -217,6 +217,17 @@
     font-size: 12px;
 }
 
+.tag {
+  padding: 0 12px;
+  background: var(--grisLight);
+  border-radius: 5px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--grisDark);
+  height: 33px;
+}
 @media screen and (min-width: 767px) {
   .property .grid {
     display: grid;

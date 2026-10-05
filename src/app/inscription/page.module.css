@@ -93,3 +93,14 @@
     text-align: center;
     margin-top: 10px;
 }
+
+@media (max-width: 767px) {
+   
+    .formHeader {
+        padding: 10px;
+    }
+    .interiorPadding {
+        padding: 0 16px;
+    }
+
+}

@@ -11,10 +11,7 @@ export default function notFound() {
       </p>
       <Link className={styles.link} href="/">
         Accueil
-      </Link>
-      <Link className={styles.link} href="/">
-        Logements
-      </Link>
+      </Link>   
     </section>
   );
 }

@@ -65,7 +65,7 @@ function setUpRegisterProperty() {
   const postalCodeInput = screen.getByLabelText(/Code postal/);
   const locationInput = screen.getByLabelText(/Localisation/);
   const priceInput = screen.getByLabelText(/Prix par nuitée/);
-  const coverInput = screen.getByLabelText(/Image de couverture/);
+  const coverInput = screen.getByLabelText(/Choisir une image de couverture/);
   const submitInput = screen.getByRole("button", {
     name: "Ajouter la propriété",
   });
@@ -280,12 +280,13 @@ describe("ajouter une propriété", () => {
       postalCodeInput,
       locationInput,
       priceInput,
-      submitInput
+      submitInput,
     } = setUpRegisterProperty();
 
-    const wifiCheckbox = await screen.findByRole("checkbox", { name: /wifi/i });
+    const wifiCheckbox = await screen.findByRole("checkbox", {
+      name: /wifi/i,
+    });
 
-    // simule la création des champs supplémentaires image
     async function addPictures(
       user: ReturnType<typeof userEvent.setup>,
       quantity: number,
@@ -299,20 +300,26 @@ describe("ajouter une propriété", () => {
       }
     }
 
-    // Faker d'images
-    const cover = new File(["cover"], "cover.jpeg", { type: "image/jpeg" });
+    const cover = new File(["cover"], "cover.jpeg", {
+      type: "image/jpeg",
+    });
+
     const picture0 = new File(["picture0"], "picture0.webp", {
       type: "image/webp",
     });
+
     const picture1 = new File(["picture1"], "picture1.jpeg", {
       type: "image/jpeg",
     });
-    const profile = new File(["profile"], "profile.png", { type: "image/png" });
 
-    // champs File reçevant les images
+    const profile = new File(["profile"], "profile.png", {
+      type: "image/png",
+    });
+
     const coverUpload = document.getElementById(
       "coverImage",
     ) as HTMLInputElement;
+
     const profileUpload = document.getElementById(
       "profile",
     ) as HTMLInputElement;
@@ -324,34 +331,39 @@ describe("ajouter une propriété", () => {
     await user.type(priceInput, "120");
     await user.click(wifiCheckbox);
 
-    // ajout des champs images nécessaires à l'upload
     await addPictures(user, 2);
+
     const picture0Upload = document.getElementById(
       "propertyPicture-0",
     ) as HTMLInputElement;
+
     const picture1Upload = document.getElementById(
       "propertyPicture-1",
     ) as HTMLInputElement;
-    // upload des images
+
     await user.upload(coverUpload, cover);
     await user.upload(picture0Upload, picture0);
     await user.upload(picture1Upload, picture1);
     await user.upload(profileUpload, profile);
 
-    // recopie des noms de fichiers dans le document
     await waitFor(() => {
-      expect(screen.getByDisplayValue("cover.jpeg")).toBeInTheDocument();
+      expect(screen.getByText("cover.jpeg")).toBeInTheDocument();
     });
+
     await waitFor(() => {
-      expect(screen.getByDisplayValue("picture0.webp")).toBeInTheDocument();
+      expect(screen.getByText("picture0.webp")).toBeInTheDocument();
     });
+
     await waitFor(() => {
-      expect(screen.getByDisplayValue("picture1.jpeg")).toBeInTheDocument();
+      expect(screen.getByText("picture1.jpeg")).toBeInTheDocument();
     });
+
     await waitFor(() => {
-      expect(screen.getByDisplayValue("profile.png")).toBeInTheDocument();
+      expect(screen.getByText("profile.png")).toBeInTheDocument();
     });
+
     mockedGetPictureUrls.mockResolvedValue([]);
+
     await user.click(submitInput);
 
     await waitFor(() => {

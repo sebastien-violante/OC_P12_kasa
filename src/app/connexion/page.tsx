@@ -1,12 +1,7 @@
 "use client";
 
 import styles from "./page.module.css";
-import {
-  useState,
-  useEffect,
-  ChangeEvent,
-  SubmitEvent,
-} from "react";
+import { useState, useEffect, ChangeEvent, SubmitEvent } from "react";
 import type {
   FlashMessageType,
   LoginFormData,
@@ -71,7 +66,7 @@ export default function Connexion() {
    * @param {string} fieldName Nom du champ à rechercher dans les erreurs Zod.
    * @returns {z.core.$ZodIssue | undefined} L'erreur correspondante, si elle existe.
    */
-  function getFieldError (fieldName: string) {
+  function getFieldError(fieldName: string) {
     return errors.find((error) => error.path.includes(fieldName));
   }
 
@@ -146,7 +141,7 @@ export default function Connexion() {
 
   /**
    * Récupère le message flash éventuellement transmis par une page précédente.
-  */
+   */
   useEffect(() => {
     const flashBag = localStorage.getItem("flash");
 
@@ -163,131 +158,95 @@ export default function Connexion() {
   }, []);
 
   return (
-    <section className={styles.formWrapper}>
-      {flash && (
-        <FlashMessage
-          status={flash.status}
-          message={flash.message}
-        />
-      )}
-
-      <div className={styles.formHeader}>
-        <h1>Heureux de vous revoir</h1>
-        <p>
-          Connectez-vous pour retrouver vos réservations, vos annonces et tout
-          ce qui rend vos séjours uniques.
-        </p>
-      </div>
-
-      <form
-        onSubmit={handleLogin}
-        className={styles.form}
-        noValidate
-      >
-        {apiError && (
-          <p id="api-error" role="alert" className={styles.apiError}>
-            {apiError}
-          </p>
+    <div className={styles.interiorPadding}>
+      <section className={styles.formWrapper}>
+        {flash && (
+          <FlashMessage status={flash.status} message={flash.message} />
         )}
 
-        <div className={styles.formGroup}>
-          <label htmlFor="email">Adresse email</label>
-
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            aria-describedby={
-              getFieldError("email")
-                ? "email-error"
-                : undefined
-            }
-            aria-invalid={getFieldError("email") ? "true" : "false"}
-            className={
-              getFieldError("email")
-                ? styles.inputOnError
-                : ""
-            }
-            autoComplete="email"
-          />
-
-          {getFieldError("email") && (
-            <p
-              id="email-error"
-              className={styles.fieldError}
-              role="alert"
-            >
-              {getFieldError("email")?.message}
-            </p>
-          )}
+        <div className={styles.formHeader}>
+          <h1>Heureux de vous revoir</h1>
+          <p>
+            Connectez-vous pour retrouver vos réservations, vos annonces et tout
+            ce qui rend vos séjours uniques.
+          </p>
         </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="password">Mot de passe</label>
-
-          <input
-            id="password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            aria-describedby={
-              getFieldError("password")
-                ? "password-error"
-                : undefined
-            }
-            aria-invalid={
-              getFieldError("password")
-                ? "true"
-                : "false"
-            }
-            className={
-              getFieldError("password")
-                ? styles.inputOnError
-                : ""
-            }
-            autoComplete="current-password"
-          />
-
-          {getFieldError("password") && (
-            <p
-              id="password-error"
-              className={styles.fieldError}
-              role="alert"
-            >
-              {getFieldError("password")?.message}
+        <form onSubmit={handleLogin} className={styles.form} noValidate>
+          {apiError && (
+            <p id="api-error" role="alert" className={styles.apiError}>
+              {apiError}
             </p>
           )}
-        </div>
 
-        <button
-          className={styles.submitBtn}
-          disabled={isSubmitting}
-          aria-busy={isSubmitting}
-        >
-          {isSubmitting
-            ? "Connexion en cours…"
-            : "Se connecter"}
-        </button>
-      </form>
+          <div className={styles.formGroup}>
+            <label htmlFor="email">Adresse email</label>
 
-      <p className={styles.link}>
-        <Link href="/mot-de-passe-oublie">
-          Mot de passe oublié
-        </Link>
-      </p>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              aria-describedby={
+                getFieldError("email") ? "email-error" : undefined
+              }
+              aria-invalid={getFieldError("email") ? "true" : "false"}
+              className={getFieldError("email") ? styles.inputOnError : ""}
+              autoComplete="email"
+            />
 
-      <p className={styles.link}>
-        Pas encore de compte ?{" "}
-        <Link
-          className={styles.connectLink}
-          href="/inscription"
-        >
-          Inscrivez-vous
-        </Link>
-      </p>
-    </section>
+            {getFieldError("email") && (
+              <p id="email-error" className={styles.fieldError} role="alert">
+                {getFieldError("email")?.message}
+              </p>
+            )}
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="password">Mot de passe</label>
+
+            <input
+              id="password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              aria-describedby={
+                getFieldError("password") ? "password-error" : undefined
+              }
+              aria-invalid={getFieldError("password") ? "true" : "false"}
+              className={getFieldError("password") ? styles.inputOnError : ""}
+              autoComplete="current-password"
+            />
+
+            {getFieldError("password") && (
+              <p id="password-error" className={styles.fieldError} role="alert">
+                {getFieldError("password")?.message}
+              </p>
+            )}
+          </div>
+
+          <button
+            className={styles.submitBtn}
+            disabled={isSubmitting}
+            aria-busy={isSubmitting}
+          >
+            {isSubmitting ? "Connexion en cours…" : "Se connecter"}
+          </button>
+        </form>
+
+        <p className={styles.link}>
+          <Link href="/mot-de-passe-oublie">Mot de passe oublié</Link>
+        </p>
+
+        <p className={styles.link}>
+          Pas encore de compte ?{" "}
+          <Link className={styles.connectLink} href="/inscription">
+            Inscrivez-vous
+          </Link>
+        </p>
+      </section>
+    </div>
   );
 }

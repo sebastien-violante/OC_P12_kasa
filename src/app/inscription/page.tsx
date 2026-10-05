@@ -39,8 +39,7 @@ export default function Inscription() {
     acceptCgu: false,
   };
 
-  const [formData, setFormData] =
-    useState<RegistrationFormData>(initFormData);
+  const [formData, setFormData] = useState<RegistrationFormData>(initFormData);
   const [errors, setErrors] = useState<z.core.$ZodIssue[]>([]);
   const [apiError, setApiError] = useState("");
   const [isSubmiting, setIsSubmiting] = useState(false);
@@ -56,22 +55,22 @@ export default function Inscription() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
-  };
+  }
 
   /**
    * Recherche l'erreur de validation associée à un champ.
    * @param {string} fieldName Nom du champ à rechercher dans les erreurs Zod.
    * @returns {z.core.$ZodIssue | undefined} L'erreur correspondante, si elle existe.
    */
-  function getFieldError (fieldName: string) {
+  function getFieldError(fieldName: string) {
     return errors.find((error) => error.path.includes(fieldName));
-  };
+  }
 
   /**
    * Valide et soumet le formulaire d'inscription.
    * @param {SubmitEvent<HTMLFormElement>} event Événement de soumission du formulaire.
    */
-  async function handleRegister (event: SubmitEvent<HTMLFormElement>) {
+  async function handleRegister(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
     // Validation des données avant de lancer la soumission.
@@ -137,239 +136,170 @@ export default function Inscription() {
     } finally {
       setIsSubmiting(false);
     }
-  };
+  }
 
   return (
-    <section className={styles.formWrapper}>
-      <div className={styles.formHeader}>
-        <h1>Rejoignez la communauté Kasa</h1>
+    <div className={styles.interiorPadding}>
+      <section className={styles.formWrapper}>
+        <div className={styles.formHeader}>
+          <h1>Rejoignez la communauté Kasa</h1>
 
-        <p>
-          Créez votre compte et commencez à voyager autrement : réservez des
-          logements uniques, découvrez de nouvelles destinations et partagez
-          vos propres lieux avec d’autres voyageurs.
-        </p>
-
-        {apiError && (
-          <p className={styles.apiError} role="alert">
-            {apiError}
+          <p>
+            Créez votre compte et commencez à voyager autrement : réservez des
+            logements uniques, découvrez de nouvelles destinations et partagez
+            vos propres lieux avec d’autres voyageurs.
           </p>
-        )}
-      </div>
 
-      <form
-        onSubmit={handleRegister}
-        className={styles.form}
-        noValidate
-      >
-        <div className={styles.formGroup}>
-          <label htmlFor="name">Nom</label>
-
-          <input
-            id="name"
-            name="name"
-            type="text"
-            value={formData.name}
-            onChange={handleChange}
-            aria-describedby={
-              getFieldError("name")
-                ? "name-error"
-                : undefined
-            }
-            aria-invalid={
-              getFieldError("name")
-                ? "true"
-                : "false"
-            }
-            className={
-              getFieldError("name")
-                ? styles.inputOnError
-                : ""
-            }
-            autoComplete="family-name"
-          />
-
-          {getFieldError("name") && (
-            <p
-              id="name-error"
-              className={styles.fieldError}
-              role="alert"
-            >
-              {getFieldError("name")?.message}
+          {apiError && (
+            <p className={styles.apiError} role="alert">
+              {apiError}
             </p>
           )}
         </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="firstname">Prénom</label>
+        <form onSubmit={handleRegister} className={styles.form} noValidate>
+          <div className={styles.formGroup}>
+            <label htmlFor="name">Nom</label>
 
-          <input
-            id="firstname"
-            name="firstname"
-            type="text"
-            value={formData.firstname}
-            onChange={handleChange}
-            aria-describedby={
-              getFieldError("firstname")
-                ? "firstname-error"
-                : undefined
-            }
-            aria-invalid={
-              getFieldError("firstname")
-                ? "true"
-                : "false"
-            }
-            className={
-              getFieldError("firstname")
-                ? styles.inputOnError
-                : ""
-            }
-            autoComplete="given-name"
-          />
+            <input
+              id="name"
+              name="name"
+              type="text"
+              value={formData.name}
+              onChange={handleChange}
+              aria-describedby={
+                getFieldError("name") ? "name-error" : undefined
+              }
+              aria-invalid={getFieldError("name") ? "true" : "false"}
+              className={getFieldError("name") ? styles.inputOnError : ""}
+              autoComplete="family-name"
+            />
 
-          {getFieldError("firstname") && (
-            <p
-              id="firstname-error"
-              className={styles.fieldError}
-              role="alert"
-            >
-              {getFieldError("firstname")?.message}
+            {getFieldError("name") && (
+              <p id="name-error" className={styles.fieldError} role="alert">
+                {getFieldError("name")?.message}
+              </p>
+            )}
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="firstname">Prénom</label>
+
+            <input
+              id="firstname"
+              name="firstname"
+              type="text"
+              value={formData.firstname}
+              onChange={handleChange}
+              aria-describedby={
+                getFieldError("firstname") ? "firstname-error" : undefined
+              }
+              aria-invalid={getFieldError("firstname") ? "true" : "false"}
+              className={getFieldError("firstname") ? styles.inputOnError : ""}
+              autoComplete="given-name"
+            />
+
+            {getFieldError("firstname") && (
+              <p
+                id="firstname-error"
+                className={styles.fieldError}
+                role="alert"
+              >
+                {getFieldError("firstname")?.message}
+              </p>
+            )}
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="email">Email</label>
+
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              aria-describedby={
+                getFieldError("email") ? "email-error" : undefined
+              }
+              aria-invalid={getFieldError("email") ? "true" : "false"}
+              className={getFieldError("email") ? styles.inputOnError : ""}
+              autoComplete="email"
+            />
+
+            {getFieldError("email") && (
+              <p id="email-error" className={styles.fieldError} role="alert">
+                {getFieldError("email")?.message}
+              </p>
+            )}
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="password">Mot de passe</label>
+
+            <input
+              id="password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              aria-describedby={
+                getFieldError("password") ? "password-error" : undefined
+              }
+              aria-invalid={getFieldError("password") ? "true" : "false"}
+              className={getFieldError("password") ? styles.inputOnError : ""}
+              autoComplete="new-password"
+            />
+
+            {getFieldError("password") && (
+              <p id="password-error" className={styles.fieldError} role="alert">
+                {getFieldError("password")?.message}
+              </p>
+            )}
+          </div>
+
+          <div className={styles.acceptCgu}>
+            <input
+              type="checkbox"
+              id="acceptCgu"
+              name="acceptCgu"
+              checked={formData.acceptCgu}
+              onChange={handleChange}
+              aria-describedby={
+                getFieldError("acceptCgu") ? "acceptCgu-error" : undefined
+              }
+              aria-invalid={getFieldError("acceptCgu") ? "true" : "false"}
+            />
+
+            <label htmlFor="acceptCgu">
+              J&apos;accepte les{" "}
+              <span>conditions générales d&apos;utilisation</span>
+            </label>
+          </div>
+
+          {getFieldError("acceptCgu") && (
+            <p id="acceptCgu-error" className={styles.fieldError} role="alert">
+              {getFieldError("acceptCgu")?.message}
             </p>
           )}
-        </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="email">Email</label>
-
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            aria-describedby={
-              getFieldError("email")
-                ? "email-error"
-                : undefined
-            }
-            aria-invalid={
-              getFieldError("email")
-                ? "true"
-                : "false"
-            }
-            className={
-              getFieldError("email")
-                ? styles.inputOnError
-                : ""
-            }
-            autoComplete="email"
-          />
-
-          {getFieldError("email") && (
-            <p
-              id="email-error"
-              className={styles.fieldError}
-              role="alert"
-            >
-              {getFieldError("email")?.message}
-            </p>
-          )}
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="password">Mot de passe</label>
-
-          <input
-            id="password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            aria-describedby={
-              getFieldError("password")
-                ? "password-error"
-                : undefined
-            }
-            aria-invalid={
-              getFieldError("password")
-                ? "true"
-                : "false"
-            }
-            className={
-              getFieldError("password")
-                ? styles.inputOnError
-                : ""
-            }
-            autoComplete="new-password"
-          />
-
-          {getFieldError("password") && (
-            <p
-              id="password-error"
-              className={styles.fieldError}
-              role="alert"
-            >
-              {getFieldError("password")?.message}
-            </p>
-          )}
-        </div>
-
-        <div className={styles.acceptCgu}>
-          <input
-            type="checkbox"
-            id="acceptCgu"
-            name="acceptCgu"
-            checked={formData.acceptCgu}
-            onChange={handleChange}
-            aria-describedby={
-              getFieldError("acceptCgu")
-                ? "acceptCgu-error"
-                : undefined
-            }
-            aria-invalid={
-              getFieldError("acceptCgu")
-                ? "true"
-                : "false"
-            }
-          />
-
-          <label htmlFor="acceptCgu">
-            J&apos;accepte les{" "}
-            <span>conditions générales d&apos;utilisation</span>
-          </label>
-        </div>
-
-        {getFieldError("acceptCgu") && (
-          <p
-            id="acceptCgu-error"
-            className={styles.fieldError}
-            role="alert"
+          <button
+            className={styles.submitBtn}
+            type="submit"
+            disabled={isSubmiting}
+            aria-busy={isSubmiting}
           >
-            {getFieldError("acceptCgu")?.message}
-          </p>
-        )}
+            {isSubmiting ? "Inscription en cours…" : "S'inscrire"}
+          </button>
+        </form>
 
-        <button
-          className={styles.submitBtn}
-          type="submit"
-          disabled={isSubmiting}
-          aria-busy={isSubmiting}
-        >
-          {isSubmiting
-            ? "Inscription en cours…"
-            : "S'inscrire"}
-        </button>
-      </form>
-
-      <p className={styles.connect}>
-        Déjà membre ?{" "}
-        <Link
-          className={styles.connectLikn}
-          href="/connexion"
-        >
-          Se connecter
-        </Link>
-      </p>
-    </section>
+        <p className={styles.connect}>
+          Déjà membre ?{" "}
+          <Link className={styles.connectLikn} href="/connexion">
+            Se connecter
+          </Link>
+        </p>
+      </section>
+    </div>
   );
 }

@@ -14,12 +14,13 @@ import Image from "next/image";
 import Tag from "@/app/components/Tag/Tag";
 import formatUrl from "@/app/utils/formatUrl";
 import { useAuth } from "@/app/context/AuthContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import postRequest from "@/app/utils/postRequest";
 import getRequest from "@/app/utils/getRequest";
 import Cookies from "js-cookie";
 import FlashMessage from "@/app/components/FlashMessage/FlashMessage";
 import { apiUrl } from "@/app/utils/api";
+import FocusTrap from "focus-trap-react";
 
 type PropertyContentProps = {
   property: Property;
@@ -48,6 +49,54 @@ export default function PropertyContent({
   const [previousConversationId, setPreviousConversationId] = useState<
     number | null
   >(null);
+
+  /**
+   * Référence vers le bouton qui ouvre la modale.
+   *
+   * Elle permet de replacer le focus sur ce bouton lorsque la modale
+   * est fermée.
+   */
+  const contactButtonRef = useRef<HTMLButtonElement>(null);
+
+  /**
+   * Référence vers le titre de la modale.
+   *
+   * Le focus initial du FocusTrap est placé sur ce titre.
+   */
+  const modalTitleRef = useRef<HTMLHeadingElement>(null);
+
+  /**
+   * Permet de savoir si la modale a réellement été ouverte avant
+   * de replacer le focus sur le bouton déclencheur.
+   */
+  const wasModalOpen = useRef(false);
+
+  /**
+   * Ferme la modale.
+   *
+   * Le FocusTrap ne gère volontairement pas la fermeture de la modale.
+   * Il gère uniquement le déplacement du focus.
+   */
+  function closeMessageModal() {
+    setIsMessageModalOpen(false);
+    setApiError("");
+  }
+
+  /**
+   * Replace le focus sur le bouton "Contacter l'hôte" uniquement
+   * lorsque la modale vient réellement d'être fermée.
+   */
+  useEffect(() => {
+    if (isMessageModalOpen) {
+      wasModalOpen.current = true;
+      return;
+    }
+
+    if (wasModalOpen.current) {
+      contactButtonRef.current?.focus();
+      wasModalOpen.current = false;
+    }
+  }, [isMessageModalOpen]);
 
   /**
    * Envoie un message à l'hôte.
@@ -97,7 +146,7 @@ export default function PropertyContent({
         });
 
         setMessage("");
-        setIsMessageModalOpen(false);
+        closeMessageModal();
 
         setFlash({
           status: true,
@@ -111,7 +160,7 @@ export default function PropertyContent({
         setSendingMessage(false);
       }
     }
-  };
+  }
 
   /**
    * Vérifie si l'utilisateur possède déjà une conversation avec l'hôte
@@ -124,7 +173,7 @@ export default function PropertyContent({
       try {
         const result = await getRequest<PreviousConversationResponse>({
           url: apiUrl(`/api/properties/${property.id}/conversation`),
-          token: token,
+          token,
         });
 
         if (result) {
@@ -216,7 +265,7 @@ export default function PropertyContent({
                     <meta itemProp="name" content={equipment} />
                     <meta itemProp="value" content="true" />
 
-                    <Tag item={equipment} select={false} />
+                    <span className={styles.tag}>{equipment}</span>
                   </div>
                 ))}
               </div>
@@ -227,7 +276,7 @@ export default function PropertyContent({
 
               <div className={styles.tags}>
                 {property.tags?.map((tag) => (
-                  <Tag key={tag} item={tag} select={true} />
+                  <span className={styles.tag} key={tag}>{tag}</span>
                 ))}
               </div>
             </div>
@@ -273,8 +322,12 @@ export default function PropertyContent({
             <>
               {!previousConversationExists && (
                 <button
+                  ref={contactButtonRef}
                   type="button"
-                  onClick={() => setIsMessageModalOpen(true)}
+                  onClick={() => {
+                    setApiError("");
+                    setIsMessageModalOpen(true);
+                  }}
                   className={styles.link}
                 >
                   Contacter l&apos;hôte
@@ -297,65 +350,118 @@ export default function PropertyContent({
       </div>
 
       {isMessageModalOpen && (
-        <div
-          className={styles.modalOverlay}
-          onClick={() => {
-            setIsMessageModalOpen(false);
-            setApiError("");
+        <FocusTrap
+          focusTrapOptions={{
+            /**
+             * Le focus est placé sur le titre de la modale.
+             *
+             * On utilise une fonction plutôt qu'un sélecteur CSS afin
+             * d'éviter les problèmes lorsque plusieurs composants
+             * similaires sont présents sur la page.
+             */
+            initialFocus: () => {
+              return modalTitleRef.current as HTMLElement;
+            },
+
+            /**
+             * Escape est géré manuellement dans la modale.
+             *
+             * Cela évite que FocusTrap tente lui-même de désactiver
+             * le trap et de modifier le cycle de rendu React.
+             */
+            escapeDeactivates: false,
+
+            /**
+             * Le focus retourne automatiquement à l'élément qui
+             * avait le focus avant l'activation du FocusTrap.
+             */
+            returnFocusOnDeactivate: true,
           }}
         >
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className={styles.closeButton}
-              onClick={() => setIsMessageModalOpen(false)}
-              aria-label="Fermer"
+          <div
+            className={styles.modalOverlay}
+            onMouseDown={(e) => {
+              /**
+               * Ferme uniquement lorsque l'utilisateur clique
+               * directement sur l'overlay.
+               */
+              if (e.target === e.currentTarget) {
+                closeMessageModal();
+              }
+            }}
+          >
+            <div
+              className={styles.modal}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="message-modal-title"
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  e.preventDefault();
+                  closeMessageModal();
+                }
+              }}
             >
-              ×
-            </button>
+              <button
+                type="button"
+                className={styles.closeButton}
+                onClick={closeMessageModal}
+                aria-label="Fermer"
+              >
+                ×
+              </button>
 
-            <h2>Message pour {property.host.name} :</h2>
+              <h2
+                id="message-modal-title"
+                ref={modalTitleRef}
+                tabIndex={-1}
+              >
+                Message pour {property.host.name} :
+              </h2>
 
-            {apiError && (
-              <p id="api-error" role="alert" className={styles.apiError}>
-                {apiError}
-              </p>
-            )}
-
-            <form onSubmit={handleSendMessage} noValidate>
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Écrivez votre message..."
-                rows={6}
-                disabled={sendingMessage}
-                required
-              />
-
-              <div className={styles.modalActions}>
-                <button
-                  type="button"
-                  className="rounded-lg bg-red-800 px-6 py-2 text-white shadow-lg"
-                  onClick={() => {
-                    setIsMessageModalOpen(false);
-                    setApiError("");
-                  }}
-                  disabled={sendingMessage}
+              {apiError && (
+                <p
+                  id="api-error"
+                  role="alert"
+                  className={styles.apiError}
                 >
-                  Annuler
-                </button>
+                  {apiError}
+                </p>
+              )}
 
-                <button
-                  type="submit"
-                  className="rounded-lg bg-emerald-700 px-6 py-2 text-white shadow-lg"
+              <form onSubmit={handleSendMessage} noValidate>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Écrivez votre message..."
+                  rows={6}
                   disabled={sendingMessage}
-                >
-                  {sendingMessage ? "Envoi..." : "Envoyer"}
-                </button>
-              </div>
-            </form>
+                  required
+                  aria-describedby={apiError ? "api-error" : undefined}
+                />
+
+                <div className={styles.modalActions}>
+                  <button
+                    type="button"
+                    className="rounded-lg bg-red-800 px-6 py-2 text-white shadow-lg"
+                    onClick={closeMessageModal}
+                    disabled={sendingMessage}
+                  >
+                    Annuler
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="rounded-lg bg-emerald-700 px-6 py-2 text-white shadow-lg"
+                    disabled={sendingMessage}
+                  >
+                    {sendingMessage ? "Envoi..." : "Envoyer"}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
+        </FocusTrap>
       )}
     </>
   );
