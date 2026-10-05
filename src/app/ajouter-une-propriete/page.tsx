@@ -67,6 +67,9 @@ export default function AddProperty() {
 
   const [formData, setFormData] = useState<PropertyFormData>(initFormData);
 
+  /**
+   * Synchronise le nom de l'hôte avec l'utilisateur actuellement connecté.
+   */
   useEffect(() => {
     if (!user) return;
 
@@ -82,6 +85,15 @@ export default function AddProperty() {
     });
   }, [user]);
 
+  /**
+   * Gère les modifications des champs du formulaire.
+   *
+   * Les cases à cocher permettent de gérer les équipements.
+   * Le code postal et le prix sont filtrés afin de ne conserver
+   * que les caractères numériques.
+   *
+   * @param event Événement déclenché par la modification d'un champ.
+   */
   function handleInputValue(
     event: ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -137,6 +149,11 @@ export default function AddProperty() {
     }));
   }
 
+  /**
+   * Met à jour l'image de couverture sélectionnée.
+   *
+   * @param event Événement provenant du champ de sélection de fichier.
+   */
   function handleCoverChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
 
@@ -145,6 +162,11 @@ export default function AddProperty() {
     setCover(file);
   }
 
+  /**
+   * Met à jour la photo de profil sélectionnée.
+   *
+   * @param event Événement provenant du champ de sélection de fichier.
+   */
   function handleProfileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
 
@@ -154,6 +176,12 @@ export default function AddProperty() {
     setProfileFileName(file.name);
   }
 
+  /**
+   * Met à jour une image spécifique du logement.
+   *
+   * @param index Index de l'image à modifier.
+   * @param event Événement provenant du champ de sélection de fichier.
+   */
   function handleImageChange(
     index: number,
     event: ChangeEvent<HTMLInputElement>,
@@ -170,10 +198,18 @@ export default function AddProperty() {
     });
   }
 
+  /**
+   * Met à jour la valeur de la nouvelle catégorie personnalisée.
+   *
+   * @param value Valeur saisie par l'utilisateur.
+   */
   function handleNewTagChange(value: string) {
     setNewTag(value);
   }
 
+  /**
+   * Ajoute une nouvelle catégorie personnalisée au formulaire.
+   */
   function handleAddTag() {
     const formatedTag = newTag.charAt(0).toUpperCase() + newTag.slice(1).trim();
 
@@ -189,6 +225,11 @@ export default function AddProperty() {
     setNewTag("");
   }
 
+  /**
+   * Sélectionne ou désélectionne une catégorie.
+   *
+   * @param tag Catégorie à sélectionner ou désélectionner.
+   */
   function handleTagToggle(tag: string) {
     setFormData((prev) => {
       if (prev.categories.includes(tag)) {
@@ -205,6 +246,11 @@ export default function AddProperty() {
     });
   }
 
+  /**
+   * Ajoute un nouvel emplacement pour une image supplémentaire.
+   *
+   * Le formulaire est limité à quatre images supplémentaires.
+   */
   function addImage() {
     if (pictureQuantity < 4) {
       setPictureQuantity((prev) => prev + 1);
@@ -212,10 +258,22 @@ export default function AddProperty() {
     }
   }
 
+  /**
+   * Retourne l'erreur de validation associée à un champ.
+   *
+   * @param fieldName Nom du champ recherché.
+   * @returns L'erreur correspondante ou undefined.
+   */
   function getFieldError(fieldName: string) {
     return errors.find((error) => error.path.includes(fieldName));
   }
 
+  /**
+   * Met à jour la photo de profil de l'utilisateur.
+   *
+   * @param profilePicture URL de la nouvelle photo de profil.
+   * @returns L'utilisateur mis à jour ou null en cas d'échec.
+   */
   async function updateProfilePicture(profilePicture: string) {
     if (!user) {
       return null;
@@ -245,6 +303,12 @@ export default function AddProperty() {
     }
   }
 
+  /**
+   * Valide les données du formulaire puis crée le logement.
+   *
+   * Cette fonction gère également l'upload des images et la mise à jour
+   * éventuelle de la photo de profil de l'hôte avant la création du logement.
+   */
   async function addProperty() {
     if (!user) {
       console.error("Utilisateur non connecté");
@@ -258,6 +322,7 @@ export default function AddProperty() {
       pictures: images,
     };
 
+    // Validation des données avant l'envoi à l'API.
     const zodValidation = newPropertySchema.safeParse(data);
 
     if (!zodValidation.success) {
@@ -298,12 +363,14 @@ export default function AddProperty() {
     const token = Cookies.get("token");
 
     try {
+      // Upload des images afin de récupérer leurs URLs.
       const pictureUrls = await getPictureUrls(pictures, token);
 
       let coverPicture = "";
       let profilePicture = user.picture ?? "";
       const propertyPictures: string[] = [];
 
+      // Répartition des URLs selon leur utilisation.
       pictureUrls.forEach((picture) => {
         switch (picture.purpose) {
           case "property-cover":
@@ -320,6 +387,7 @@ export default function AddProperty() {
         }
       });
 
+      // Mise à jour de la photo de profil si une nouvelle image a été fournie.
       if (profilePicture !== (user.picture ?? "")) {
         const updatedUser = await updateProfilePicture(profilePicture);
 
@@ -328,6 +396,7 @@ export default function AddProperty() {
         }
       }
 
+      // Construction des données envoyées à l'API.
       const payload: CreatePropertyPayload = {
         title: data.title.charAt(0).toUpperCase() + data.title.slice(1).trim(),
         description:
@@ -347,6 +416,7 @@ export default function AddProperty() {
       };
 
       try {
+        // Création du logement.
         await postRequest<Property, CreatePropertyPayload>({
           url: apiUrl(`/api/properties`),
           payload,
@@ -383,6 +453,12 @@ export default function AddProperty() {
     }
   }
 
+  /**
+   * Transforme le rôle d'un utilisateur "client" en "owner"
+   * afin qu'il puisse créer un logement.
+   *
+   * Le nouveau token fourni par l'API est enregistré dans les cookies.
+   */
   useEffect(() => {
     if (user?.role === "client") {
       const changeRole = async () => {
@@ -413,6 +489,10 @@ export default function AddProperty() {
     }
   }, [user]);
 
+  /**
+   * Récupère les catégories disponibles depuis l'API au chargement
+   * de la page.
+   */
   useEffect(() => {
     const loadTags = async () => {
       try {
@@ -429,6 +509,10 @@ export default function AddProperty() {
     loadTags();
   }, []);
 
+  /**
+   * Récupère les équipements disponibles depuis l'API au chargement
+   * de la page.
+   */
   useEffect(() => {
     const loadEquipements = async () => {
       try {
@@ -767,7 +851,8 @@ export default function AddProperty() {
               </div>
 
               <div className={styles.formGroup}>
-              <p className={styles.groupLabel}>Photo de profil</p>
+                <p className={styles.groupLabel}>Photo de profil</p>
+
                 <div className={styles.inputWrapper}>
                   <span id="profileFileName" className={styles.fileName}>
                     {profileFileName || ""}
