@@ -146,7 +146,7 @@ describe("PropertyCard - favoris", () => {
     jest.clearAllMocks();
   });
 
-  it("ajoute la propriété aux favoris", async () => {
+  it("appel de l'ajout aux favoris", async () => {
     const addFavorite = jest.fn();
 
     const { user } = setUpDisplayCard({
@@ -218,7 +218,7 @@ describe("PropertyCard - favoris", () => {
     expect(addFavorite).not.toHaveBeenCalled();
   });
 
-  it("retire la propriété des favoris", async () => {
+  it("appel de la suppression des favoris", async () => {
     const removeFavorite = jest.fn();
 
     const { user } = setUpDisplayCard({

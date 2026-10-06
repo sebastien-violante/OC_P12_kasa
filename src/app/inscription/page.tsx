@@ -14,6 +14,7 @@ import { registerSchema } from "../types/schemas/registerSchema";
 import postRequest from "../utils/postRequest";
 import { useRouter } from "next/navigation";
 import { apiUrl } from "../utils/api";
+import { useAuth } from "../context/AuthContext";
 
 /**
  * Page d'inscription utilisateur.
@@ -30,7 +31,7 @@ import { apiUrl } from "../utils/api";
  */
 export default function Inscription() {
   const router = useRouter();
-
+  const { login } = useAuth()
   const initFormData: RegistrationFormData = {
     name: "",
     firstname: "",
@@ -105,6 +106,8 @@ export default function Inscription() {
       });
 
       if (result.data) {
+        
+        login(result.data.user)
         // Le message est mis "en tampon" dans localStorage pour être récupéré par la page connexion après redirection
         localStorage.setItem(
           "flash",

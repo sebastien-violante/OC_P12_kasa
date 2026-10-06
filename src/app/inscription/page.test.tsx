@@ -5,6 +5,9 @@ import postRequest from "../utils/postRequest";
 
 // MOCK DES IMPORTS ///////////////////////////////////
 const mockPush = jest.fn();
+const mockLogin = jest.fn();
+
+
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
     push: mockPush,
@@ -14,6 +17,12 @@ jest.mock("next/navigation", () => ({
 jest.mock("../utils/postRequest", () => ({
   __esModule: true,
   default: jest.fn(),
+}));
+
+jest.mock("../context/AuthContext", () => ({
+  useAuth: () => ({
+    login: mockLogin,
+  }),
 }));
 
 // FONCTION DE FACTORISATION ////////////////////////////
@@ -223,7 +232,7 @@ describe("inscription", () => {
     ).toBeInTheDocument();
   });
 
-  it("appelle postRequest avec la bonne payload", async () => {
+  it("appelle postRequest avec la bonne payload pour enregistrer l'utilisateur", async () => {
     const {
       user,
       nameInput,

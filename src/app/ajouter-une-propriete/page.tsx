@@ -739,7 +739,7 @@ export default function AddProperty() {
                   <span className="sr-only">
                     Choisir une image de couverture
                   </span>
-                  <span aria-hidden="true">+</span>
+                  <span className={styles.span} aria-hidden="true">+</span>
                 </label>
 
                 <input
@@ -792,7 +792,7 @@ export default function AddProperty() {
                         <span className="sr-only">
                           Choisir la photo du logement {index + 1}
                         </span>
-                        <span aria-hidden="true">+</span>
+                        <span aria-hidden="true" className={styles.span}>+</span>
                       </label>
 
                       <input
@@ -882,7 +882,7 @@ export default function AddProperty() {
                     <span className="sr-only">
                       Choisir une photo de profil
                     </span>
-                    <span aria-hidden="true">+</span>
+                    <span aria-hidden="true" className={styles.span}>+</span>
                   </label>
 
                   <input
@@ -968,7 +968,7 @@ export default function AddProperty() {
                 onClick={() => handleAddTag()}
                 aria-label="Ajouter la catégorie"
               >
-                <span aria-hidden="true">+</span>
+                <span aria-hidden="true" className={styles.span}>+</span>
               </button>
             </div>
           </div>

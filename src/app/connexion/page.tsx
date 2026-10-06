@@ -113,6 +113,7 @@ export default function Connexion() {
         });
 
         // Mise à jour du contexte d'authentification avec la valeur de l'utilisateur connecté.
+        console.log("USER DANS CONNEXION", user)
         login(user);
 
         // Nettoyage de l'état du formulaire avant la redirection.
@@ -237,7 +238,7 @@ export default function Connexion() {
         </form>
 
         <p className={styles.link}>
-          <Link href="/mot-de-passe-oublie">Mot de passe oublié</Link>
+          <Link href="">Mot de passe oublié</Link>
         </p>
 
         <p className={styles.link}>
