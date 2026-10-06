@@ -469,6 +469,8 @@ export default function AddProperty() {
         };
 
         try {
+          console.log("🟣 CHANGE ROLE - USER :", user);
+console.log("🟣 CHANGE ROLE - ID :", user.id);
           const result = await patchRequest<
             { role: "owner" },
             { token: string }
