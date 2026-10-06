@@ -468,7 +468,7 @@ export default function AddProperty() {
         try {
           const result = await patchRequest<
             { role: "owner" },
-            { token: string }
+            { user: User; token: string }
           >({
             url: apiUrl(`/api/users/${user.id}`),
             token,
