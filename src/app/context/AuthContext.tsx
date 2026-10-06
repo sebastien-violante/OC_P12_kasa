@@ -28,7 +28,8 @@ function getUserFromCookie(): User | null {
   }
 
   try {
-    return JSON.parse(cookie) as User;
+    const parsed = JSON.parse(cookie);
+    return parsed.user as User;
   } catch {
     return null;
   }
