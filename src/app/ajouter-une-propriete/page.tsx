@@ -284,14 +284,14 @@ export default function AddProperty() {
     };
 
     try {
-      const result = await patchRequest<{ picture: string }, User>({
+      const result = await patchRequest<{ picture: string }, { user: User; token: string }>({
         url: apiUrl(`/api/users/${user.id}`),
         token,
         payload,
       });
 
       if (result.data) {
-        updateUser(result.data);
+        updateUser(result.data.user);
 
         return result.data;
       }
