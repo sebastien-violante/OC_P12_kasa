@@ -291,8 +291,6 @@ export default function AddProperty() {
       });
 
       if (result.data) {
-          console.log("🔵 PATCH USER RESPONSE :", result.data);
-  console.log("🔵 PATCH USER ID :", result.data.id);
         updateUser(result.data);
 
         return result.data;
@@ -469,8 +467,6 @@ export default function AddProperty() {
         };
 
         try {
-          console.log("🟣 CHANGE ROLE - USER :", user);
-console.log("🟣 CHANGE ROLE - ID :", user.id);
           const result = await patchRequest<
             { role: "owner" },
             { token: string }

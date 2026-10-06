@@ -113,7 +113,6 @@ export default function Connexion() {
         });
 
         // Mise à jour du contexte d'authentification avec la valeur de l'utilisateur connecté.
-        console.log("USER DANS CONNEXION", user)
         login(user);
 
         // Nettoyage de l'état du formulaire avant la redirection.

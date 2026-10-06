@@ -37,8 +37,6 @@ export default function PropertyContent({
   property,
 }: PropertyContentProps) {
   const { user } = useAuth();
-  console.log("USER", user)
-  console.log("PROPERTY", property)
   const token = Cookies.get("token");
 
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);

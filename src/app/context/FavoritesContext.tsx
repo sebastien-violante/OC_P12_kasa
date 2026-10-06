@@ -73,12 +73,9 @@ export function FavoritesProvider({
   // Synchronisation avec l'API
   useEffect(() => {
 
-    console.log("⭐ FAVORITES - USER :", user);
- 
     if (!user) return;
  
     const userId = user.id;
-     console.log("⭐ FAVORITES - USER ID :", user.id);
     const token = Cookies.get("token");
 
     if (!token) return;

@@ -63,7 +63,6 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         });
 
         if (result.success) {
-          console.log(result)
           addFavorite(propertyId);
         }
       } catch (error) {

@@ -40,19 +40,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const storedUser = getUserFromCookie();
-    console.log("🟢 AUTH COOKIE USER :", storedUser);
     setUser(storedUser);
   }, []);
 
   const login = (user: User) => {
-    console.log("🟢 AUTH LOGIN USER :", user);
     setUser(user);
     Cookies.set("user", JSON.stringify(user));
   };
 
   const updateUser = (user: User) => {
-     console.log("🟢 updateUser reçoit :", user);
-  console.log("🟢 updateUser reçoit ID :", user.id);
     setUser(user);
     Cookies.set("user", JSON.stringify(user));
   };
