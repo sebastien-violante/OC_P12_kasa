@@ -475,7 +475,7 @@ export default function AddProperty() {
             token,
             payload,
           });
-
+console.log("🟠 CHANGE ROLE RESPONSE :", result.data);
           if (result.data) {
             const newToken = result.data.token;
             Cookies.set("token", newToken);
