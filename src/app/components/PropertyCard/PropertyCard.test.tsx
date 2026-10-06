@@ -154,7 +154,7 @@ describe("PropertyCard - favoris", () => {
     });
 
     mockedPostRequest.mockResolvedValue({
-      data: true,
+      success: true,
     } as any);
 
     const button = screen.getByRole("button", {
@@ -227,7 +227,7 @@ describe("PropertyCard - favoris", () => {
     });
 
     mockedDeleteRequest.mockResolvedValue({
-      data: true,
+      success: true,
     } as any);
 
     const button = screen.getByRole("button", {

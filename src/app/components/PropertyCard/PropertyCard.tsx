@@ -62,7 +62,8 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           token,
         });
 
-        if (result.data) {
+        if (result.success) {
+          console.log(result)
           addFavorite(propertyId);
         }
       } catch (error) {
@@ -82,7 +83,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         token,
       });
 
-      if (result.data) {
+      if (result.success) {
         removeFavorite(propertyId);
       }
     } catch (error) {
