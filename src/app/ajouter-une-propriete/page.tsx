@@ -474,10 +474,10 @@ export default function AddProperty() {
             token,
             payload,
           });
-console.log("🟠 CHANGE ROLE RESPONSE :", result.data);
+          console.log("🟠 CHANGE ROLE RESPONSE :", result.data);
           if (result.data) {
-            const newToken = result.data.token;
-            Cookies.set("token", newToken);
+            Cookies.set("token", result.data.token);
+            updateUser(result.data.user);
           }
         } catch (error) {
           console.error(error);
@@ -633,9 +633,7 @@ console.log("🟠 CHANGE ROLE RESPONSE :", result.data);
                 getFieldError("postalCode") ? "postalCode-error" : undefined
               }
               aria-invalid={getFieldError("postalCode") ? "true" : "false"}
-              className={
-                getFieldError("postalCode") ? styles.inputOnError : ""
-              }
+              className={getFieldError("postalCode") ? styles.inputOnError : ""}
             />
 
             {getFieldError("postalCode") && (
@@ -738,7 +736,9 @@ console.log("🟠 CHANGE ROLE RESPONSE :", result.data);
                   <span className="sr-only">
                     Choisir une image de couverture
                   </span>
-                  <span className={styles.span} aria-hidden="true">+</span>
+                  <span className={styles.span} aria-hidden="true">
+                    +
+                  </span>
                 </label>
 
                 <input
@@ -767,10 +767,7 @@ console.log("🟠 CHANGE ROLE RESPONSE :", result.data);
                 return (
                   <div className={styles.formGroup} key={index}>
                     <div className={styles.inputWrapper}>
-                      <span
-                        id={`${inputId}-name`}
-                        className={styles.fileName}
-                      >
+                      <span id={`${inputId}-name`} className={styles.fileName}>
                         {image?.name || ""}
                       </span>
 
@@ -779,10 +776,7 @@ console.log("🟠 CHANGE ROLE RESPONSE :", result.data);
                         className={styles.addButton}
                         tabIndex={0}
                         onKeyDown={(event) => {
-                          if (
-                            event.key === "Enter" ||
-                            event.key === " "
-                          ) {
+                          if (event.key === "Enter" || event.key === " ") {
                             event.preventDefault();
                             pictureInputRef.current[index]?.click();
                           }
@@ -791,7 +785,9 @@ console.log("🟠 CHANGE ROLE RESPONSE :", result.data);
                         <span className="sr-only">
                           Choisir la photo du logement {index + 1}
                         </span>
-                        <span aria-hidden="true" className={styles.span}>+</span>
+                        <span aria-hidden="true" className={styles.span}>
+                          +
+                        </span>
                       </label>
 
                       <input
@@ -878,10 +874,10 @@ console.log("🟠 CHANGE ROLE RESPONSE :", result.data);
                       }
                     }}
                   >
-                    <span className="sr-only">
-                      Choisir une photo de profil
+                    <span className="sr-only">Choisir une photo de profil</span>
+                    <span aria-hidden="true" className={styles.span}>
+                      +
                     </span>
-                    <span aria-hidden="true" className={styles.span}>+</span>
                   </label>
 
                   <input
@@ -948,9 +944,7 @@ console.log("🟠 CHANGE ROLE RESPONSE :", result.data);
             ))}
           </div>
 
-          <label htmlFor="newTag">
-            Ajouter une catégorie personnalisée
-          </label>
+          <label htmlFor="newTag">Ajouter une catégorie personnalisée</label>
 
           <div className={styles.formGroup}>
             <div className={styles.inputWrapper}>
@@ -967,7 +961,9 @@ console.log("🟠 CHANGE ROLE RESPONSE :", result.data);
                 onClick={() => handleAddTag()}
                 aria-label="Ajouter la catégorie"
               >
-                <span aria-hidden="true" className={styles.span}>+</span>
+                <span aria-hidden="true" className={styles.span}>
+                  +
+                </span>
               </button>
             </div>
           </div>
