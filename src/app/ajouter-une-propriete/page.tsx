@@ -456,7 +456,6 @@ export default function AddProperty() {
   /**
    * Transforme le rôle d'un utilisateur "client" en "owner"
    * afin qu'il puisse créer un logement.
-   *
    * Le nouveau token fourni par l'API est enregistré dans les cookies.
    */
   useEffect(() => {
