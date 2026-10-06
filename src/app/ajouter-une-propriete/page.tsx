@@ -291,6 +291,8 @@ export default function AddProperty() {
       });
 
       if (result.data) {
+          console.log("🔵 PATCH USER RESPONSE :", result.data);
+  console.log("🔵 PATCH USER ID :", result.data.id);
         updateUser(result.data);
 
         return result.data;

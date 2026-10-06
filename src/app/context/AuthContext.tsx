@@ -48,6 +48,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const updateUser = (user: User) => {
+     console.log("🟢 updateUser reçoit :", user);
+  console.log("🟢 updateUser reçoit ID :", user.id);
     setUser(user);
     Cookies.set("user", JSON.stringify(user));
   };
