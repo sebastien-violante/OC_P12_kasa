@@ -49,7 +49,8 @@ export default function HomeContent({
   // Récupération du message flash éventuellement transmis par une autre page.
   useEffect(() => {
     const flashBag = localStorage.getItem("flash");
-
+localStorage.removeItem('favorites')
+localStorage.removeItem('favorites_undefined')
     if (flashBag) {
       const parsedFlashBag = JSON.parse(flashBag);
 
