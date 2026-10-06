@@ -22,7 +22,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 function getUserFromCookie(): User | null {
   const cookie = Cookies.get("user");
-
+console.log("🔴 COOKIE USER BRUT :", cookie);
   if (!cookie) {
     return null;
   }
