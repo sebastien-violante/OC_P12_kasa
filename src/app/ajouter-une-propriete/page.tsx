@@ -478,6 +478,7 @@ export default function AddProperty() {
           if (result.data) {
             Cookies.set("token", result.data.token);
             updateUser(result.data.user);
+            console.log("🟢 USER APRÈS CHANGE ROLE :", result.data.user);
           }
         } catch (error) {
           console.error(error);
