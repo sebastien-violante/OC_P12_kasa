@@ -106,7 +106,8 @@ export default function Inscription() {
       });
 
       if (result.data) {
-        
+         console.log("REGISTER RESULT", result.data);
+  console.log("REGISTER USER", result.data.user);
         login(result.data.user)
         // Le message est mis "en tampon" dans localStorage pour être récupéré par la page connexion après redirection
         localStorage.setItem(
