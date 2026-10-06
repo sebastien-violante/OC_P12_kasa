@@ -391,8 +391,8 @@ export default function AddProperty() {
       if (profilePicture !== (user.picture ?? "")) {
         const updatedUser = await updateProfilePicture(profilePicture);
 
-        if (updatedUser?.picture) {
-          profilePicture = updatedUser.picture;
+        if (updatedUser?.user.picture) {
+          profilePicture = updatedUser.user.picture;
         }
       }
 
