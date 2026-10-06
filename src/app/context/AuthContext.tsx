@@ -49,6 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const updateUser = (user: User) => {
+      console.log("🟡 UPDATE USER :", user);
     setUser(user);
     Cookies.set("user", JSON.stringify(user));
   };
