@@ -57,7 +57,7 @@
 .property .item:first-child {
   grid-row: span 1;
   grid-column: span 4;
-  width: 358px;
+  width: 100%;
 }
 
 .property .item img {
