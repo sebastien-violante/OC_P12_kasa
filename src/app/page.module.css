@@ -76,6 +76,7 @@
   padding: 30px;
   color: var(--darkOrange);
   cursor: pointer;
+  width: 100%;
 }
 
 .tiles {
