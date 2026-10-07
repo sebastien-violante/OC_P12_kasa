@@ -5,7 +5,10 @@ import styles from "./Header.module.css";
 import Link from "next/link";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
-
+import Cookies from "js-cookie";
+import getRequest from "@/app/utils/getRequest";
+import { Conversation } from "@/app/types/types";
+import { apiUrl } from "@/app/utils/api";
 /**
  * Affiche l'en-tête principal de l'application.
  *
@@ -19,7 +22,8 @@ export default function Header() {
 
   const menuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
-
+  const token = Cookies.get("token");
+  const [unreadMessages, setUnreadMessages] = useState(0);
   /**
    * Ouvre ou ferme le menu de navigation mobile.
    */
@@ -72,6 +76,35 @@ export default function Header() {
     };
   }, [menuExpanded]);
 
+  /**
+   * Récupère les messages non lus
+   */
+  useEffect(() => {
+    const loadConversations = async () => {
+      if (!token) {
+        router.push("/connexion");
+        return;
+      }
+
+      try {
+        const data = await getRequest<Conversation[]>({
+          url: apiUrl("/api/conversations"),
+          token,
+        });
+        const unreadCount = data.reduce(
+          (total, conversation) => total + conversation.unreadCount,
+          0,
+        );
+        setUnreadMessages(unreadCount)
+      } catch (error) {
+        console.error(error);
+        setUnreadMessages(0);
+      }
+    };
+
+    loadConversations();
+  }, [token, router]);
+
   return (
     <header className={styles.header}>
       <nav className={styles.nav} aria-label="Navigation principale">
@@ -115,6 +148,10 @@ export default function Header() {
                 <li className={styles.icon}>
                   <Link href="/messagerie" aria-label="Mes messages">
                     <img src="/pictures/message-nav.svg" alt="" />
+
+                    {unreadMessages > 0 && (
+                      <span className={styles.redPoint}></span>
+                    )}
                   </Link>
                 </li>
 
