@@ -474,11 +474,9 @@ export default function AddProperty() {
             token,
             payload,
           });
-          console.log("🟠 CHANGE ROLE RESPONSE :", result.data);
           if (result.data) {
             Cookies.set("token", result.data.token);
             updateUser(result.data.user);
-            console.log("🟢 USER APRÈS CHANGE ROLE :", result.data.user);
           }
         } catch (error) {
           console.error(error);
