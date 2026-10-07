@@ -69,6 +69,12 @@
         background-color: currentColor;
         color: var(--mainRed);
       }
+      .redPoint {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--mainRed);
+      }
     }
 
     .mobileMenu {
