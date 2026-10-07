@@ -26,10 +26,8 @@ console.log("🔴 COOKIE USER BRUT :", cookie);
   if (!cookie) {
     return null;
   }
-
   try {
-    const parsed = JSON.parse(cookie);
-    return parsed.user as User;
+    return JSON.parse(cookie) as User;
   } catch {
     return null;
   }
