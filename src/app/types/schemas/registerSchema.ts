@@ -3,12 +3,14 @@ import { z } from "zod";
 export const registerSchema = z.object({
   firstname: z
     .string()
+    .trim()
     .min(2, "Le prénom doit comprendre au moins 2 caractères")
     .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ]+$/, {
     message: "Le prénom doit contenir des caractères alphabétiques ",
   }),
   name: z
     .string()
+    .trim()
     .min(2, "Le nom doit comprendre au moins 2 caractères")
     .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ]+$/, {
     message: "Le nom doit contenir des caractères alphabétiques",
