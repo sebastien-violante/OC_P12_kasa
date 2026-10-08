@@ -57,12 +57,12 @@ export async function generateMetadata({
     title: `${property.title} | Kasa`,
     description: property.description,
     alternates: {
-      canonical: `/logements/${property.id}`,
+      canonical: `/logement/${property.id}`,
     },
     openGraph: {
       title: `${property.title} | Kasa`,
       description: property.description,
-      url: `/logements/${property.id}`,
+      url: `/logement/${property.id}`,
       siteName: "Kasa",
       images: [
         {
