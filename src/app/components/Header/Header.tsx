@@ -81,24 +81,21 @@ export default function Header() {
    */
   useEffect(() => {
     const loadConversations = async () => {
-      if (!token) {
-        router.push("/connexion");
-        return;
-      }
-
-      try {
-        const data = await getRequest<Conversation[]>({
-          url: apiUrl("/api/conversations"),
-          token,
-        });
-        const unreadCount = data.reduce(
-          (total, conversation) => total + conversation.unreadCount,
-          0,
-        );
-        setUnreadMessages(unreadCount)
-      } catch (error) {
-        console.error(error);
-        setUnreadMessages(0);
+      if (token) {
+        try {
+          const data = await getRequest<Conversation[]>({
+            url: apiUrl("/api/conversations"),
+            token,
+          });
+          const unreadCount = data.reduce(
+            (total, conversation) => total + conversation.unreadCount,
+            0,
+          );
+          setUnreadMessages(unreadCount);
+        } catch (error) {
+          console.error(error);
+          setUnreadMessages(0);
+        }
       }
     };
 
